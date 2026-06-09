@@ -1,0 +1,1052 @@
+{
+  "generatedAt": "2026-06-09T04:53:46.436Z",
+  "sourceMode": "SEC filings + Alpha Vantage quotes",
+  "companies": {
+    "AAPL": {
+      "name": "Apple Inc.",
+      "ticker": "AAPL",
+      "meta": "TECHNOLOGY · CONSUMER ELECTRONICS · NASDAQ",
+      "price": 301.54,
+      "change": -1.8872,
+      "cap": "$4.51T",
+      "score": 79,
+      "quality": "Solid fundamentals",
+      "copy": "The business is performing well, with a few areas worth monitoring.",
+      "metrics": [
+        [
+          "Revenue growth",
+          "+6.4%",
+          "+4.4 pts",
+          "Latest reported fiscal year"
+        ],
+        [
+          "EPS growth",
+          "+22.7%",
+          "+23.5 pts",
+          "Diluted EPS, latest fiscal year"
+        ],
+        [
+          "Net margin",
+          "26.9%",
+          "+2.9 pts",
+          "Calculated from SEC filings"
+        ],
+        [
+          "Forward P/E",
+          "32.1x",
+          "Provider",
+          "Alpha Vantage overview"
+        ]
+      ],
+      "signals": [
+        [
+          "FCF yield",
+          "2.2%"
+        ],
+        [
+          "ROE",
+          "105.2%"
+        ],
+        [
+          "Debt / op. income",
+          "0.1x"
+        ],
+        [
+          "Revenue CAGR",
+          "8.7%"
+        ]
+      ],
+      "annual": {
+        "labels": [
+          "FY20",
+          "FY21",
+          "FY22",
+          "FY23",
+          "FY24",
+          "FY25"
+        ],
+        "revenue": [
+          274.5,
+          365.8,
+          394.3,
+          383.3,
+          391,
+          416.2
+        ],
+        "eps": [
+          3.28,
+          5.61,
+          6.11,
+          6.13,
+          6.08,
+          7.46
+        ]
+      },
+      "quarterly": {
+        "labels": [
+          "Jun '24",
+          "Dec '24",
+          "Mar '25",
+          "Jun '25",
+          "Dec '25",
+          "Mar '26"
+        ],
+        "revenue": [
+          85.8,
+          124.3,
+          95.4,
+          94,
+          143.8,
+          111.2
+        ],
+        "eps": [
+          1.4,
+          2.4,
+          1.65,
+          1.57,
+          2.84,
+          2.01
+        ]
+      },
+      "operating": {
+        "title": "Installed base",
+        "value": "2.35B",
+        "label": "active devices",
+        "change": "+8.1% YoY",
+        "values": [
+          1.5,
+          1.65,
+          1.8,
+          2,
+          2.2,
+          2.35
+        ],
+        "years": [
+          "20",
+          "21",
+          "22",
+          "23",
+          "24",
+          "25"
+        ],
+        "insight": "The installed base reached an all-time high, supporting recurring services revenue.",
+        "sourceUrl": "https://www.apple.com/newsroom/",
+        "asOf": "2025",
+        "provenance": "mock"
+      },
+      "analytics": {
+        "revenueGrowth": 6.4,
+        "epsGrowth": 22.7,
+        "netMargin": 26.9,
+        "pe": 32.1,
+        "score": 79
+      },
+      "sources": {
+        "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+        "quote": "Alpha Vantage"
+      }
+    },
+    "MSFT": {
+      "name": "MICROSOFT CORPORATION",
+      "ticker": "MSFT",
+      "meta": "TECHNOLOGY · SOFTWARE - INFRASTRUCTURE · NASDAQ",
+      "price": 411.74,
+      "change": -1.1832,
+      "cap": "$3.10T",
+      "score": 86,
+      "quality": "Strong compounder",
+      "copy": "Healthy growth and durable economics support long-term compounding potential.",
+      "metrics": [
+        [
+          "Revenue growth",
+          "+14.9%",
+          "-0.7 pts",
+          "Latest reported fiscal year"
+        ],
+        [
+          "EPS growth",
+          "+15.6%",
+          "-6.2 pts",
+          "Diluted EPS, latest fiscal year"
+        ],
+        [
+          "Net margin",
+          "36.1%",
+          "+0.2 pts",
+          "Calculated from SEC filings"
+        ],
+        [
+          "Forward P/E",
+          "21.5x",
+          "Provider",
+          "Alpha Vantage overview"
+        ]
+      ],
+      "signals": [
+        [
+          "FCF yield",
+          "2.3%"
+        ],
+        [
+          "ROE",
+          "24.6%"
+        ],
+        [
+          "Debt / op. income",
+          "0.1x"
+        ],
+        [
+          "Revenue CAGR",
+          "14.5%"
+        ]
+      ],
+      "annual": {
+        "labels": [
+          "FY20",
+          "FY21",
+          "FY22",
+          "FY23",
+          "FY24",
+          "FY25"
+        ],
+        "revenue": [
+          143,
+          168.1,
+          198.3,
+          211.9,
+          245.1,
+          281.7
+        ],
+        "eps": [
+          5.76,
+          8.05,
+          9.65,
+          9.68,
+          11.8,
+          13.64
+        ]
+      },
+      "quarterly": {
+        "labels": [
+          "Sep '24",
+          "Dec '24",
+          "Mar '25",
+          "Sep '25",
+          "Dec '25",
+          "Mar '26"
+        ],
+        "revenue": [
+          65.6,
+          69.6,
+          70.1,
+          77.7,
+          81.3,
+          82.9
+        ],
+        "eps": [
+          3.3,
+          3.23,
+          3.46,
+          3.72,
+          5.16,
+          4.27
+        ]
+      },
+      "operating": {
+        "title": "Azure growth",
+        "value": "33%",
+        "label": "constant currency",
+        "change": "+4 pts YoY",
+        "values": [
+          27,
+          28,
+          29,
+          31,
+          32,
+          33
+        ],
+        "years": [
+          "Q1",
+          "Q2",
+          "Q3",
+          "Q4",
+          "Q1",
+          "Q2"
+        ],
+        "insight": "Azure growth continues to accelerate as AI workloads add to core cloud migrations.",
+        "sourceUrl": "https://www.microsoft.com/en-us/Investor/",
+        "asOf": "2025-Q2",
+        "provenance": "mock"
+      },
+      "analytics": {
+        "revenueGrowth": 14.9,
+        "epsGrowth": 15.6,
+        "netMargin": 36.1,
+        "pe": 21.5,
+        "score": 86
+      },
+      "sources": {
+        "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000789019.json",
+        "quote": "Alpha Vantage"
+      }
+    },
+    "NVDA": {
+      "name": "NVIDIA CORP",
+      "ticker": "NVDA",
+      "meta": "Technology · Semiconductors · NASDAQ",
+      "price": 208.64,
+      "change": 1.726,
+      "cap": "Quote key required",
+      "score": 96,
+      "quality": "Exceptional quality",
+      "copy": "Strong growth and profitability create an unusually resilient fundamental profile.",
+      "metrics": [
+        [
+          "Revenue growth",
+          "+65.5%",
+          "-48.7 pts",
+          "Latest reported fiscal year"
+        ],
+        [
+          "EPS growth",
+          "+66.7%",
+          "-79.5 pts",
+          "Diluted EPS, latest fiscal year"
+        ],
+        [
+          "Net margin",
+          "55.6%",
+          "-0.2 pts",
+          "Calculated from SEC filings"
+        ],
+        [
+          "Forward P/E",
+          "N/A",
+          "Provider",
+          "Alpha Vantage overview"
+        ]
+      ],
+      "signals": [
+        [
+          "FCF yield",
+          "N/A"
+        ],
+        [
+          "ROE",
+          "61.4%"
+        ],
+        [
+          "Debt / op. income",
+          "0.0x"
+        ],
+        [
+          "Revenue CAGR",
+          "66.9%"
+        ]
+      ],
+      "annual": {
+        "labels": [
+          "FY21",
+          "FY22",
+          "FY23",
+          "FY24",
+          "FY25",
+          "FY26"
+        ],
+        "revenue": [
+          16.7,
+          26.9,
+          27,
+          60.9,
+          130.5,
+          215.9
+        ],
+        "eps": [
+          0.17,
+          0.38,
+          0.17,
+          1.19,
+          2.94,
+          4.9
+        ]
+      },
+      "quarterly": {
+        "labels": [
+          "Jul '24",
+          "Oct '24",
+          "Apr '25",
+          "Jul '25",
+          "Oct '25",
+          "Apr '26"
+        ],
+        "revenue": [
+          30,
+          35.1,
+          44.1,
+          46.7,
+          57,
+          81.6
+        ],
+        "eps": [
+          0.67,
+          0.78,
+          0.76,
+          1.08,
+          1.3,
+          2.39
+        ]
+      },
+      "operating": {
+        "title": "Data center",
+        "value": "$39.1B",
+        "label": "quarterly revenue",
+        "change": "+73% YoY",
+        "values": [
+          14.5,
+          18.4,
+          22.6,
+          30.8,
+          35.6,
+          39.1
+        ],
+        "years": [
+          "Q1",
+          "Q2",
+          "Q3",
+          "Q4",
+          "Q1",
+          "Q2"
+        ],
+        "insight": "Data center remains the engine, though comparisons are becoming increasingly demanding.",
+        "sourceUrl": "https://investor.nvidia.com/",
+        "asOf": "2025-Q2",
+        "provenance": "mock"
+      },
+      "analytics": {
+        "revenueGrowth": 65.5,
+        "epsGrowth": 66.7,
+        "netMargin": 55.6,
+        "pe": null,
+        "score": 96
+      },
+      "sources": {
+        "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001045810.json",
+        "quote": "Alpha Vantage"
+      }
+    },
+    "AMZN": {
+      "name": "AMAZON.COM, INC.",
+      "ticker": "AMZN",
+      "meta": "Consumer Cyclical · Internet Retail · NASDAQ",
+      "price": null,
+      "change": 0,
+      "cap": "Quote key required",
+      "score": 80,
+      "quality": "Solid fundamentals",
+      "copy": "The business is performing well, with a few areas worth monitoring.",
+      "metrics": [
+        [
+          "Revenue growth",
+          "+12.4%",
+          "+1.4 pts",
+          "Latest reported fiscal year"
+        ],
+        [
+          "EPS growth",
+          "+29.8%",
+          "-60.8 pts",
+          "Diluted EPS, latest fiscal year"
+        ],
+        [
+          "Net margin",
+          "10.8%",
+          "+1.5 pts",
+          "Calculated from SEC filings"
+        ],
+        [
+          "Forward P/E",
+          "N/A",
+          "Provider",
+          "Add Alpha Vantage key"
+        ]
+      ],
+      "signals": [
+        [
+          "FCF yield",
+          "N/A"
+        ],
+        [
+          "ROE",
+          "17.6%"
+        ],
+        [
+          "Debt / op. income",
+          "0.0x"
+        ],
+        [
+          "Revenue CAGR",
+          "13.2%"
+        ]
+      ],
+      "annual": {
+        "labels": [
+          "FY20",
+          "FY21",
+          "FY22",
+          "FY23",
+          "FY24",
+          "FY25"
+        ],
+        "revenue": [
+          386.1,
+          469.8,
+          514,
+          574.8,
+          638,
+          716.9
+        ],
+        "eps": [
+          2.09,
+          3.24,
+          -0.27,
+          2.9,
+          5.53,
+          7.17
+        ]
+      },
+      "quarterly": {
+        "labels": [
+          "Jun '24",
+          "Sep '24",
+          "Mar '25",
+          "Jun '25",
+          "Sep '25",
+          "Mar '26"
+        ],
+        "revenue": [
+          148,
+          158.9,
+          155.7,
+          167.7,
+          180.2,
+          181.5
+        ],
+        "eps": [
+          1.26,
+          1.43,
+          1.59,
+          1.68,
+          1.95,
+          2.78
+        ]
+      },
+      "operating": {
+        "title": "AWS growth",
+        "value": "17.5%",
+        "label": "year over year",
+        "change": "+0.3 pts",
+        "values": [
+          12.2,
+          13.2,
+          17.2,
+          19.1,
+          18.9,
+          17.5
+        ],
+        "years": [
+          "Q1",
+          "Q2",
+          "Q3",
+          "Q4",
+          "Q1",
+          "Q2"
+        ],
+        "insight": "AWS demand remains healthy while capacity investment positions it for AI workloads.",
+        "sourceUrl": "https://ir.aboutamazon.com/",
+        "asOf": "2025-Q2",
+        "provenance": "mock"
+      },
+      "analytics": {
+        "revenueGrowth": 12.4,
+        "epsGrowth": 29.8,
+        "netMargin": 10.8,
+        "pe": null,
+        "score": 80
+      },
+      "sources": {
+        "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001018724.json",
+        "quote": null
+      }
+    },
+    "GOOGL": {
+      "name": "Alphabet Inc.",
+      "ticker": "GOOGL",
+      "meta": "Communication Services · Internet Content · NASDAQ",
+      "price": null,
+      "change": 0,
+      "cap": "Quote key required",
+      "score": 92,
+      "quality": "Exceptional quality",
+      "copy": "Strong growth and profitability create an unusually resilient fundamental profile.",
+      "metrics": [
+        [
+          "Revenue growth",
+          "+15.1%",
+          "+1.2 pts",
+          "Latest reported fiscal year"
+        ],
+        [
+          "EPS growth",
+          "+34.4%",
+          "-4.3 pts",
+          "Diluted EPS, latest fiscal year"
+        ],
+        [
+          "Net margin",
+          "32.8%",
+          "+4.2 pts",
+          "Calculated from SEC filings"
+        ],
+        [
+          "Forward P/E",
+          "N/A",
+          "Provider",
+          "Add Alpha Vantage key"
+        ]
+      ],
+      "signals": [
+        [
+          "FCF yield",
+          "N/A"
+        ],
+        [
+          "ROE",
+          "27.6%"
+        ],
+        [
+          "Debt / op. income",
+          "0.0x"
+        ],
+        [
+          "Revenue CAGR",
+          "20.0%"
+        ]
+      ],
+      "annual": {
+        "labels": [
+          "FY23",
+          "FY24",
+          "FY25"
+        ],
+        "revenue": [
+          307.4,
+          350,
+          402.8
+        ],
+        "eps": [
+          5.8,
+          8.04,
+          10.81
+        ]
+      },
+      "quarterly": {
+        "labels": [
+          "Jun '24",
+          "Sep '24",
+          "Mar '25",
+          "Jun '25",
+          "Sep '25",
+          "Mar '26"
+        ],
+        "revenue": [
+          84.7,
+          88.3,
+          90.2,
+          96.4,
+          102.3,
+          109.9
+        ],
+        "eps": [
+          1.89,
+          2.12,
+          2.81,
+          2.31,
+          2.87,
+          5.11
+        ]
+      },
+      "operating": {
+        "title": "Annual revenue",
+        "value": "$402.8B",
+        "label": "latest fiscal year",
+        "change": "+15.1%",
+        "values": [
+          307.4,
+          350,
+          402.8
+        ],
+        "years": [
+          "FY23",
+          "FY24",
+          "FY25"
+        ],
+        "insight": "Add a company-specific operating metric in config/manual-kpis.json.",
+        "provenance": "sec-derived"
+      },
+      "analytics": {
+        "revenueGrowth": 15.1,
+        "epsGrowth": 34.4,
+        "netMargin": 32.8,
+        "pe": null,
+        "score": 92
+      },
+      "sources": {
+        "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001652044.json",
+        "quote": null
+      }
+    },
+    "META": {
+      "name": "Meta Platforms, Inc.",
+      "ticker": "META",
+      "meta": "Communication Services · Internet Content · NASDAQ",
+      "price": null,
+      "change": 0,
+      "cap": "Quote key required",
+      "score": 84,
+      "quality": "Strong compounder",
+      "copy": "Healthy growth and durable economics support long-term compounding potential.",
+      "metrics": [
+        [
+          "Revenue growth",
+          "+22.2%",
+          "+0.2 pts",
+          "Latest reported fiscal year"
+        ],
+        [
+          "EPS growth",
+          "-1.5%",
+          "-62.0 pts",
+          "Diluted EPS, latest fiscal year"
+        ],
+        [
+          "Net margin",
+          "30.1%",
+          "-7.8 pts",
+          "Calculated from SEC filings"
+        ],
+        [
+          "Forward P/E",
+          "N/A",
+          "Provider",
+          "Add Alpha Vantage key"
+        ]
+      ],
+      "signals": [
+        [
+          "FCF yield",
+          "N/A"
+        ],
+        [
+          "ROE",
+          "24.8%"
+        ],
+        [
+          "Debt / op. income",
+          "0.7x"
+        ],
+        [
+          "Revenue CAGR",
+          "18.5%"
+        ]
+      ],
+      "annual": {
+        "labels": [
+          "FY20",
+          "FY21",
+          "FY22",
+          "FY23",
+          "FY24",
+          "FY25"
+        ],
+        "revenue": [
+          86,
+          117.9,
+          116.6,
+          134.9,
+          164.5,
+          201
+        ],
+        "eps": [
+          10.09,
+          13.77,
+          8.59,
+          14.87,
+          23.86,
+          23.49
+        ]
+      },
+      "quarterly": {
+        "labels": [
+          "Jun '24",
+          "Sep '24",
+          "Mar '25",
+          "Jun '25",
+          "Sep '25",
+          "Mar '26"
+        ],
+        "revenue": [
+          39.1,
+          40.6,
+          42.3,
+          47.5,
+          51.2,
+          56.3
+        ],
+        "eps": [
+          5.16,
+          6.03,
+          6.43,
+          7.14,
+          1.05,
+          10.44
+        ]
+      },
+      "operating": {
+        "title": "Annual revenue",
+        "value": "$201.0B",
+        "label": "latest fiscal year",
+        "change": "+22.2%",
+        "values": [
+          86,
+          117.9,
+          116.6,
+          134.9,
+          164.5,
+          201
+        ],
+        "years": [
+          "FY20",
+          "FY21",
+          "FY22",
+          "FY23",
+          "FY24",
+          "FY25"
+        ],
+        "insight": "Add a company-specific operating metric in config/manual-kpis.json.",
+        "provenance": "sec-derived"
+      },
+      "analytics": {
+        "revenueGrowth": 22.2,
+        "epsGrowth": -1.5,
+        "netMargin": 30.1,
+        "pe": null,
+        "score": 84
+      },
+      "sources": {
+        "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001326801.json",
+        "quote": null
+      }
+    },
+    "MU": {
+      "name": "MICRON TECHNOLOGY INC",
+      "ticker": "MU",
+      "meta": "Technology · Semiconductors · NASDAQ",
+      "price": null,
+      "change": 0,
+      "cap": "Quote key required",
+      "score": 96,
+      "quality": "Exceptional quality",
+      "copy": "Strong growth and profitability create an unusually resilient fundamental profile.",
+      "metrics": [
+        [
+          "Revenue growth",
+          "+48.9%",
+          "-12.7 pts",
+          "Latest reported fiscal year"
+        ],
+        [
+          "EPS growth",
+          "+990.7%",
+          "+877.7 pts",
+          "Diluted EPS, latest fiscal year"
+        ],
+        [
+          "Net margin",
+          "22.8%",
+          "+19.7 pts",
+          "Calculated from SEC filings"
+        ],
+        [
+          "Forward P/E",
+          "N/A",
+          "Provider",
+          "Add Alpha Vantage key"
+        ]
+      ],
+      "signals": [
+        [
+          "FCF yield",
+          "N/A"
+        ],
+        [
+          "ROE",
+          "11.8%"
+        ],
+        [
+          "Debt / op. income",
+          "0.0x"
+        ],
+        [
+          "Revenue CAGR",
+          "11.8%"
+        ]
+      ],
+      "annual": {
+        "labels": [
+          "FY20",
+          "FY21",
+          "FY22",
+          "FY23",
+          "FY24",
+          "FY25"
+        ],
+        "revenue": [
+          21.4,
+          27.7,
+          30.8,
+          15.5,
+          25.1,
+          37.4
+        ],
+        "eps": [
+          2.38,
+          5.14,
+          7.74,
+          -5.34,
+          0.7,
+          7.59
+        ]
+      },
+      "quarterly": {
+        "labels": [
+          "May '24",
+          "Nov '24",
+          "Feb '25",
+          "May '25",
+          "Nov '25",
+          "Feb '26"
+        ],
+        "revenue": [
+          6.8,
+          8.7,
+          8.1,
+          9.3,
+          13.6,
+          23.9
+        ],
+        "eps": [
+          0.3,
+          1.67,
+          1.41,
+          1.68,
+          4.6,
+          12.07
+        ]
+      },
+      "operating": {
+        "title": "Annual revenue",
+        "value": "$37.4B",
+        "label": "latest fiscal year",
+        "change": "+48.9%",
+        "values": [
+          21.4,
+          27.7,
+          30.8,
+          15.5,
+          25.1,
+          37.4
+        ],
+        "years": [
+          "FY20",
+          "FY21",
+          "FY22",
+          "FY23",
+          "FY24",
+          "FY25"
+        ],
+        "insight": "Add a company-specific operating metric in config/manual-kpis.json.",
+        "provenance": "sec-derived"
+      },
+      "analytics": {
+        "revenueGrowth": 48.9,
+        "epsGrowth": 990.7,
+        "netMargin": 22.8,
+        "pe": null,
+        "score": 96
+      },
+      "sources": {
+        "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000723125.json",
+        "quote": null
+      }
+    }
+  },
+  "peers": [
+    {
+      "ticker": "AAPL",
+      "growth": 6.4,
+      "eps": 22.7,
+      "pe": 32.1,
+      "margin": 26.9,
+      "score": 79
+    },
+    {
+      "ticker": "MSFT",
+      "growth": 14.9,
+      "eps": 15.6,
+      "pe": 21.5,
+      "margin": 36.1,
+      "score": 86
+    },
+    {
+      "ticker": "NVDA",
+      "growth": 65.5,
+      "eps": 66.7,
+      "pe": null,
+      "margin": 55.6,
+      "score": 96
+    },
+    {
+      "ticker": "AMZN",
+      "growth": 12.4,
+      "eps": 29.8,
+      "pe": null,
+      "margin": 10.8,
+      "score": 80
+    },
+    {
+      "ticker": "GOOGL",
+      "growth": 15.1,
+      "eps": 34.4,
+      "pe": null,
+      "margin": 32.8,
+      "score": 92
+    },
+    {
+      "ticker": "META",
+      "growth": 22.2,
+      "eps": -1.5,
+      "pe": null,
+      "margin": 30.1,
+      "score": 84
+    },
+    {
+      "ticker": "MU",
+      "growth": 48.9,
+      "eps": 990.7,
+      "pe": null,
+      "margin": 22.8,
+      "score": 96
+    }
+  ],
+  "failures": []
+}

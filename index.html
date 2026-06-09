@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Northstar stock fundamentals, sector, and market analysis dashboard"
+    />
+    <title>Northstar | Stock Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#" aria-label="Northstar home">
+          <span class="brand-mark">N</span>
+          <span>Northstar</span>
+        </a>
+
+        <nav class="main-nav" aria-label="Main navigation">
+          <button class="nav-item active" data-view="overview">
+            <span class="nav-icon">⌁</span> Overview
+          </button>
+          <button class="nav-item" data-view="companies">
+            <span class="nav-icon">◇</span> Companies
+          </button>
+          <button class="nav-item" data-view="sectors">
+            <span class="nav-icon">◎</span> Sectors
+          </button>
+          <button class="nav-item" data-view="markets">
+            <span class="nav-icon">↗</span> Markets
+          </button>
+        </nav>
+
+        <div class="watchlist">
+          <div class="section-label-row">
+            <span class="section-label">Watchlist</span>
+            <button class="icon-button" id="add-watchlist" aria-label="Add selected company to watchlist">+</button>
+          </div>
+          <div class="watchlist-status" id="watchlist-status" aria-live="polite"></div>
+          <div id="watchlist-items"></div>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="data-status">
+            <span class="status-dot"></span>
+            Demo dataset
+          </div>
+          <p>Built for clearer thinking, not financial advice.</p>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Investment research workspace</p>
+            <h1>Good morning, <em>Lihao.</em></h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="language-toggle" id="language-toggle" aria-label="Switch language">中文</button>
+            <div class="search-control">
+              <label class="search-box">
+                <span>⌕</span>
+                <input
+                  id="stock-search"
+                  type="search"
+                  placeholder="Search ticker or company"
+                  autocomplete="off"
+                  aria-controls="search-results"
+                  aria-expanded="false"
+                />
+                <kbd>/</kbd>
+              </label>
+              <div class="search-results" id="search-results" role="listbox"></div>
+            </div>
+            <button class="avatar" aria-label="Open account menu">LH</button>
+          </div>
+        </header>
+
+        <section class="market-strip-wrap">
+          <div class="mock-banner">[MOCK/FAKE] Market index snapshot</div>
+          <div class="market-strip" aria-label="Market summary" id="market-strip"></div>
+        </section>
+
+        <div class="dashboard">
+          <section class="hero-card card">
+            <div class="company-header">
+              <div class="company-identity">
+                <div class="company-logo" id="company-logo">A</div>
+                <div>
+                  <div class="company-title-row">
+                    <h2 id="company-name">Apple Inc.</h2>
+                    <span class="ticker-tag" id="company-ticker">AAPL</span>
+                  </div>
+                  <p id="company-meta">Technology · Consumer Electronics · NASDAQ</p>
+                </div>
+              </div>
+              <div class="company-price">
+                <div>
+                  <strong id="company-price">$203.92</strong>
+                  <span class="positive" id="company-change">+1.24%</span>
+                </div>
+                <p id="company-cap">Market cap $3.08T</p>
+              </div>
+            </div>
+
+            <div class="thesis-grid">
+              <div class="thesis-score">
+                <div class="score-ring" id="score-ring">
+                  <div><strong id="quality-score">84</strong><span>/100</span></div>
+                </div>
+                <div>
+                  <span class="section-label">Quality score <b class="mock-inline">[MOCK/FAKE]</b></span>
+                  <h3 id="quality-label">Strong compounder</h3>
+                  <p id="quality-copy">Durable margins and cash flow offset moderating top-line growth.</p>
+                </div>
+              </div>
+              <div class="signal-list" id="signal-list"></div>
+            </div>
+          </section>
+
+          <section class="metrics-grid" id="metrics-grid"></section>
+
+          <section class="chart-card card revenue-card">
+            <div class="card-heading">
+              <div>
+                <span class="section-label">Fundamental growth</span>
+                <h2>Revenue & EPS</h2>
+              </div>
+              <div class="segmented-control" id="period-control">
+                <button data-period="annual" class="active">Annual</button>
+                <button data-period="quarterly">Quarterly</button>
+              </div>
+            </div>
+            <div class="legend">
+              <span><i class="legend-block revenue"></i>Revenue</span>
+              <span><i class="legend-line eps"></i>EPS</span>
+            </div>
+            <div class="chart-wrap">
+              <svg id="fundamentals-chart" role="img" aria-label="Revenue and EPS chart"></svg>
+              <div class="chart-tooltip" id="fundamentals-tooltip"></div>
+            </div>
+          </section>
+
+          <section class="card users-card">
+            <div class="card-heading">
+              <div>
+                <span class="section-label">Operating pulse <b id="operating-provenance"></b></span>
+                <h2 id="operating-title">Installed base</h2>
+              </div>
+              <span class="trend-badge positive" id="operating-change">+8.1% YoY</span>
+            </div>
+            <div class="operating-value">
+              <strong id="operating-value">2.35B</strong>
+              <span id="operating-label">active devices</span>
+            </div>
+            <div class="sparkline-wrap">
+              <svg id="operating-chart" role="img" aria-label="Operating metric trend"></svg>
+            </div>
+            <p class="insight" id="operating-insight">
+              The installed base reached an all-time high, supporting recurring services revenue.
+            </p>
+          </section>
+
+          <section class="card peer-card">
+            <div class="card-heading">
+              <div>
+                <span class="section-label">Relative view</span>
+                <h2>Peer comparison</h2>
+              </div>
+              <button class="text-button" id="sort-peers">Sort by score ↕</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Company</th>
+                    <th>Rev. growth</th>
+                    <th>EPS growth</th>
+                    <th>Fwd. P/E</th>
+                    <th>Net margin</th>
+                    <th>Score <span class="mock-inline">[MOCK/FAKE]</span></th>
+                  </tr>
+                </thead>
+                <tbody id="peer-table"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="card sector-card">
+            <div class="card-heading">
+              <div>
+                <span class="section-label">Market composition</span>
+                <h2>Sectors at a glance</h2>
+              </div>
+              <span class="as-of mock-label">[MOCK/FAKE] S&P 500 illustration</span>
+            </div>
+            <div class="sector-content">
+              <div class="donut-wrap">
+                <svg id="sector-donut" role="img" aria-label="Sector allocation donut chart"></svg>
+                <div class="donut-center"><span>Largest</span><strong>Tech</strong><small>31.4%</small></div>
+              </div>
+              <div class="sector-list" id="sector-list"></div>
+            </div>
+          </section>
+
+          <section class="card scatter-card">
+            <div class="card-heading">
+              <div>
+                <span class="section-label">Market map</span>
+                <h2>Growth vs. valuation</h2>
+              </div>
+              <span class="as-of"><b class="mock-inline">[MOCK/FAKE]</b> score-based bubble sizing</span>
+            </div>
+            <div class="chart-wrap scatter-wrap">
+              <svg id="scatter-chart" role="img" aria-label="Growth versus valuation scatter plot"></svg>
+              <div class="chart-tooltip" id="scatter-tooltip"></div>
+            </div>
+          </section>
+        </div>
+
+        <footer>
+          <span>Northstar Research</span>
+          <span>Figures are illustrative demo data until the local refresh runs</span>
+        </footer>
+      </main>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

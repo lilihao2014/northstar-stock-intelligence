@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: northstar-stock-intelligence
+    runtime: node
+    plan: free
+    buildCommand: npm run check
+    startCommand: npm run serve
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 24.3.0
+      - key: SEC_USER_AGENT
+        sync: false
+      - key: ALPHA_VANTAGE_API_KEY
+        sync: false

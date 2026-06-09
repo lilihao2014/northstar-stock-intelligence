@@ -1,0 +1,10 @@
+{
+  "name": "northstar-stock-intelligence",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "refresh": "node --env-file-if-exists=.env scripts/refresh-data.mjs",
+    "serve": "node --env-file-if-exists=.env scripts/server.mjs",
+    "check": "node --check app.js && node --check scripts/refresh-data.mjs && node --check scripts/server.mjs"
+  }
+}

@@ -1,0 +1,51 @@
+[
+  {
+    "ticker": "AAPL",
+    "cik": "0000320193",
+    "sector": "Technology",
+    "industry": "Consumer Electronics",
+    "exchange": "NASDAQ"
+  },
+  {
+    "ticker": "MSFT",
+    "cik": "0000789019",
+    "sector": "Technology",
+    "industry": "Software Infrastructure",
+    "exchange": "NASDAQ"
+  },
+  {
+    "ticker": "NVDA",
+    "cik": "0001045810",
+    "sector": "Technology",
+    "industry": "Semiconductors",
+    "exchange": "NASDAQ"
+  },
+  {
+    "ticker": "AMZN",
+    "cik": "0001018724",
+    "sector": "Consumer Cyclical",
+    "industry": "Internet Retail",
+    "exchange": "NASDAQ"
+  },
+  {
+    "ticker": "GOOGL",
+    "cik": "0001652044",
+    "sector": "Communication Services",
+    "industry": "Internet Content",
+    "exchange": "NASDAQ"
+  },
+  {
+    "ticker": "META",
+    "cik": "0001326801",
+    "sector": "Communication Services",
+    "industry": "Internet Content",
+    "exchange": "NASDAQ"
+  },
+  {
+    "ticker": "MU",
+    "cik": "0000723125",
+    "sector": "Technology",
+    "industry": "Semiconductors",
+    "exchange": "NASDAQ"
+  }
+]
