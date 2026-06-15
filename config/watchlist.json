@@ -47,5 +47,12 @@
     "sector": "Technology",
     "industry": "Semiconductors",
     "exchange": "NASDAQ"
+  },
+  {
+    "ticker": "OSCR",
+    "cik": "0001568651",
+    "sector": "Healthcare",
+    "industry": "Health Plans",
+    "exchange": "NYSE"
   }
 ]

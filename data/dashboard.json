@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-15T05:01:48.930Z",
+  "generatedAt": "2026-06-15T13:51:27.500Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
@@ -986,6 +986,148 @@
         "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000723125.json",
         "quote": "Alpha Vantage"
       }
+    },
+    "OSCR": {
+      "name": "Oscar Health, Inc.",
+      "ticker": "OSCR",
+      "meta": "Healthcare · Health Plans · NYSE",
+      "price": 28.26,
+      "change": -2.2484,
+      "cap": "Quote key required",
+      "score": 63,
+      "quality": "Mixed profile",
+      "copy": "Growth, profitability, or balance-sheet signals require closer review.",
+      "metrics": [
+        [
+          "Revenue growth",
+          "+27.5%",
+          "-29.0 pts",
+          "Latest reported fiscal year"
+        ],
+        [
+          "EPS growth",
+          "-1865.5%",
+          "-1973.3 pts",
+          "Diluted EPS, latest fiscal year"
+        ],
+        [
+          "Net margin",
+          "-3.8%",
+          "-4.1 pts",
+          "Calculated from SEC filings"
+        ],
+        [
+          "Forward P/E",
+          "N/A",
+          "Provider",
+          "Alpha Vantage overview"
+        ]
+      ],
+      "signals": [
+        [
+          "FCF yield",
+          "N/A"
+        ],
+        [
+          "ROE",
+          "-26.6%"
+        ],
+        [
+          "Debt / op. income",
+          "-1.1x"
+        ],
+        [
+          "Revenue CAGR",
+          "90.8%"
+        ]
+      ],
+      "annual": {
+        "labels": [
+          "FY20",
+          "FY21",
+          "FY22",
+          "FY23",
+          "FY24",
+          "FY25"
+        ],
+        "revenue": [
+          0.5,
+          1.8,
+          4,
+          5.9,
+          9.2,
+          11.7
+        ],
+        "eps": [
+          -2.32,
+          -3.2,
+          -2.85,
+          -1.22,
+          0.1,
+          -1.69
+        ]
+      },
+      "quarterly": {
+        "labels": [
+          "Jun '24",
+          "Sep '24",
+          "Mar '25",
+          "Jun '25",
+          "Sep '25",
+          "Mar '26"
+        ],
+        "revenue": [
+          2.2,
+          2.4,
+          3,
+          2.9,
+          3,
+          4.6
+        ],
+        "eps": [
+          0.18,
+          -0.22,
+          0.9,
+          -0.89,
+          -0.53,
+          2.06
+        ]
+      },
+      "operating": {
+        "title": "Quarterly revenue",
+        "value": "$4.6B",
+        "label": "latest reported quarter",
+        "change": "+53.3%",
+        "values": [
+          2.2,
+          2.4,
+          3,
+          2.9,
+          3,
+          4.6
+        ],
+        "years": [
+          "Jun '24",
+          "Sep '24",
+          "Mar '25",
+          "Jun '25",
+          "Sep '25",
+          "Mar '26"
+        ],
+        "insight": "Reported revenue trend derived from SEC 10-Q and 10-K filings.",
+        "provenance": "sec-derived"
+      },
+      "analytics": {
+        "revenueGrowth": 27.5,
+        "epsGrowth": -1865.5,
+        "netMargin": -3.8,
+        "pe": null,
+        "score": 63
+      },
+      "sources": {
+        "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001568651.json",
+        "quote": "Alpha Vantage"
+      }
     }
   },
   "peers": [
@@ -1044,6 +1186,14 @@
       "pe": null,
       "margin": 22.8,
       "score": 96
+    },
+    {
+      "ticker": "OSCR",
+      "growth": 27.5,
+      "eps": -1865.5,
+      "pe": null,
+      "margin": -3.8,
+      "score": 63
     }
   ],
   "marketData": [
