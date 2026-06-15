@@ -245,6 +245,7 @@ const translations = {
     "No companies yet. Select a company and press +.": "暂无自选股。请选择公司并点击 +。",
     "Select a company first": "请先选择公司",
     "is already added": "已在自选股中",
+    "Already in watchlist": "已在自选股中",
     added: "已添加",
     removed: "已移除",
     "No US-listed SEC ticker found.": "未找到在美国上市的 SEC 股票代码。",
@@ -408,6 +409,7 @@ function applyLanguage() {
   renderFallbackWarning();
   renderDataStatus();
   renderSearchResults($("#stock-search").value);
+  syncWatchlistButton();
 }
 
 function svgEl(tag, attrs = {}) {
@@ -452,6 +454,23 @@ function renderWatchlist() {
   document.querySelectorAll(".watchlist-remove").forEach((button) => {
     button.addEventListener("click", () => removeFromWatchlist(button.dataset.removeTicker));
   });
+  syncWatchlistButton();
+}
+
+function syncWatchlistButton() {
+  const button = $("#add-watchlist");
+  const alreadyAdded = watchlistTickers.includes(selectedTicker);
+  button.disabled = alreadyAdded;
+  button.textContent = alreadyAdded ? "✓" : "+";
+  button.setAttribute(
+    "aria-label",
+    alreadyAdded
+      ? `${selectedTicker} ${tr("Already in watchlist")}`
+      : currentLanguage === "zh"
+        ? "将当前公司加入自选股"
+        : "Add selected company to watchlist",
+  );
+  button.title = alreadyAdded ? `${selectedTicker} ${tr("Already in watchlist")}` : "";
 }
 
 function showWatchlistStatus(message) {
@@ -486,7 +505,7 @@ function addToWatchlist(ticker = selectedTicker) {
     return false;
   }
   if (watchlistTickers.includes(ticker)) {
-    showWatchlistStatus(currentLanguage === "zh" ? `${ticker} ${tr("is already added")}` : `${ticker} is already added`);
+    syncWatchlistButton();
     return false;
   }
   watchlistTickers.push(ticker);
@@ -920,6 +939,7 @@ function selectCompany(ticker) {
   selectedTicker = ticker;
   renderCompany();
   renderScatter();
+  syncWatchlistButton();
 }
 
 function setupInteractions() {

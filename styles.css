@@ -147,6 +147,11 @@ button {
   cursor: pointer;
 }
 
+.icon-button:disabled {
+  color: var(--lime);
+  cursor: default;
+}
+
 #watchlist-items {
   margin-top: 14px;
   display: grid;
