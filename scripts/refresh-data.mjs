@@ -4,7 +4,11 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputPath = path.join(root, "data", "dashboard.json");
-const watchlist = JSON.parse(await readFile(path.join(root, "config", "watchlist.json"), "utf8"));
+const configuredWatchlist = JSON.parse(await readFile(path.join(root, "config", "watchlist.json"), "utf8"));
+const requestedTicker = process.env.REFRESH_TICKER?.trim().toUpperCase() || null;
+const watchlist = requestedTicker
+  ? configuredWatchlist.filter((item) => item.ticker === requestedTicker)
+  : configuredWatchlist;
 const secIdentity = process.env.SEC_USER_AGENT;
 const alphaKey = process.env.ALPHA_VANTAGE_API_KEY;
 const marketSymbols = [
@@ -26,6 +30,11 @@ const sectorSymbols = [
 if (!secIdentity) {
   console.error("Missing SEC_USER_AGENT.");
   console.error('Example: SEC_USER_AGENT="Northstar lihao@example.com" npm run refresh');
+  process.exit(1);
+}
+
+if (requestedTicker && !watchlist.length) {
+  console.error(`Ticker ${requestedTicker} is not present in config/watchlist.json.`);
   process.exit(1);
 }
 
@@ -390,7 +399,7 @@ async function refreshCompany(config, index) {
 }
 
 const previous = await readFile(outputPath, "utf8").then(JSON.parse).catch(() => null);
-const companies = {};
+const companies = requestedTicker ? { ...(previous?.companies || {}) } : {};
 const failures = [];
 
 for (const [index, config] of watchlist.entries()) {
@@ -456,8 +465,12 @@ async function refreshQuoteGroup(definitions, cachedItems = []) {
   return results.filter((item) => Number.isFinite(item.price));
 }
 
-const marketData = await refreshQuoteGroup(marketSymbols, previous?.marketData);
-const sectors = await refreshQuoteGroup(sectorSymbols, previous?.sectors);
+const marketData = requestedTicker
+  ? previous?.marketData || []
+  : await refreshQuoteGroup(marketSymbols, previous?.marketData);
+const sectors = requestedTicker
+  ? previous?.sectors || []
+  : await refreshQuoteGroup(sectorSymbols, previous?.sectors);
 
 const payload = {
   generatedAt: new Date().toISOString(),

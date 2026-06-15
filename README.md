@@ -64,6 +64,7 @@ The Node server provides:
 - Static dashboard files and the generated data cache
 
 Selecting an uncached ticker in search downloads its SEC fundamentals, adds it to `config/watchlist.json`, refreshes the shared cache, and opens it in the dashboard. No API key is exposed to the browser.
+On-demand additions refresh only the requested ticker, preserving existing companies and market data while staying within provider request limits.
 
 ## Deploy on Render
 

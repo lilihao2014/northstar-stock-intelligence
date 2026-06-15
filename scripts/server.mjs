@@ -99,7 +99,7 @@ function searchTickers(directory, query) {
     .slice(0, 10);
 }
 
-async function runRefresh() {
+async function runRefresh(ticker) {
   if (!secIdentity) {
     throw new Error("SEC_USER_AGENT is required to download new company data");
   }
@@ -107,7 +107,7 @@ async function runRefresh() {
   await new Promise((resolvePromise, reject) => {
     const child = spawn(process.execPath, ["scripts/refresh-data.mjs"], {
       cwd: root,
-      env: process.env,
+      env: { ...process.env, REFRESH_TICKER: ticker },
       stdio: ["ignore", "pipe", "pipe"],
     });
     let output = "";
@@ -128,7 +128,8 @@ async function addCompany(ticker) {
   if (!listing) throw new Error(`Ticker ${normalized} was not found in the SEC directory`);
 
   const watchlist = JSON.parse(await readFile(watchlistPath, "utf8"));
-  if (!watchlist.some((item) => item.ticker === normalized)) {
+  const alreadyTracked = watchlist.some((item) => item.ticker === normalized);
+  if (!alreadyTracked) {
     watchlist.push({
       ticker: listing.ticker,
       cik: listing.cik,
@@ -139,7 +140,15 @@ async function addCompany(ticker) {
     await writeFile(watchlistPath, `${JSON.stringify(watchlist, null, 2)}\n`);
   }
 
-  await runRefresh();
+  try {
+    await runRefresh(normalized);
+  } catch (error) {
+    if (!alreadyTracked) {
+      const restored = watchlist.filter((item) => item.ticker !== normalized);
+      await writeFile(watchlistPath, `${JSON.stringify(restored, null, 2)}\n`);
+    }
+    throw error;
+  }
   const dashboard = JSON.parse(await readFile(dashboardPath, "utf8"));
   const company = dashboard.companies?.[normalized];
   if (!company) throw new Error(`SEC financial statements are not available for ${normalized}`);
