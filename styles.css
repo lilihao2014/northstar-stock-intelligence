@@ -770,6 +770,18 @@ kbd {
   letter-spacing: -0.03em;
 }
 
+.chart-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.chart-ticker {
+  color: var(--green);
+  font: 700 9px "DM Mono", monospace;
+  letter-spacing: 0.08em;
+}
+
 .segmented-control {
   padding: 3px;
   border-radius: 6px;

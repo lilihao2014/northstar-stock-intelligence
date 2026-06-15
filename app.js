@@ -196,6 +196,7 @@ const $ = (selector) => document.querySelector(selector);
 const fmtSign = (value, suffix = "%") => `${value >= 0 ? "+" : ""}${value.toFixed(2)}${suffix}`;
 const svgNS = "http://www.w3.org/2000/svg";
 const watchlistStorageKey = "northstar-watchlist";
+const selectedTickerStorageKey = "northstar-selected-ticker";
 const translations = {
   zh: {
     Overview: "概览",
@@ -661,6 +662,7 @@ function renderCompany() {
   $("#company-logo").style.background = company.color;
   $("#company-name").textContent = company.name;
   $("#company-ticker").textContent = company.ticker;
+  $("#fundamentals-ticker").textContent = company.ticker;
   $("#company-meta").textContent = translateMeta(company.meta);
   $("#company-price").textContent = Number.isFinite(company.price) ? `$${company.price.toFixed(2)}` : tr("Price unavailable");
   $("#company-change").textContent = fmtSign(company.change);
@@ -937,6 +939,7 @@ function hideTooltips() {
 function selectCompany(ticker) {
   if (!companies[ticker]) return;
   selectedTicker = ticker;
+  localStorage.setItem(selectedTickerStorageKey, ticker);
   renderCompany();
   renderScatter();
   syncWatchlistButton();
@@ -1069,6 +1072,8 @@ function renderDataStatus() {
 
 async function init() {
   await loadGeneratedData();
+  const savedTicker = localStorage.getItem(selectedTickerStorageKey);
+  if (savedTicker && companies[savedTicker]) selectedTicker = savedTicker;
   if (!companies[selectedTicker]) selectedTicker = Object.keys(companies)[0];
   loadWatchlist();
   renderMarketStrip();
