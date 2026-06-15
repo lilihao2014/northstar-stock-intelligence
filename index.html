@@ -85,7 +85,7 @@
         </header>
 
         <section class="market-strip-wrap">
-          <div class="mock-banner">[MOCK/FAKE] Market index snapshot</div>
+          <div class="market-source">Alpha Vantage · ETF proxies</div>
           <div class="market-strip" aria-label="Market summary" id="market-strip"></div>
         </section>
 
@@ -117,7 +117,7 @@
                   <div><strong id="quality-score">84</strong><span>/100</span></div>
                 </div>
                 <div>
-                  <span class="section-label">Quality score <b class="mock-inline">[MOCK/FAKE]</b></span>
+                  <span class="section-label">Fundamental score <b class="calculated-inline">[CALCULATED]</b></span>
                   <h3 id="quality-label">Strong compounder</h3>
                   <p id="quality-copy">Durable margins and cash flow offset moderating top-line growth.</p>
                 </div>
@@ -186,7 +186,7 @@
                     <th>EPS growth</th>
                     <th>Fwd. P/E</th>
                     <th>Net margin</th>
-                    <th>Score <span class="mock-inline">[MOCK/FAKE]</span></th>
+                    <th>Score <span class="calculated-inline">[CALCULATED]</span></th>
                   </tr>
                 </thead>
                 <tbody id="peer-table"></tbody>
@@ -197,16 +197,12 @@
           <section class="card sector-card">
             <div class="card-heading">
               <div>
-                <span class="section-label">Market composition</span>
-                <h2>Sectors at a glance</h2>
+                <span class="section-label">Market sectors</span>
+                <h2>Sector ETF performance</h2>
               </div>
-              <span class="as-of mock-label">[MOCK/FAKE] S&P 500 illustration</span>
+              <span class="as-of">Alpha Vantage · SPDR ETFs</span>
             </div>
             <div class="sector-content">
-              <div class="donut-wrap">
-                <svg id="sector-donut" role="img" aria-label="Sector allocation donut chart"></svg>
-                <div class="donut-center"><span>Largest</span><strong>Tech</strong><small>31.4%</small></div>
-              </div>
               <div class="sector-list" id="sector-list"></div>
             </div>
           </section>
@@ -217,7 +213,7 @@
                 <span class="section-label">Market map</span>
                 <h2>Growth vs. valuation</h2>
               </div>
-              <span class="as-of"><b class="mock-inline">[MOCK/FAKE]</b> score-based bubble sizing</span>
+              <span class="as-of"><b class="calculated-inline">[CALCULATED]</b> score-based bubble sizing</span>
             </div>
             <div class="chart-wrap scatter-wrap">
               <svg id="scatter-chart" role="img" aria-label="Growth versus valuation scatter plot"></svg>

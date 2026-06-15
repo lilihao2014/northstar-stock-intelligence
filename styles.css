@@ -450,11 +450,22 @@ kbd {
 
 .mock-banner,
 .mock-label,
-.mock-inline {
+.mock-inline,
+.calculated-inline,
+.market-source {
   color: #b4533c;
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.08em;
+}
+
+.calculated-inline,
+.market-source {
+  color: var(--green);
+}
+
+.market-source {
+  text-transform: uppercase;
 }
 
 .mock-banner,
@@ -952,10 +963,7 @@ tr:last-child td {
 }
 
 .sector-content {
-  display: grid;
-  grid-template-columns: 145px 1fr;
-  align-items: center;
-  gap: 18px;
+  display: block;
   margin-top: 17px;
 }
 
@@ -996,7 +1004,7 @@ tr:last-child td {
 
 .sector-list {
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .sector-row {
@@ -1009,6 +1017,13 @@ tr:last-child td {
   display: flex;
   align-items: center;
   gap: 7px;
+}
+
+.sector-name em {
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  font-size: 7px;
+  font-style: normal;
 }
 
 .sector-swatch {
@@ -1025,6 +1040,13 @@ tr:last-child td {
 .sector-row small {
   min-width: 38px;
   text-align: right;
+}
+
+.market-empty,
+.sector-empty {
+  color: var(--muted);
+  font-size: 9px;
+  padding: 10px 0;
 }
 
 .scatter-wrap {

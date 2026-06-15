@@ -4,9 +4,9 @@ A responsive, dependency-free stock analysis dashboard covering:
 
 - Revenue and EPS growth
 - Profitability, valuation, and quality metrics
-- Company-specific operating KPIs
+- SEC-derived quarterly operating trends
 - Peer comparisons
-- Sector composition and daily performance
+- Broad-market and sector ETF performance
 - Growth-versus-valuation market mapping
 
 ## Refresh real data
@@ -14,8 +14,8 @@ A responsive, dependency-free stock analysis dashboard covering:
 Northstar uses a local refresh script instead of a backend server:
 
 - SEC Company Facts supplies reported revenue, EPS, margins, cash flow, debt, and equity.
-- Alpha Vantage optionally supplies quotes, market capitalization, profile data, and P/E.
-- `config/manual-kpis.json` stores company-specific metrics such as active devices or Azure growth. These are visibly labeled `[MOCK/FAKE]` until replaced with verified data.
+- Alpha Vantage supplies company quotes, market capitalization, profile data, P/E, broad-market ETF proxies, and sector ETF quotes.
+- Northstar calculates a clearly labeled fundamental score from reported growth, profitability, and balance-sheet metrics.
 
 Set your SEC identity. The SEC requires an application name and contact email in the user agent:
 
@@ -47,7 +47,7 @@ npm run refresh
 
 API keys stay in your terminal environment and are never sent to the browser.
 
-To change the companies being tracked, edit `config/watchlist.json`. To update active users, subscribers, cloud growth, deliveries, or other nonstandard KPIs, edit `config/manual-kpis.json`.
+To change the companies being tracked, edit `config/watchlist.json`.
 
 ## Run locally
 
@@ -76,4 +76,4 @@ The included `render.yaml` defines a public Node web service.
 
 The free Render filesystem is ephemeral. Companies committed in `data/dashboard.json` remain available after redeploys; companies fetched on demand may need to be fetched again after a restart. A paid persistent disk or database is required for permanent server-side additions.
 
-The market strip, sector panel, built-in fallback figures, and manually entered KPIs are illustrative and visibly labeled `[MOCK/FAKE]`. Always check the linked filing or investor-relations source before making an investment decision.
+The market strip uses liquid ETF/ETN proxies rather than direct index feeds. Built-in fallback company figures are used only if generated data cannot load, and the entire fallback view is visibly labeled `[MOCK/FAKE]`. Always check the linked filing or investor-relations source before making an investment decision.

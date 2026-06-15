@@ -161,22 +161,8 @@ const demoPeers = [
   { ticker: "META", growth: 16.2, eps: 21.8, pe: 22.1, margin: 39.0, score: 92 },
 ];
 
-let sectors = [
-  { name: "Technology", weight: 31.4, change: 1.22, color: "#1f6657" },
-  { name: "Financials", weight: 14.1, change: 0.48, color: "#68a590" },
-  { name: "Healthcare", weight: 11.2, change: -0.31, color: "#cadd80" },
-  { name: "Consumer cyc.", weight: 10.4, change: 0.75, color: "#d7a84b" },
-  { name: "Communication", weight: 9.4, change: 1.08, color: "#e77d61" },
-  { name: "Other", weight: 23.5, change: 0.16, color: "#b7beb7" },
-];
-
-let marketData = [
-  ["S&P 500", "6,012.28", 0.54],
-  ["NASDAQ", "19,591.12", 0.92],
-  ["DOW", "42,761.76", 0.18],
-  ["10Y YIELD", "4.42%", -0.03],
-  ["VIX", "17.21", -2.14],
-];
+let sectors = [];
+let marketData = [];
 
 const demoScatterCompanies = [
   ["NVDA", 65.2, 29.6, 94],
@@ -221,8 +207,9 @@ const translations = {
     "Investment research workspace": "投资研究工作台",
     "Good morning,": "早上好，",
     "Search ticker or company": "搜索股票代码或公司",
-    "[MOCK/FAKE] Market index snapshot": "[模拟/虚假] 市场指数快照",
-    "Quality score": "质量评分",
+    "Alpha Vantage · ETF proxies": "Alpha Vantage · ETF 代理",
+    "Fundamental score": "基本面评分",
+    "[CALCULATED]": "[计算值]",
     "[MOCK/FAKE]": "[模拟/虚假]",
     "Fundamental growth": "基本面增长",
     "Revenue & EPS": "营收与每股收益",
@@ -239,14 +226,18 @@ const translations = {
     "Fwd. P/E": "预期市盈率",
     "Net margin": "净利率",
     Score: "评分",
-    "Market composition": "市场构成",
-    "Sectors at a glance": "行业概览",
-    "[MOCK/FAKE] S&P 500 illustration": "[模拟/虚假] 标普500示意",
-    Largest: "最大",
-    Tech: "科技",
+    "Market sectors": "市场行业",
+    "Sector ETF performance": "行业 ETF 表现",
+    "Alpha Vantage · SPDR ETFs": "Alpha Vantage · SPDR ETF",
     "Market map": "市场地图",
     "Growth vs. valuation": "增长与估值",
     "score-based bubble sizing": "气泡大小基于评分",
+    "S&P 500 ETF": "标普 500 ETF",
+    "NASDAQ 100 ETF": "纳斯达克 100 ETF",
+    "Dow Jones ETF": "道琼斯 ETF",
+    "Russell 2000 ETF": "罗素 2000 ETF",
+    "Volatility ETN": "波动率 ETN",
+    Industrials: "工业",
     "Northstar Research": "Northstar 研究",
     "Price unavailable": "价格不可用",
     "Market cap unavailable": "市值不可用",
@@ -308,7 +299,6 @@ const translations = {
     Other: "其他",
     "REVENUE GROWTH": "营收增长",
     Growth: "增长",
-    "Quality score": "质量评分",
     "Fundamentals and market data refreshed": "基本面及市场数据更新时间",
     "Fundamentals refreshed": "基本面数据更新时间",
     "Market data is not configured": "市场数据尚未配置",
@@ -317,7 +307,12 @@ const translations = {
     "Azure growth continues to accelerate as AI workloads add to core cloud migrations.": "随着 AI 工作负载叠加核心云迁移需求，Azure 增长继续加速。",
     "Data center remains the engine, though comparisons are becoming increasingly demanding.": "数据中心仍是增长引擎，但同比基数正变得更具挑战。",
     "AWS demand remains healthy while capacity investment positions it for AI workloads.": "AWS 需求保持健康，产能投资正在为 AI 工作负载做好准备。",
-    "Add a company-specific operating metric in config/manual-kpis.json.": "可在 config/manual-kpis.json 中添加公司特定经营指标。",
+    "Quarterly revenue": "季度营收",
+    "latest reported quarter": "最近报告季度",
+    "Reported revenue trend derived from SEC 10-Q and 10-K filings.": "营收趋势根据 SEC 10-Q 和 10-K 文件计算。",
+    "Market quotes unavailable": "市场行情暂不可用",
+    "Sector quotes unavailable": "行业行情暂不可用",
+    "Valuation data unavailable": "估值数据暂不可用",
     "Trailing twelve months": "过去十二个月",
     "Diluted EPS, TTM": "过去十二个月摊薄每股收益",
     "Above sector median": "高于行业中位数",
@@ -338,6 +333,10 @@ function tr(text) {
 
 function mockText() {
   return tr("[MOCK/FAKE]");
+}
+
+function calculatedText() {
+  return tr("[CALCULATED]");
 }
 
 function translateMeta(meta) {
@@ -361,15 +360,15 @@ function applyLanguage() {
     [".watchlist .section-label", "", "Watchlist"],
     [".sidebar-footer p", "", "Built for clearer thinking, not financial advice."],
     [".eyebrow", "", "Investment research workspace"],
-    [".mock-banner", "", "[MOCK/FAKE] Market index snapshot"],
+    [".market-source", "", "Alpha Vantage · ETF proxies"],
     [".revenue-card .section-label", "", "Fundamental growth"],
     [".revenue-card h2", "", "Revenue & EPS"],
     [".peer-card .section-label", "", "Relative view"],
     [".peer-card h2", "", "Peer comparison"],
     ["#sort-peers", "", "Sort by score ↕"],
-    [".sector-card .section-label", "", "Market composition"],
-    [".sector-card h2", "", "Sectors at a glance"],
-    [".sector-card .mock-label", "", "[MOCK/FAKE] S&P 500 illustration"],
+    [".sector-card .section-label", "", "Market sectors"],
+    [".sector-card h2", "", "Sector ETF performance"],
+    [".sector-card .as-of", "", "Alpha Vantage · SPDR ETFs"],
     [".scatter-card .section-label", "", "Market map"],
     [".scatter-card h2", "", "Growth vs. valuation"],
     ["footer span:first-child", "", "Northstar Research"],
@@ -387,22 +386,20 @@ function applyLanguage() {
   if (legend[0]) legend[0].lastChild.textContent = tr("Revenue");
   document.querySelector(".users-card .section-label").childNodes[0].textContent = `${tr("Operating pulse")} `;
   const qualityLabel = document.querySelector(".thesis-score .section-label");
-  if (qualityLabel) qualityLabel.childNodes[0].textContent = `${tr("Quality score")} `;
+  if (qualityLabel) qualityLabel.innerHTML = `${tr("Fundamental score")} <b class="calculated-inline">${calculatedText()}</b>`;
   document.querySelectorAll(".mock-inline").forEach((label) => {
     if (label.id !== "operating-provenance") label.textContent = mockText();
   });
+  document.querySelectorAll(".calculated-inline").forEach((label) => {
+    label.textContent = calculatedText();
+  });
   const scatterAsOf = document.querySelector(".scatter-card .as-of");
-  if (scatterAsOf) scatterAsOf.innerHTML = `<b class="mock-inline">${mockText()}</b> ${tr("score-based bubble sizing")}`;
+  if (scatterAsOf) scatterAsOf.innerHTML = `<b class="calculated-inline">${calculatedText()}</b> ${tr("score-based bubble sizing")}`;
   const headers = ["Company", "Rev. growth", "EPS growth", "Fwd. P/E", "Net margin"];
   document.querySelectorAll(".peer-card th").forEach((th, index) => {
     if (index < headers.length) th.textContent = tr(headers[index]);
-    if (index === 5) th.innerHTML = `${tr("Score")} <span class="mock-inline">[MOCK/FAKE]</span>`;
+    if (index === 5) th.innerHTML = `${tr("Score")} <span class="calculated-inline">${calculatedText()}</span>`;
   });
-  const center = document.querySelector(".donut-center");
-  if (center) {
-    center.querySelector("span").textContent = tr("Largest");
-    center.querySelector("strong").textContent = tr("Tech");
-  }
   renderCompany();
   renderPeers();
   renderSectors();
@@ -420,16 +417,18 @@ function svgEl(tag, attrs = {}) {
 }
 
 function renderMarketStrip() {
-  $("#market-strip").innerHTML = marketData
+  $("#market-strip").innerHTML = marketData.length
+    ? marketData
     .map(
-      ([name, value, change]) => `
+      ({ symbol, name, price, change }) => `
         <div class="market-item">
-          <span>${name}</span>
-          <strong>${value}</strong>
+          <span>${tr(name)} · ${symbol}</span>
+          <strong>${Number(price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
           <small class="${change >= 0 ? "positive" : "negative"}">${fmtSign(change)}</small>
         </div>`,
     )
-    .join("");
+    .join("")
+    : `<div class="market-empty">${tr("Market quotes unavailable")}</div>`;
 }
 
 function renderWatchlist() {
@@ -604,7 +603,6 @@ function refreshPeerData(updatedPeers) {
   scatterCompanies = peers
     .filter((peer) => Number.isFinite(peer.growth) && Number.isFinite(peer.pe))
     .map((peer) => [peer.ticker, peer.growth, peer.pe, peer.score]);
-  if (!scatterCompanies.length) scatterCompanies = demoScatterCompanies;
   renderPeers();
 }
 
@@ -817,39 +815,18 @@ function renderPeers() {
 }
 
 function renderSectors() {
-  const svg = $("#sector-donut");
-  const radius = 52;
-  const circumference = 2 * Math.PI * radius;
-  let offset = 0;
-  svg.setAttribute("viewBox", "0 0 145 145");
-  svg.innerHTML = "";
-
-  sectors.forEach((sector) => {
-    const length = (sector.weight / 100) * circumference;
-    const circle = svgEl("circle", {
-      cx: 72.5,
-      cy: 72.5,
-      r: radius,
-      fill: "none",
-      stroke: sector.color,
-      "stroke-width": 18,
-      "stroke-dasharray": `${Math.max(0, length - 2)} ${circumference}`,
-      "stroke-dashoffset": -offset,
-    });
-    svg.appendChild(circle);
-    offset += length;
-  });
-
-  $("#sector-list").innerHTML = sectors
+  $("#sector-list").innerHTML = sectors.length
+    ? sectors
     .map(
       (sector) => `
         <div class="sector-row">
-          <span class="sector-name"><i class="sector-swatch" style="background:${sector.color}"></i>${tr(sector.name)}</span>
-          <strong>${sector.weight.toFixed(1)}%</strong>
+          <span class="sector-name"><i class="sector-swatch" style="background:${sector.color}"></i>${tr(sector.name)} <em>${sector.symbol}</em></span>
+          <strong>$${Number(sector.price).toFixed(2)}</strong>
           <small class="${sector.change >= 0 ? "positive" : "negative"}">${fmtSign(sector.change)}</small>
         </div>`,
     )
-    .join("");
+    .join("")
+    : `<div class="sector-empty">${tr("Sector quotes unavailable")}</div>`;
 }
 
 function renderScatter() {
@@ -885,6 +862,20 @@ function renderScatter() {
   axisLabel.textContent = tr("REVENUE GROWTH");
   svg.appendChild(axisLabel);
 
+  if (!scatterCompanies.length) {
+    const emptyLabel = svgEl("text", {
+      x: width / 2,
+      y: height / 2,
+      "text-anchor": "middle",
+      fill: "#87938f",
+      "font-size": 12,
+      "font-family": "Manrope",
+    });
+    emptyLabel.textContent = tr("Valuation data unavailable");
+    svg.appendChild(emptyLabel);
+    return;
+  }
+
   scatterCompanies.forEach(([ticker, growth, pe, score]) => {
     const x = xScale(growth);
     const y = yScale(pe);
@@ -912,7 +903,7 @@ function renderScatter() {
 function showScatterTooltip(event, ticker, growth, pe, score) {
   const tooltip = $("#scatter-tooltip");
   const rect = event.currentTarget.ownerSVGElement.getBoundingClientRect();
-  tooltip.innerHTML = `<strong>${ticker}</strong><br>${tr("Growth")} ${fmtSign(growth)} · P/E ${pe.toFixed(1)}×<br>${tr("Quality score")} ${score}`;
+  tooltip.innerHTML = `<strong>${ticker}</strong><br>${tr("Growth")} ${fmtSign(growth)} · P/E ${pe.toFixed(1)}×<br>${tr("Fundamental score")} ${score}`;
   tooltip.style.left = `${event.clientX - rect.left}px`;
   tooltip.style.top = `${event.clientY - rect.top}px`;
   tooltip.style.opacity = 1;
@@ -1022,11 +1013,12 @@ async function loadGeneratedData() {
     companies = Object.fromEntries(
       Object.entries(payload.companies).map(([ticker, company]) => [ticker, mergeCompany(company)]),
     );
-    peers = payload.peers?.length ? payload.peers : demoPeers;
+    peers = payload.peers ?? [];
+    marketData = payload.marketData?.filter((item) => Number.isFinite(item.price)) ?? [];
+    sectors = payload.sectors?.filter((item) => Number.isFinite(item.price)) ?? [];
     scatterCompanies = peers
       .filter((peer) => Number.isFinite(peer.growth) && Number.isFinite(peer.pe))
       .map((peer) => [peer.ticker, peer.growth, peer.pe, peer.score]);
-    if (!scatterCompanies.length) scatterCompanies = demoScatterCompanies;
     dataMetadata = payload;
   } catch (error) {
     console.info(`Using built-in demo data: ${error.message}`);

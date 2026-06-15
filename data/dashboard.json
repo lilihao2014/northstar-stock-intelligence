@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-06-09T04:53:46.436Z",
+  "generatedAt": "2026-06-15T05:01:48.930Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
       "name": "Apple Inc.",
       "ticker": "AAPL",
-      "meta": "TECHNOLOGY · CONSUMER ELECTRONICS · NASDAQ",
-      "price": 301.54,
-      "change": -1.8872,
-      "cap": "$4.51T",
+      "meta": "Technology · Consumer Electronics · NASDAQ",
+      "price": 291.13,
+      "change": -1.5222,
+      "cap": "Quote key required",
       "score": 79,
       "quality": "Solid fundamentals",
       "copy": "The business is performing well, with a few areas worth monitoring.",
@@ -33,7 +33,7 @@
         ],
         [
           "Forward P/E",
-          "32.1x",
+          "N/A",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -41,7 +41,7 @@
       "signals": [
         [
           "FCF yield",
-          "2.2%"
+          "N/A"
         ],
         [
           "ROE",
@@ -109,36 +109,34 @@
         ]
       },
       "operating": {
-        "title": "Installed base",
-        "value": "2.35B",
-        "label": "active devices",
-        "change": "+8.1% YoY",
+        "title": "Quarterly revenue",
+        "value": "$111.2B",
+        "label": "latest reported quarter",
+        "change": "-22.7%",
         "values": [
-          1.5,
-          1.65,
-          1.8,
-          2,
-          2.2,
-          2.35
+          85.8,
+          124.3,
+          95.4,
+          94,
+          143.8,
+          111.2
         ],
         "years": [
-          "20",
-          "21",
-          "22",
-          "23",
-          "24",
-          "25"
+          "Jun '24",
+          "Dec '24",
+          "Mar '25",
+          "Jun '25",
+          "Dec '25",
+          "Mar '26"
         ],
-        "insight": "The installed base reached an all-time high, supporting recurring services revenue.",
-        "sourceUrl": "https://www.apple.com/newsroom/",
-        "asOf": "2025",
-        "provenance": "mock"
+        "insight": "Reported revenue trend derived from SEC 10-Q and 10-K filings.",
+        "provenance": "sec-derived"
       },
       "analytics": {
         "revenueGrowth": 6.4,
         "epsGrowth": 22.7,
         "netMargin": 26.9,
-        "pe": 32.1,
+        "pe": null,
         "score": 79
       },
       "sources": {
@@ -149,10 +147,10 @@
     "MSFT": {
       "name": "MICROSOFT CORPORATION",
       "ticker": "MSFT",
-      "meta": "TECHNOLOGY · SOFTWARE - INFRASTRUCTURE · NASDAQ",
-      "price": 411.74,
-      "change": -1.1832,
-      "cap": "$3.10T",
+      "meta": "Technology · Software Infrastructure · NASDAQ",
+      "price": 390.74,
+      "change": 0.1025,
+      "cap": "Quote key required",
       "score": 86,
       "quality": "Strong compounder",
       "copy": "Healthy growth and durable economics support long-term compounding potential.",
@@ -177,7 +175,7 @@
         ],
         [
           "Forward P/E",
-          "21.5x",
+          "N/A",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -185,7 +183,7 @@
       "signals": [
         [
           "FCF yield",
-          "2.3%"
+          "N/A"
         ],
         [
           "ROE",
@@ -253,36 +251,34 @@
         ]
       },
       "operating": {
-        "title": "Azure growth",
-        "value": "33%",
-        "label": "constant currency",
-        "change": "+4 pts YoY",
+        "title": "Quarterly revenue",
+        "value": "$82.9B",
+        "label": "latest reported quarter",
+        "change": "+2.0%",
         "values": [
-          27,
-          28,
-          29,
-          31,
-          32,
-          33
+          65.6,
+          69.6,
+          70.1,
+          77.7,
+          81.3,
+          82.9
         ],
         "years": [
-          "Q1",
-          "Q2",
-          "Q3",
-          "Q4",
-          "Q1",
-          "Q2"
+          "Sep '24",
+          "Dec '24",
+          "Mar '25",
+          "Sep '25",
+          "Dec '25",
+          "Mar '26"
         ],
-        "insight": "Azure growth continues to accelerate as AI workloads add to core cloud migrations.",
-        "sourceUrl": "https://www.microsoft.com/en-us/Investor/",
-        "asOf": "2025-Q2",
-        "provenance": "mock"
+        "insight": "Reported revenue trend derived from SEC 10-Q and 10-K filings.",
+        "provenance": "sec-derived"
       },
       "analytics": {
         "revenueGrowth": 14.9,
         "epsGrowth": 15.6,
         "netMargin": 36.1,
-        "pe": 21.5,
+        "pe": null,
         "score": 86
       },
       "sources": {
@@ -294,8 +290,8 @@
       "name": "NVIDIA CORP",
       "ticker": "NVDA",
       "meta": "Technology · Semiconductors · NASDAQ",
-      "price": 208.64,
-      "change": 1.726,
+      "price": 205.19,
+      "change": 0.1562,
       "cap": "Quote key required",
       "score": 96,
       "quality": "Exceptional quality",
@@ -397,30 +393,28 @@
         ]
       },
       "operating": {
-        "title": "Data center",
-        "value": "$39.1B",
-        "label": "quarterly revenue",
-        "change": "+73% YoY",
+        "title": "Quarterly revenue",
+        "value": "$81.6B",
+        "label": "latest reported quarter",
+        "change": "+43.2%",
         "values": [
-          14.5,
-          18.4,
-          22.6,
-          30.8,
-          35.6,
-          39.1
+          30,
+          35.1,
+          44.1,
+          46.7,
+          57,
+          81.6
         ],
         "years": [
-          "Q1",
-          "Q2",
-          "Q3",
-          "Q4",
-          "Q1",
-          "Q2"
+          "Jul '24",
+          "Oct '24",
+          "Apr '25",
+          "Jul '25",
+          "Oct '25",
+          "Apr '26"
         ],
-        "insight": "Data center remains the engine, though comparisons are becoming increasingly demanding.",
-        "sourceUrl": "https://investor.nvidia.com/",
-        "asOf": "2025-Q2",
-        "provenance": "mock"
+        "insight": "Reported revenue trend derived from SEC 10-Q and 10-K filings.",
+        "provenance": "sec-derived"
       },
       "analytics": {
         "revenueGrowth": 65.5,
@@ -435,11 +429,11 @@
       }
     },
     "AMZN": {
-      "name": "AMAZON.COM, INC.",
+      "name": "AMAZON COM INC",
       "ticker": "AMZN",
       "meta": "Consumer Cyclical · Internet Retail · NASDAQ",
-      "price": null,
-      "change": 0,
+      "price": 238.55,
+      "change": -1.2256,
       "cap": "Quote key required",
       "score": 80,
       "quality": "Solid fundamentals",
@@ -467,7 +461,7 @@
           "Forward P/E",
           "N/A",
           "Provider",
-          "Add Alpha Vantage key"
+          "Alpha Vantage overview"
         ]
       ],
       "signals": [
@@ -541,30 +535,28 @@
         ]
       },
       "operating": {
-        "title": "AWS growth",
-        "value": "17.5%",
-        "label": "year over year",
-        "change": "+0.3 pts",
+        "title": "Quarterly revenue",
+        "value": "$181.5B",
+        "label": "latest reported quarter",
+        "change": "+0.7%",
         "values": [
-          12.2,
-          13.2,
-          17.2,
-          19.1,
-          18.9,
-          17.5
+          148,
+          158.9,
+          155.7,
+          167.7,
+          180.2,
+          181.5
         ],
         "years": [
-          "Q1",
-          "Q2",
-          "Q3",
-          "Q4",
-          "Q1",
-          "Q2"
+          "Jun '24",
+          "Sep '24",
+          "Mar '25",
+          "Jun '25",
+          "Sep '25",
+          "Mar '26"
         ],
-        "insight": "AWS demand remains healthy while capacity investment positions it for AI workloads.",
-        "sourceUrl": "https://ir.aboutamazon.com/",
-        "asOf": "2025-Q2",
-        "provenance": "mock"
+        "insight": "Reported revenue trend derived from SEC 10-Q and 10-K filings.",
+        "provenance": "sec-derived"
       },
       "analytics": {
         "revenueGrowth": 12.4,
@@ -575,15 +567,15 @@
       },
       "sources": {
         "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001018724.json",
-        "quote": null
+        "quote": "Alpha Vantage"
       }
     },
     "GOOGL": {
       "name": "Alphabet Inc.",
       "ticker": "GOOGL",
       "meta": "Communication Services · Internet Content · NASDAQ",
-      "price": null,
-      "change": 0,
+      "price": 359.68,
+      "change": 0.5339,
       "cap": "Quote key required",
       "score": 92,
       "quality": "Exceptional quality",
@@ -611,7 +603,7 @@
           "Forward P/E",
           "N/A",
           "Provider",
-          "Add Alpha Vantage key"
+          "Alpha Vantage overview"
         ]
       ],
       "signals": [
@@ -676,21 +668,27 @@
         ]
       },
       "operating": {
-        "title": "Annual revenue",
-        "value": "$402.8B",
-        "label": "latest fiscal year",
-        "change": "+15.1%",
+        "title": "Quarterly revenue",
+        "value": "$109.9B",
+        "label": "latest reported quarter",
+        "change": "+7.4%",
         "values": [
-          307.4,
-          350,
-          402.8
+          84.7,
+          88.3,
+          90.2,
+          96.4,
+          102.3,
+          109.9
         ],
         "years": [
-          "FY23",
-          "FY24",
-          "FY25"
+          "Jun '24",
+          "Sep '24",
+          "Mar '25",
+          "Jun '25",
+          "Sep '25",
+          "Mar '26"
         ],
-        "insight": "Add a company-specific operating metric in config/manual-kpis.json.",
+        "insight": "Reported revenue trend derived from SEC 10-Q and 10-K filings.",
         "provenance": "sec-derived"
       },
       "analytics": {
@@ -702,15 +700,15 @@
       },
       "sources": {
         "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001652044.json",
-        "quote": null
+        "quote": "Alpha Vantage"
       }
     },
     "META": {
       "name": "Meta Platforms, Inc.",
       "ticker": "META",
       "meta": "Communication Services · Internet Content · NASDAQ",
-      "price": null,
-      "change": 0,
+      "price": 566.98,
+      "change": -0.2551,
       "cap": "Quote key required",
       "score": 84,
       "quality": "Strong compounder",
@@ -738,7 +736,7 @@
           "Forward P/E",
           "N/A",
           "Provider",
-          "Add Alpha Vantage key"
+          "Alpha Vantage overview"
         ]
       ],
       "signals": [
@@ -812,27 +810,27 @@
         ]
       },
       "operating": {
-        "title": "Annual revenue",
-        "value": "$201.0B",
-        "label": "latest fiscal year",
-        "change": "+22.2%",
+        "title": "Quarterly revenue",
+        "value": "$56.3B",
+        "label": "latest reported quarter",
+        "change": "+10.0%",
         "values": [
-          86,
-          117.9,
-          116.6,
-          134.9,
-          164.5,
-          201
+          39.1,
+          40.6,
+          42.3,
+          47.5,
+          51.2,
+          56.3
         ],
         "years": [
-          "FY20",
-          "FY21",
-          "FY22",
-          "FY23",
-          "FY24",
-          "FY25"
+          "Jun '24",
+          "Sep '24",
+          "Mar '25",
+          "Jun '25",
+          "Sep '25",
+          "Mar '26"
         ],
-        "insight": "Add a company-specific operating metric in config/manual-kpis.json.",
+        "insight": "Reported revenue trend derived from SEC 10-Q and 10-K filings.",
         "provenance": "sec-derived"
       },
       "analytics": {
@@ -844,15 +842,15 @@
       },
       "sources": {
         "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001326801.json",
-        "quote": null
+        "quote": "Alpha Vantage"
       }
     },
     "MU": {
       "name": "MICRON TECHNOLOGY INC",
       "ticker": "MU",
       "meta": "Technology · Semiconductors · NASDAQ",
-      "price": null,
-      "change": 0,
+      "price": 981.61,
+      "change": -1.4319,
       "cap": "Quote key required",
       "score": 96,
       "quality": "Exceptional quality",
@@ -880,7 +878,7 @@
           "Forward P/E",
           "N/A",
           "Provider",
-          "Add Alpha Vantage key"
+          "Alpha Vantage overview"
         ]
       ],
       "signals": [
@@ -954,27 +952,27 @@
         ]
       },
       "operating": {
-        "title": "Annual revenue",
-        "value": "$37.4B",
-        "label": "latest fiscal year",
-        "change": "+48.9%",
+        "title": "Quarterly revenue",
+        "value": "$23.9B",
+        "label": "latest reported quarter",
+        "change": "+75.7%",
         "values": [
-          21.4,
-          27.7,
-          30.8,
-          15.5,
-          25.1,
-          37.4
+          6.8,
+          8.7,
+          8.1,
+          9.3,
+          13.6,
+          23.9
         ],
         "years": [
-          "FY20",
-          "FY21",
-          "FY22",
-          "FY23",
-          "FY24",
-          "FY25"
+          "May '24",
+          "Nov '24",
+          "Feb '25",
+          "May '25",
+          "Nov '25",
+          "Feb '26"
         ],
-        "insight": "Add a company-specific operating metric in config/manual-kpis.json.",
+        "insight": "Reported revenue trend derived from SEC 10-Q and 10-K filings.",
         "provenance": "sec-derived"
       },
       "analytics": {
@@ -986,7 +984,7 @@
       },
       "sources": {
         "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000723125.json",
-        "quote": null
+        "quote": "Alpha Vantage"
       }
     }
   },
@@ -995,7 +993,7 @@
       "ticker": "AAPL",
       "growth": 6.4,
       "eps": 22.7,
-      "pe": 32.1,
+      "pe": null,
       "margin": 26.9,
       "score": 79
     },
@@ -1003,7 +1001,7 @@
       "ticker": "MSFT",
       "growth": 14.9,
       "eps": 15.6,
-      "pe": 21.5,
+      "pe": null,
       "margin": 36.1,
       "score": 86
     },
@@ -1046,6 +1044,55 @@
       "pe": null,
       "margin": 22.8,
       "score": 96
+    }
+  ],
+  "marketData": [
+    {
+      "symbol": "SPY",
+      "name": "S&P 500 ETF",
+      "price": 741.75,
+      "change": 0.5408,
+      "tradingDay": "2026-06-12"
+    },
+    {
+      "symbol": "DIA",
+      "name": "Dow Jones ETF",
+      "price": 513.06,
+      "change": 0.7264,
+      "tradingDay": "2026-06-12"
+    },
+    {
+      "symbol": "VXX",
+      "name": "Volatility ETN",
+      "price": 24.2,
+      "change": -4.4234,
+      "tradingDay": "2026-06-12"
+    }
+  ],
+  "sectors": [
+    {
+      "symbol": "XLF",
+      "name": "Financials",
+      "color": "#68a590",
+      "price": 53.34,
+      "change": 1.3683,
+      "tradingDay": "2026-06-12"
+    },
+    {
+      "symbol": "XLY",
+      "name": "Consumer cyc.",
+      "color": "#d7a84b",
+      "price": 116.6,
+      "change": 0.258,
+      "tradingDay": "2026-06-12"
+    },
+    {
+      "symbol": "XLI",
+      "name": "Industrials",
+      "color": "#7196ab",
+      "price": 176.18,
+      "change": 0.5881,
+      "tradingDay": "2026-06-12"
     }
   ],
   "failures": []

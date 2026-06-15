@@ -5,10 +5,23 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputPath = path.join(root, "data", "dashboard.json");
 const watchlist = JSON.parse(await readFile(path.join(root, "config", "watchlist.json"), "utf8"));
-const manualKpis = JSON.parse(await readFile(path.join(root, "config", "manual-kpis.json"), "utf8"));
-
 const secIdentity = process.env.SEC_USER_AGENT;
 const alphaKey = process.env.ALPHA_VANTAGE_API_KEY;
+const marketSymbols = [
+  { symbol: "SPY", name: "S&P 500 ETF" },
+  { symbol: "QQQ", name: "NASDAQ 100 ETF" },
+  { symbol: "DIA", name: "Dow Jones ETF" },
+  { symbol: "IWM", name: "Russell 2000 ETF" },
+  { symbol: "VXX", name: "Volatility ETN" },
+];
+const sectorSymbols = [
+  { symbol: "XLK", name: "Technology", color: "#1f6657" },
+  { symbol: "XLF", name: "Financials", color: "#68a590" },
+  { symbol: "XLV", name: "Healthcare", color: "#cadd80" },
+  { symbol: "XLY", name: "Consumer cyc.", color: "#d7a84b" },
+  { symbol: "XLC", name: "Communication", color: "#e77d61" },
+  { symbol: "XLI", name: "Industrials", color: "#7196ab" },
+];
 
 if (!secIdentity) {
   console.error("Missing SEC_USER_AGENT.");
@@ -208,20 +221,33 @@ async function fetchAlphaVantage(ticker) {
   const quoteParams = new URLSearchParams({ function: "GLOBAL_QUOTE", symbol: ticker, apikey: alphaKey });
 
   async function fetchEndpoint(url) {
-    for (let attempt = 0; attempt < 2; attempt++) {
-      const payload = await fetchJson(url);
-      if (!payload.Note && !payload.Information) return payload;
-      if (attempt === 0) await delay(1200);
-    }
-    return null;
+    const payload = await fetchJson(url);
+    return payload.Note || payload.Information ? null : payload;
   }
 
   const quoteResponse = await fetchEndpoint(`https://www.alphavantage.co/query?${quoteParams}`);
-  await delay(350);
+  await delay(850);
   const overview = await fetchEndpoint(`https://www.alphavantage.co/query?${params}`);
   const quote = quoteResponse?.["Global Quote"] ?? {};
   if (!quoteResponse && !overview) throw new Error("Alpha Vantage rate limit reached");
   return { overview, quote };
+}
+
+async function fetchMarketQuote(symbol) {
+  if (!alphaKey) return null;
+  const params = new URLSearchParams({ function: "GLOBAL_QUOTE", symbol, apikey: alphaKey });
+  const response = await fetchJson(`https://www.alphavantage.co/query?${params}`);
+  if (response.Note || response.Information) return null;
+  const quote = response["Global Quote"] ?? {};
+  const price = Number(quote["05. price"]);
+  const change = Number(String(quote["10. change percent"] ?? "").replace("%", ""));
+  if (!Number.isFinite(price)) return null;
+  return {
+    symbol,
+    price,
+    change: Number.isFinite(change) ? change : 0,
+    tradingDay: quote["07. latest trading day"] || null,
+  };
 }
 
 function buildCompany(config, companyFacts, alpha) {
@@ -315,16 +341,16 @@ function buildCompany(config, companyFacts, alpha) {
     ],
     annual,
     quarterly: quarterly.labels.length >= 2 ? quarterly : annual,
-    operating: manualKpis[config.ticker]
-      ? { ...manualKpis[config.ticker], provenance: "mock" }
-      : {
-      title: "Annual revenue",
-      value: formatMoney(latestRevenue),
-      label: "latest fiscal year",
-      change: formatPercent(revenueGrowth),
-      values: annual.revenue,
-      years: annual.labels,
-      insight: "Add a company-specific operating metric in config/manual-kpis.json.",
+    operating: {
+      title: "Quarterly revenue",
+      value: `$${quarterly.revenue.at(-1)?.toFixed(1) ?? annual.revenue.at(-1)?.toFixed(1)}B`,
+      label: "latest reported quarter",
+      change: quarterly.revenue.length > 1
+        ? formatPercent(percentChange(quarterly.revenue.at(-1), quarterly.revenue.at(-2)))
+        : formatPercent(revenueGrowth),
+      values: quarterly.revenue.length >= 2 ? quarterly.revenue : annual.revenue,
+      years: quarterly.labels.length >= 2 ? quarterly.labels : annual.labels,
+      insight: "Reported revenue trend derived from SEC 10-Q and 10-K filings.",
       provenance: "sec-derived",
     },
     analytics: {
@@ -411,11 +437,35 @@ const peers = Object.values(companies)
     score: company.analytics.score,
   }));
 
+async function refreshQuoteGroup(definitions, cachedItems = []) {
+  const cachedBySymbol = new Map(cachedItems.map((item) => [item.symbol, item]));
+  const results = [];
+  for (const definition of definitions) {
+    await delay(850);
+    let quote = null;
+    try {
+      quote = await fetchMarketQuote(definition.symbol);
+    } catch {
+      quote = null;
+    }
+    results.push({
+      ...definition,
+      ...(quote || cachedBySymbol.get(definition.symbol) || {}),
+    });
+  }
+  return results.filter((item) => Number.isFinite(item.price));
+}
+
+const marketData = await refreshQuoteGroup(marketSymbols, previous?.marketData);
+const sectors = await refreshQuoteGroup(sectorSymbols, previous?.sectors);
+
 const payload = {
   generatedAt: new Date().toISOString(),
   sourceMode: alphaKey ? "SEC filings + Alpha Vantage quotes" : "SEC filings",
   companies,
   peers,
+  marketData,
+  sectors,
   failures,
 };
 
@@ -425,5 +475,5 @@ await writeFile(tempPath, `${JSON.stringify(payload, null, 2)}\n`);
 await rename(tempPath, outputPath);
 
 console.log(`\nWrote ${path.relative(root, outputPath)} with ${Object.keys(companies).length} companies.`);
-if (!alphaKey) console.log("No ALPHA_VANTAGE_API_KEY found; existing demo prices remain visible in the dashboard.");
+if (!alphaKey) console.log("No ALPHA_VANTAGE_API_KEY found; market quote panels will remain unavailable.");
 if (failures.length) failures.forEach((failure) => console.warn(`Warning: ${failure}`));
