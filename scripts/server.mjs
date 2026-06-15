@@ -172,7 +172,7 @@ async function serveStatic(pathname, response) {
     const body = await readFile(filePath);
     response.writeHead(200, {
       "Content-Type": mimeTypes[extname(filePath)] || "application/octet-stream",
-      "Cache-Control": "no-cache",
+      "Cache-Control": "no-store",
     });
     response.end(body);
   } catch {
