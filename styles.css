@@ -293,20 +293,31 @@ h1 em {
   gap: 12px;
 }
 
-.language-toggle {
-  min-width: 44px;
-  padding: 8px 10px;
+.language-selector {
+  display: flex;
+  padding: 2px;
   border: 1px solid var(--line);
   border-radius: 7px;
   background: rgba(255, 255, 255, 0.55);
-  color: var(--green);
-  cursor: pointer;
+}
+
+.language-selector button {
+  min-width: 36px;
+  padding: 6px 8px;
+  border-radius: 5px;
+  color: var(--muted);
   font-size: 10px;
   font-weight: 700;
 }
 
-.language-toggle:hover {
+.language-selector button:hover {
+  color: var(--ink);
+}
+
+.language-selector button.active {
   background: white;
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(26, 47, 42, 0.1);
 }
 
 .search-box {

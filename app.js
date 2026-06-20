@@ -397,8 +397,12 @@ function translateMeta(meta) {
 function applyLanguage() {
   document.documentElement.lang = currentLanguage === "zh" ? "zh-CN" : "en";
   document.title = currentLanguage === "zh" ? "Northstar | 股票分析" : "Northstar | Stock Intelligence";
-  $("#language-toggle").textContent = currentLanguage === "en" ? "中文" : "EN";
-  $("#language-toggle").setAttribute("aria-label", currentLanguage === "en" ? "切换到中文" : "Switch to English");
+  $("#language-selector").setAttribute("aria-label", currentLanguage === "zh" ? "语言" : "Language");
+  document.querySelectorAll("#language-selector button").forEach((button) => {
+    const active = button.dataset.language === currentLanguage;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
   $("#add-watchlist").setAttribute("aria-label", currentLanguage === "zh" ? "将当前公司加入自选股" : "Add selected company to watchlist");
   document.querySelector(".main-nav").setAttribute("aria-label", currentLanguage === "zh" ? "主导航" : "Main navigation");
   $("#stock-search").placeholder = tr("Search ticker or company");
@@ -1096,8 +1100,10 @@ function selectCompany(ticker) {
 }
 
 function setupInteractions() {
-  $("#language-toggle").addEventListener("click", () => {
-    currentLanguage = currentLanguage === "en" ? "zh" : "en";
+  $("#language-selector").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-language]");
+    if (!button || button.dataset.language === currentLanguage) return;
+    currentLanguage = button.dataset.language;
     localStorage.setItem("northstar-language", currentLanguage);
     applyLanguage();
   });
