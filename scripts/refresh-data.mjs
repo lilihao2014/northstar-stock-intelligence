@@ -506,8 +506,9 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const dilutedSharesQuarterly = quarterlySeries(dilutedShareFacts);
   const epsAnnual = derivePerShareSeries(netIncomeAnnual, dilutedSharesAnnual);
   const epsQuarterly = derivePerShareSeries(netIncomeQuarterly, dilutedSharesQuarterly);
+  const reportedEpsQuarterly = quarterlySeries(epsFacts);
   if (epsAnnual.length < 2) epsAnnual.push(...rawEpsAnnual);
-  if (epsQuarterly.length < 2) epsQuarterly.push(...quarterlySeries(epsFacts));
+  if (epsQuarterly.length < 2) epsQuarterly.push(...reportedEpsQuarterly);
   const operatingIncomeAnnual = annualSeries(operatingIncomeFacts);
   const operatingIncomeQuarterly = quarterlySeries(operatingIncomeFacts);
   const premiumsEarnedQuarterly = quarterlySeries(premiumsEarnedFacts);
@@ -567,11 +568,18 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const latestQuarterPremiums = closestPeriod(premiumsEarnedQuarterly, latestQuarterRevenue?.end);
   const latestQuarterClaims = closestPeriod(claimsIncurredQuarterly, latestQuarterRevenue?.end);
   const latestQuarterSga = closestPeriod(sellingGeneralAdministrativeQuarterly, latestQuarterRevenue?.end);
-  const latestQuarterEps = closestPeriod(rawEpsAnnual.concat(quarterlySeries(epsFacts)), latestQuarterRevenue?.end)
+  const latestQuarterEps = closestPeriod(reportedEpsQuarterly, latestQuarterRevenue?.end)
     || closestPeriod(epsQuarterly, latestQuarterRevenue?.end);
+  const priorYearQuarterEps = priorYearPeriod(epsQuarterly, latestQuarterEps);
+  const priorYearQuarterNetIncome = priorYearPeriod(netIncomeQuarterly, latestQuarterNetIncome);
   const latestQuarterMargin = latestQuarterRevenue?.val && latestQuarterNetIncome?.val
     ? (latestQuarterNetIncome.val / latestQuarterRevenue.val) * 100
     : null;
+  const priorYearQuarterMargin = priorYearQuarterRevenue?.val && priorYearQuarterNetIncome?.val
+    ? (priorYearQuarterNetIncome.val / priorYearQuarterRevenue.val) * 100
+    : null;
+  const quarterlyRevenueGrowth = percentChange(latestQuarterRevenue?.val, priorYearQuarterRevenue?.val);
+  const quarterlyEpsGrowth = percentChange(latestQuarterEps?.val, priorYearQuarterEps?.val);
   const medicalLossRatio = latestQuarterPremiums?.val && latestQuarterClaims?.val
     ? (latestQuarterClaims.val / latestQuarterPremiums.val) * 100
     : null;
@@ -591,6 +599,18 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
       ["SG&A expense", formatMoney(latestQuarterSga?.val), "SEC reported"],
     );
   }
+  const annualSummaryMetrics = [
+    ["Revenue growth", formatPercent(revenueGrowth), formatPercent((revenueGrowth ?? 0) - (priorRevenueGrowth ?? 0), 1).replace("%", " pts"), "Latest reported fiscal year"],
+    ["EPS growth", formatPercent(epsGrowth), formatPercent((epsGrowth ?? 0) - (priorEpsGrowth ?? 0), 1).replace("%", " pts"), "Diluted EPS, latest fiscal year"],
+    ["Net margin", Number.isFinite(netMargin) ? `${netMargin.toFixed(1)}%` : "N/A", formatPercent((netMargin ?? 0) - (priorNetMargin ?? 0), 1).replace("%", " pts"), "Calculated from SEC filings"],
+    ["Forward P/E", formatMultiple(pe), "Provider", alpha ? "Alpha Vantage overview" : "Add Alpha Vantage key"],
+  ];
+  const quarterlySummaryMetrics = [
+    ["Revenue growth", formatPercent(quarterlyRevenueGrowth), "Same quarter prior year", "Compared with same quarter last year"],
+    ["EPS growth", formatPercent(quarterlyEpsGrowth), "Same quarter prior year", "Compared with same quarter last year"],
+    ["Net margin", Number.isFinite(latestQuarterMargin) ? `${latestQuarterMargin.toFixed(1)}%` : "N/A", Number.isFinite(latestQuarterMargin) && Number.isFinite(priorYearQuarterMargin) ? formatPercent(latestQuarterMargin - priorYearQuarterMargin, 1).replace("%", " pts") : "N/A", "Compared with same quarter last year"],
+    ["Forward P/E", formatMultiple(pe), "Provider", alpha ? "Alpha Vantage overview" : "Add Alpha Vantage key"],
+  ];
 
   return {
     name: companyFacts.entityName,
@@ -603,12 +623,8 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     quality,
     copy,
     color: config.color,
-    metrics: [
-      ["Revenue growth", formatPercent(revenueGrowth), formatPercent((revenueGrowth ?? 0) - (priorRevenueGrowth ?? 0), 1).replace("%", " pts"), "Latest reported fiscal year"],
-      ["EPS growth", formatPercent(epsGrowth), formatPercent((epsGrowth ?? 0) - (priorEpsGrowth ?? 0), 1).replace("%", " pts"), "Diluted EPS, latest fiscal year"],
-      ["Net margin", Number.isFinite(netMargin) ? `${netMargin.toFixed(1)}%` : "N/A", formatPercent((netMargin ?? 0) - (priorNetMargin ?? 0), 1).replace("%", " pts"), "Calculated from SEC filings"],
-      ["Forward P/E", formatMultiple(pe), "Provider", alpha ? "Alpha Vantage overview" : "Add Alpha Vantage key"],
-    ],
+    metrics: annualSummaryMetrics,
+    periodMetrics: { annual: annualSummaryMetrics, quarterly: quarterlySummaryMetrics },
     signals: [
       ["FCF yield", Number.isFinite(fcfYield) ? `${fcfYield.toFixed(1)}%` : "N/A"],
       ["ROE", Number.isFinite(roe) ? `${roe.toFixed(1)}%` : "N/A"],

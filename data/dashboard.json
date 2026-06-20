@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-20T04:26:33.098Z",
+  "generatedAt": "2026-06-20T12:29:06.585Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
@@ -38,6 +38,60 @@
           "Alpha Vantage overview"
         ]
       ],
+      "periodMetrics": {
+        "annual": [
+          [
+            "Revenue growth",
+            "+6.4%",
+            "+4.4 pts",
+            "Latest reported fiscal year"
+          ],
+          [
+            "EPS growth",
+            "+22.7%",
+            "+23.5 pts",
+            "Diluted EPS, latest fiscal year"
+          ],
+          [
+            "Net margin",
+            "26.9%",
+            "+2.9 pts",
+            "Calculated from SEC filings"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ],
+        "quarterly": [
+          [
+            "Revenue growth",
+            "+16.6%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "EPS growth",
+            "+22.1%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Net margin",
+            "26.6%",
+            "+0.6 pts",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ]
+      },
       "signals": [
         [
           "FCF yield",
@@ -234,10 +288,10 @@
     "MSFT": {
       "name": "MICROSOFT CORPORATION",
       "ticker": "MSFT",
-      "meta": "Technology · Software Infrastructure · NASDAQ",
+      "meta": "TECHNOLOGY · SOFTWARE - INFRASTRUCTURE · NASDAQ",
       "price": 379.4,
       "change": 0.1293,
-      "cap": "Quote key required",
+      "cap": "$2.82T",
       "score": 86,
       "quality": "Strong compounder",
       "copy": "Healthy growth and durable economics support long-term compounding potential.",
@@ -262,15 +316,69 @@
         ],
         [
           "Forward P/E",
-          "N/A",
+          "19.5x",
           "Provider",
           "Alpha Vantage overview"
         ]
       ],
+      "periodMetrics": {
+        "annual": [
+          [
+            "Revenue growth",
+            "+14.9%",
+            "-0.7 pts",
+            "Latest reported fiscal year"
+          ],
+          [
+            "EPS growth",
+            "+15.6%",
+            "-6.2 pts",
+            "Diluted EPS, latest fiscal year"
+          ],
+          [
+            "Net margin",
+            "36.1%",
+            "+0.2 pts",
+            "Calculated from SEC filings"
+          ],
+          [
+            "Forward P/E",
+            "19.5x",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ],
+        "quarterly": [
+          [
+            "Revenue growth",
+            "+18.3%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "EPS growth",
+            "+23.4%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Net margin",
+            "38.3%",
+            "+1.5 pts",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Forward P/E",
+            "19.5x",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ]
+      },
       "signals": [
         [
           "FCF yield",
-          "N/A"
+          "2.5%"
         ],
         [
           "ROE",
@@ -452,7 +560,7 @@
         "revenueGrowth": 14.9,
         "epsGrowth": 15.6,
         "netMargin": 36.1,
-        "pe": null,
+        "pe": 19.5,
         "score": 86
       },
       "sources": {
@@ -466,7 +574,7 @@
       "meta": "Technology · Semiconductors · NASDAQ",
       "price": 210.69,
       "change": 2.9514,
-      "cap": "$5.10T",
+      "cap": "Quote key required",
       "score": 96,
       "quality": "Exceptional quality",
       "copy": "Strong growth and profitability create an unusually resilient fundamental profile.",
@@ -491,15 +599,69 @@
         ],
         [
           "Forward P/E",
-          "24.0x",
+          "N/A",
           "Provider",
           "Alpha Vantage overview"
         ]
       ],
+      "periodMetrics": {
+        "annual": [
+          [
+            "Revenue growth",
+            "+65.5%",
+            "-48.7 pts",
+            "Latest reported fiscal year"
+          ],
+          [
+            "EPS growth",
+            "+66.7%",
+            "-79.5 pts",
+            "Diluted EPS, latest fiscal year"
+          ],
+          [
+            "Net margin",
+            "55.6%",
+            "-0.2 pts",
+            "Calculated from SEC filings"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ],
+        "quarterly": [
+          [
+            "Revenue growth",
+            "+85.2%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "EPS growth",
+            "+213.3%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Net margin",
+            "71.5%",
+            "+28.8 pts",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ]
+      },
       "signals": [
         [
           "FCF yield",
-          "2.0%"
+          "N/A"
         ],
         [
           "ROE",
@@ -702,7 +864,7 @@
         "revenueGrowth": 65.5,
         "epsGrowth": 66.7,
         "netMargin": 55.6,
-        "pe": 24,
+        "pe": null,
         "score": 96
       },
       "sources": {
@@ -746,6 +908,60 @@
           "Alpha Vantage overview"
         ]
       ],
+      "periodMetrics": {
+        "annual": [
+          [
+            "Revenue growth",
+            "+12.4%",
+            "+1.4 pts",
+            "Latest reported fiscal year"
+          ],
+          [
+            "EPS growth",
+            "+29.8%",
+            "-60.8 pts",
+            "Diluted EPS, latest fiscal year"
+          ],
+          [
+            "Net margin",
+            "10.8%",
+            "+1.5 pts",
+            "Calculated from SEC filings"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ],
+        "quarterly": [
+          [
+            "Revenue growth",
+            "+16.6%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "EPS growth",
+            "+75.2%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Net margin",
+            "16.7%",
+            "+5.7 pts",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ]
+      },
       "signals": [
         [
           "FCF yield",
@@ -1090,6 +1306,60 @@
           "Alpha Vantage overview"
         ]
       ],
+      "periodMetrics": {
+        "annual": [
+          [
+            "Revenue growth",
+            "+15.1%",
+            "+1.2 pts",
+            "Latest reported fiscal year"
+          ],
+          [
+            "EPS growth",
+            "+34.4%",
+            "-4.3 pts",
+            "Diluted EPS, latest fiscal year"
+          ],
+          [
+            "Net margin",
+            "32.8%",
+            "+4.2 pts",
+            "Calculated from SEC filings"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ],
+        "quarterly": [
+          [
+            "Revenue growth",
+            "+21.8%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "EPS growth",
+            "+81.8%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Net margin",
+            "56.9%",
+            "+18.7 pts",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ]
+      },
       "signals": [
         [
           "FCF yield",
@@ -1280,7 +1550,7 @@
       "meta": "Communication Services · Internet Content · NASDAQ",
       "price": 577.22,
       "change": 1.6984,
-      "cap": "$1.47T",
+      "cap": "Quote key required",
       "score": 84,
       "quality": "Strong compounder",
       "copy": "Healthy growth and durable economics support long-term compounding potential.",
@@ -1305,15 +1575,69 @@
         ],
         [
           "Forward P/E",
-          "18.4x",
+          "N/A",
           "Provider",
           "Alpha Vantage overview"
         ]
       ],
+      "periodMetrics": {
+        "annual": [
+          [
+            "Revenue growth",
+            "+22.2%",
+            "+0.2 pts",
+            "Latest reported fiscal year"
+          ],
+          [
+            "EPS growth",
+            "-1.5%",
+            "-62.0 pts",
+            "Diluted EPS, latest fiscal year"
+          ],
+          [
+            "Net margin",
+            "30.1%",
+            "-7.8 pts",
+            "Calculated from SEC filings"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ],
+        "quarterly": [
+          [
+            "Revenue growth",
+            "+33.1%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "EPS growth",
+            "+62.5%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Net margin",
+            "47.5%",
+            "+8.2 pts",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ]
+      },
       "signals": [
         [
           "FCF yield",
-          "3.1%"
+          "N/A"
         ],
         [
           "ROE",
@@ -1495,7 +1819,7 @@
         "revenueGrowth": 22.2,
         "epsGrowth": -1.5,
         "netMargin": 30.1,
-        "pe": 18.4,
+        "pe": null,
         "score": 84
       },
       "sources": {
@@ -1539,6 +1863,60 @@
           "Alpha Vantage overview"
         ]
       ],
+      "periodMetrics": {
+        "annual": [
+          [
+            "Revenue growth",
+            "+48.9%",
+            "-12.7 pts",
+            "Latest reported fiscal year"
+          ],
+          [
+            "EPS growth",
+            "+990.7%",
+            "+877.7 pts",
+            "Diluted EPS, latest fiscal year"
+          ],
+          [
+            "Net margin",
+            "22.8%",
+            "+19.7 pts",
+            "Calculated from SEC filings"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ],
+        "quarterly": [
+          [
+            "Revenue growth",
+            "+196.3%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "EPS growth",
+            "+756.3%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Net margin",
+            "57.8%",
+            "+38.1 pts",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ]
+      },
       "signals": [
         [
           "FCF yield",
@@ -1801,6 +2179,60 @@
           "Alpha Vantage overview"
         ]
       ],
+      "periodMetrics": {
+        "annual": [
+          [
+            "Revenue growth",
+            "+27.5%",
+            "-29.0 pts",
+            "Latest reported fiscal year"
+          ],
+          [
+            "EPS growth",
+            "-1865.5%",
+            "-1973.3 pts",
+            "Diluted EPS, latest fiscal year"
+          ],
+          [
+            "Net margin",
+            "-3.8%",
+            "-4.1 pts",
+            "Calculated from SEC filings"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ],
+        "quarterly": [
+          [
+            "Revenue growth",
+            "+52.6%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "EPS growth",
+            "+130.1%",
+            "Same quarter prior year",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Net margin",
+            "14.6%",
+            "+5.6 pts",
+            "Compared with same quarter last year"
+          ],
+          [
+            "Forward P/E",
+            "N/A",
+            "Provider",
+            "Alpha Vantage overview"
+          ]
+        ]
+      },
       "signals": [
         [
           "FCF yield",
@@ -2656,7 +3088,7 @@
       "ticker": "MSFT",
       "growth": 14.9,
       "eps": 15.6,
-      "pe": null,
+      "pe": 19.5,
       "margin": 36.1,
       "score": 86
     },
@@ -2664,7 +3096,7 @@
       "ticker": "NVDA",
       "growth": 65.5,
       "eps": 66.7,
-      "pe": 24,
+      "pe": null,
       "margin": 55.6,
       "score": 96
     },
@@ -2688,7 +3120,7 @@
       "ticker": "META",
       "growth": 22.2,
       "eps": -1.5,
-      "pe": 18.4,
+      "pe": null,
       "margin": 30.1,
       "score": 84
     },
@@ -2734,9 +3166,9 @@
     {
       "symbol": "VXX",
       "name": "Volatility ETN",
-      "price": 24.2,
-      "change": -4.4234,
-      "tradingDay": "2026-06-12"
+      "price": 22.8,
+      "change": -3.1436,
+      "tradingDay": "2026-06-18"
     }
   ],
   "sectors": [
@@ -2752,9 +3184,9 @@
       "symbol": "XLF",
       "name": "Financials",
       "color": "#68a590",
-      "price": 53.34,
-      "change": 1.3683,
-      "tradingDay": "2026-06-12"
+      "price": 53.57,
+      "change": -0.8881,
+      "tradingDay": "2026-06-18"
     },
     {
       "symbol": "XLV",
@@ -2768,9 +3200,9 @@
       "symbol": "XLY",
       "name": "Consumer cyc.",
       "color": "#d7a84b",
-      "price": 116.6,
-      "change": 0.258,
-      "tradingDay": "2026-06-12"
+      "price": 117.16,
+      "change": 1.446,
+      "tradingDay": "2026-06-18"
     },
     {
       "symbol": "XLC",

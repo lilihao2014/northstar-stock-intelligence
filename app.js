@@ -348,6 +348,7 @@ const translations = {
     "Company-specific metric reported in SEC filings.": "公司在 SEC 文件中报告的特定指标。",
     "SEC reported": "SEC 报告值",
     "Same quarter prior year": "上年同期",
+    "Compared with same quarter last year": "与去年同期相比",
     Calculated: "计算值",
     Filed: "申报日期",
     "latest reported quarter": "最近报告季度",
@@ -728,21 +729,7 @@ function renderCompany() {
     .map(([label, value]) => `<div class="signal"><span>${tr(label)}</span><strong>${value}</strong></div>`)
     .join("");
 
-  $("#metrics-grid").innerHTML = company.metrics
-    .map(([label, value, delta, note], index) => {
-      const isNegative = delta.startsWith("-");
-      const neutral = label === "Forward P/E";
-      return `
-        <article class="metric-card card">
-          <div class="metric-top">
-            <span>${tr(label)}</span>
-            <span class="metric-delta ${neutral ? "" : isNegative ? "negative" : "positive"}">${tr(delta)}</span>
-          </div>
-          <strong>${value}</strong>
-          <p>${tr(note)}</p>
-        </article>`;
-    })
-    .join("");
+  renderSummaryMetrics(company);
 
   const op = company.operating;
   const operatingProvenance = $("#operating-provenance");
@@ -772,6 +759,25 @@ function renderCompany() {
   renderFundamentals();
   renderOperatingChart();
   renderWatchlist();
+}
+
+function renderSummaryMetrics(company) {
+  const metrics = company.periodMetrics?.[selectedPeriod] || company.metrics;
+  $("#metrics-grid").innerHTML = metrics
+    .map(([label, value, delta, note], index) => {
+      const isNegative = delta.startsWith("-");
+      const neutral = label === "Forward P/E" || delta === "Same quarter prior year";
+      return `
+        <article class="metric-card card">
+          <div class="metric-top">
+            <span>${tr(label)}</span>
+            <span class="metric-delta ${neutral ? "" : isNegative ? "negative" : "positive"}">${tr(delta)}</span>
+          </div>
+          <strong>${value}</strong>
+          <p>${tr(note)}</p>
+        </article>`;
+    })
+    .join("");
 }
 
 function renderFinancialMetrics(metrics) {
@@ -1094,6 +1100,7 @@ function setupInteractions() {
     selectedPeriod = button.dataset.period;
     document.querySelectorAll("#period-control button").forEach((item) => item.classList.toggle("active", item === button));
     renderFundamentals();
+    renderSummaryMetrics(companies[selectedTicker]);
   });
 
   $("#sort-peers").addEventListener("click", () => {
