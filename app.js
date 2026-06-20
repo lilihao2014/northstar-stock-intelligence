@@ -196,6 +196,9 @@ const $ = (selector) => document.querySelector(selector);
 const fmtSign = (value, suffix = "%") => `${value >= 0 ? "+" : ""}${value.toFixed(2)}${suffix}`;
 const svgNS = "http://www.w3.org/2000/svg";
 const watchlistStorageKey = "northstar-watchlist";
+const hiddenMetricsStorageKey = "northstar-hidden-metrics-v1";
+let hiddenMetricsByTicker = {};
+let customMetricsManagerOpen = false;
 const selectedTickerStorageKey = "northstar-selected-ticker";
 const translations = {
   zh: {
@@ -332,6 +335,14 @@ const translations = {
     "Latest fiscal year": "最新财年",
     "Company-specific metrics": "公司特定指标",
     "Operating metrics": "经营指标",
+    "Manage metrics": "管理指标",
+    "Done": "完成",
+    "Hide": "隐藏",
+    "Restore": "恢复",
+    "Hidden metrics": "已隐藏指标",
+    "Hidden only for this ticker": "仅对此股票隐藏",
+    "No metrics are hidden.": "没有隐藏的指标。",
+    "All company-specific metrics are hidden. Use Manage metrics to restore them.": "所有公司特定指标均已隐藏。请使用管理指标恢复。",
     Members: "会员人数",
     "Total members reported at period end.": "期末报告会员总数。",
     "Company-specific metric reported in SEC filings.": "公司在 SEC 文件中报告的特定指标。",
@@ -401,6 +412,8 @@ function applyLanguage() {
     [".financial-metrics-card .as-of", "", "SEC filings"],
     [".custom-metrics-card .section-label", "", "Company-specific metrics"],
     [".custom-metrics-card h2", "", "Operating metrics"],
+    ["#hidden-metrics-panel strong", "", "Hidden metrics"],
+    ["#hidden-metrics-panel > div > span", "", "Hidden only for this ticker"],
     [".peer-card .section-label", "", "Relative view"],
     [".peer-card h2", "", "Peer comparison"],
     ["#sort-peers", "", "Sort by score ↕"],
@@ -779,14 +792,26 @@ function renderCustomMetrics(metrics) {
     $("#custom-metrics-grid").innerHTML = "";
     return;
   }
-  $("#custom-metrics-grid").innerHTML = metrics.map((metric) => `
+  const hiddenIds = new Set(hiddenMetricsByTicker[selectedTicker] || []);
+  const visibleMetrics = metrics.filter((metric) => !hiddenIds.has(metric.id));
+  const hiddenMetrics = metrics.filter((metric) => hiddenIds.has(metric.id));
+  $("#manage-custom-metrics").textContent = tr(customMetricsManagerOpen ? "Done" : "Manage metrics");
+  $("#hidden-metrics-panel").hidden = !customMetricsManagerOpen;
+  $("#hidden-metrics-list").innerHTML = hiddenMetrics.length
+    ? hiddenMetrics.map((metric) => `
+        <button class="metric-restore" data-restore-metric="${metric.id}">${tr("Restore")} ${tr(metric.title)}</button>`).join("")
+    : `<span class="hidden-metrics-empty">${tr("No metrics are hidden.")}</span>`;
+  $("#custom-metrics-grid").innerHTML = visibleMetrics.length ? visibleMetrics.map((metric) => `
     <article class="custom-metric">
       <div class="custom-metric-heading">
         <div>
           <span>${tr(metric.title)}</span>
           <strong>${metric.latest}</strong>
         </div>
-        <small>${metric.source}</small>
+        <div class="custom-metric-controls">
+          <small>${metric.source}</small>
+          <button data-hide-metric="${metric.id}" aria-label="${tr("Hide")} ${tr(metric.title)}">${tr("Hide")}</button>
+        </div>
       </div>
       <div class="custom-metric-series">
         ${metric.labels.map((label, index) => `
@@ -796,7 +821,30 @@ function renderCustomMetrics(metrics) {
           </div>`).join("")}
       </div>
       <p>${tr(metric.description)}</p>
-    </article>`).join("");
+    </article>`).join("")
+    : `<div class="custom-metrics-empty">${tr("All company-specific metrics are hidden. Use Manage metrics to restore them.")}</div>`;
+}
+
+function loadHiddenMetrics() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(hiddenMetricsStorageKey) || "{}");
+    hiddenMetricsByTicker = saved && typeof saved === "object" && !Array.isArray(saved) ? saved : {};
+  } catch {
+    hiddenMetricsByTicker = {};
+  }
+}
+
+function saveHiddenMetrics() {
+  localStorage.setItem(hiddenMetricsStorageKey, JSON.stringify(hiddenMetricsByTicker));
+}
+
+function setMetricHidden(metricId, hidden) {
+  const ids = new Set(hiddenMetricsByTicker[selectedTicker] || []);
+  if (hidden) ids.add(metricId);
+  else ids.delete(metricId);
+  hiddenMetricsByTicker[selectedTicker] = [...ids];
+  saveHiddenMetrics();
+  renderCustomMetrics(companies[selectedTicker].customMetrics || []);
 }
 
 function renderFundamentals() {
@@ -1027,6 +1075,7 @@ function hideTooltips() {
 function selectCompany(ticker) {
   if (!companies[ticker]) return;
   selectedTicker = ticker;
+  customMetricsManagerOpen = false;
   localStorage.setItem(selectedTickerStorageKey, ticker);
   renderCompany();
   renderScatter();
@@ -1054,6 +1103,21 @@ function setupInteractions() {
 
   $("#add-watchlist").addEventListener("click", () => {
     addToWatchlist();
+  });
+
+  $("#manage-custom-metrics").addEventListener("click", () => {
+    customMetricsManagerOpen = !customMetricsManagerOpen;
+    renderCustomMetrics(companies[selectedTicker].customMetrics || []);
+  });
+
+  $("#custom-metrics-grid").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-hide-metric]");
+    if (button) setMetricHidden(button.dataset.hideMetric, true);
+  });
+
+  $("#hidden-metrics-list").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-restore-metric]");
+    if (button) setMetricHidden(button.dataset.restoreMetric, false);
   });
 
   $("#stock-search").addEventListener("input", (event) => {
@@ -1166,6 +1230,7 @@ async function init() {
   const savedTicker = localStorage.getItem(selectedTickerStorageKey);
   if (savedTicker && companies[savedTicker]) selectedTicker = savedTicker;
   if (!companies[selectedTicker]) selectedTicker = Object.keys(companies)[0];
+  loadHiddenMetrics();
   loadWatchlist();
   renderMarketStrip();
   renderCompany();

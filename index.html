@@ -200,7 +200,17 @@
                 <span class="section-label">Company-specific metrics</span>
                 <h2>Operating metrics</h2>
               </div>
-              <span class="as-of">SEC inline XBRL</span>
+              <div class="custom-metrics-actions">
+                <button class="text-button" id="manage-custom-metrics">Manage metrics</button>
+                <span class="as-of">SEC inline XBRL</span>
+              </div>
+            </div>
+            <div class="hidden-metrics-panel" id="hidden-metrics-panel" hidden>
+              <div>
+                <strong>Hidden metrics</strong>
+                <span>Hidden only for this ticker</span>
+              </div>
+              <div class="hidden-metrics-list" id="hidden-metrics-list"></div>
             </div>
             <div class="custom-metrics-grid" id="custom-metrics-grid"></div>
           </section>

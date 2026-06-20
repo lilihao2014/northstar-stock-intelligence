@@ -790,6 +790,73 @@ kbd {
   margin-top: 16px;
 }
 
+.custom-metrics-actions,
+.custom-metric-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-metric-controls {
+  align-self: flex-start;
+}
+
+.custom-metric-controls button,
+.metric-restore {
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.45);
+  font-size: 8px;
+}
+
+.custom-metric-controls button:hover,
+.metric-restore:hover {
+  color: var(--ink);
+  border-color: var(--green-soft);
+}
+
+.hidden-metrics-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px dashed var(--line);
+  border-radius: 7px;
+}
+
+.hidden-metrics-panel[hidden] {
+  display: none;
+}
+
+.hidden-metrics-panel strong,
+.hidden-metrics-panel span {
+  display: block;
+  font-size: 8px;
+}
+
+.hidden-metrics-panel span,
+.hidden-metrics-empty,
+.custom-metrics-empty {
+  color: var(--muted);
+}
+
+.hidden-metrics-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.custom-metrics-empty {
+  padding: 18px;
+  border: 1px dashed var(--line);
+  border-radius: 7px;
+  font-size: 9px;
+}
+
 .custom-metric {
   padding: 14px;
   border: 1px solid var(--line);
@@ -1346,6 +1413,16 @@ footer {
 
   .financial-metrics-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .custom-metrics-card .card-heading,
+  .hidden-metrics-panel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .hidden-metrics-list {
+    justify-content: flex-start;
   }
 
   .signal-list {
