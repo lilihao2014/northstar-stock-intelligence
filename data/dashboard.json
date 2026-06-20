@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-20T14:59:34.406Z",
+  "generatedAt": "2026-06-20T15:18:04.006Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
@@ -17,19 +17,69 @@
           "Revenue growth",
           "+6.4%",
           "+4.4 pts",
-          "Latest reported fiscal year"
+          "Latest reported fiscal year",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+33.3%",
+              "+7.8%",
+              "-2.8%",
+              "+2.0%",
+              "+6.4%"
+            ]
+          }
         ],
         [
           "EPS growth",
           "+22.7%",
           "+23.5 pts",
-          "Diluted EPS, latest fiscal year"
+          "Diluted EPS, latest fiscal year",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+71.4%",
+              "+8.9%",
+              "+0.3%",
+              "-0.8%",
+              "+22.7%"
+            ]
+          }
         ],
         [
           "Net margin",
           "26.9%",
           "+2.9 pts",
-          "Calculated from SEC filings"
+          "Calculated from SEC filings",
+          {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "20.9%",
+              "25.9%",
+              "25.3%",
+              "25.3%",
+              "24.0%",
+              "26.9%"
+            ]
+          }
         ],
         [
           "Forward P/E",
@@ -44,19 +94,69 @@
             "Revenue growth",
             "+6.4%",
             "+4.4 pts",
-            "Latest reported fiscal year"
+            "Latest reported fiscal year",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+33.3%",
+                "+7.8%",
+                "-2.8%",
+                "+2.0%",
+                "+6.4%"
+              ]
+            }
           ],
           [
             "EPS growth",
             "+22.7%",
             "+23.5 pts",
-            "Diluted EPS, latest fiscal year"
+            "Diluted EPS, latest fiscal year",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+71.4%",
+                "+8.9%",
+                "+0.3%",
+                "-0.8%",
+                "+22.7%"
+              ]
+            }
           ],
           [
             "Net margin",
             "26.9%",
             "+2.9 pts",
-            "Calculated from SEC filings"
+            "Calculated from SEC filings",
+            {
+              "labels": [
+                "FY20",
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "20.9%",
+                "25.9%",
+                "25.3%",
+                "25.3%",
+                "24.0%",
+                "26.9%"
+              ]
+            }
           ],
           [
             "Forward P/E",
@@ -70,25 +170,67 @@
             "Revenue growth",
             "+16.6%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '25",
+                "Dec '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "+9.6%",
+                "+15.7%",
+                "+16.6%"
+              ]
+            }
           ],
           [
             "EPS growth",
-            "+22.1%",
+            "+21.8%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '25",
+                "Dec '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "+12.1%",
+                "+18.3%",
+                "+21.8%"
+              ]
+            }
           ],
           [
             "Net margin",
             "26.6%",
             "+0.6 pts",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '24",
+                "Dec '24",
+                "Mar '25",
+                "Jun '25",
+                "Dec '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "25.0%",
+                "29.2%",
+                "26.0%",
+                "24.9%",
+                "29.3%",
+                "26.6%"
+              ]
+            }
           ],
           [
             "Forward P/E",
             "N/A",
             "Provider",
-            "Alpha Vantage overview"
+            "Add Alpha Vantage key"
           ]
         ]
       },
@@ -99,7 +241,7 @@
         ],
         [
           "ROE",
-          "105.2%"
+          "151.9%"
         ],
         [
           "Debt / op. income",
@@ -203,49 +345,191 @@
           "title": "Free cash flow",
           "value": "$98.8B",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$73.4B",
+              "$93.0B",
+              "$111.4B",
+              "$99.6B",
+              "$108.8B",
+              "$98.8B"
+            ]
+          }
         },
         {
           "title": "Operating cash flow",
           "value": "$111.5B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$80.7B",
+              "$104.0B",
+              "$122.2B",
+              "$110.5B",
+              "$118.3B",
+              "$111.5B"
+            ]
+          }
         },
         {
           "title": "Capital expenditures",
           "value": "$12.7B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$7.3B",
+              "$11.1B",
+              "$10.7B",
+              "$11.0B",
+              "$9.4B",
+              "$12.7B"
+            ]
+          }
         },
         {
           "title": "FCF margin",
           "value": "23.7%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "26.7%",
+              "25.4%",
+              "28.3%",
+              "26.0%",
+              "27.8%",
+              "23.7%"
+            ]
+          }
         },
         {
           "title": "Operating margin",
           "value": "32.0%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "24.1%",
+              "29.8%",
+              "30.3%",
+              "29.8%",
+              "31.5%",
+              "32.0%"
+            ]
+          }
         },
         {
           "title": "ROE",
-          "value": "105.2%",
+          "value": "151.9%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "87.9%",
+              "150.1%",
+              "197.0%",
+              "156.1%",
+              "164.6%",
+              "151.9%"
+            ]
+          }
         },
         {
           "title": "Debt / op. income",
           "value": "0.1x",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "0.1x",
+              "0.1x",
+              "0.1x",
+              "0.1x",
+              "0.1x",
+              "0.1x"
+            ]
+          }
         },
         {
           "title": "Revenue CAGR",
           "value": "8.7%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "33.3%",
+              "19.9%",
+              "11.8%",
+              "9.2%",
+              "8.7%"
+            ]
+          }
         }
       ],
       "customMetrics": [],
@@ -291,7 +575,7 @@
       "meta": "Technology · Software Infrastructure · NASDAQ",
       "price": 379.4,
       "change": 0.1293,
-      "cap": "Quote key required",
+      "cap": "$2.82T",
       "score": 86,
       "quality": "Strong compounder",
       "copy": "Healthy growth and durable economics support long-term compounding potential.",
@@ -300,23 +584,73 @@
           "Revenue growth",
           "+14.9%",
           "-0.7 pts",
-          "Latest reported fiscal year"
+          "Latest reported fiscal year",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+17.5%",
+              "+18.0%",
+              "+6.9%",
+              "+15.7%",
+              "+14.9%"
+            ]
+          }
         ],
         [
           "EPS growth",
           "+15.6%",
           "-6.2 pts",
-          "Diluted EPS, latest fiscal year"
+          "Diluted EPS, latest fiscal year",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+39.7%",
+              "+19.8%",
+              "+0.4%",
+              "+21.8%",
+              "+15.6%"
+            ]
+          }
         ],
         [
           "Net margin",
           "36.1%",
           "+0.2 pts",
-          "Calculated from SEC filings"
+          "Calculated from SEC filings",
+          {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "31.0%",
+              "36.5%",
+              "36.7%",
+              "34.1%",
+              "36.0%",
+              "36.1%"
+            ]
+          }
         ],
         [
           "Forward P/E",
-          "N/A",
+          "19.5x",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -327,23 +661,73 @@
             "Revenue growth",
             "+14.9%",
             "-0.7 pts",
-            "Latest reported fiscal year"
+            "Latest reported fiscal year",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+17.5%",
+                "+18.0%",
+                "+6.9%",
+                "+15.7%",
+                "+14.9%"
+              ]
+            }
           ],
           [
             "EPS growth",
             "+15.6%",
             "-6.2 pts",
-            "Diluted EPS, latest fiscal year"
+            "Diluted EPS, latest fiscal year",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+39.7%",
+                "+19.8%",
+                "+0.4%",
+                "+21.8%",
+                "+15.6%"
+              ]
+            }
           ],
           [
             "Net margin",
             "36.1%",
             "+0.2 pts",
-            "Calculated from SEC filings"
+            "Calculated from SEC filings",
+            {
+              "labels": [
+                "FY20",
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "31.0%",
+                "36.5%",
+                "36.7%",
+                "34.1%",
+                "36.0%",
+                "36.1%"
+              ]
+            }
           ],
           [
             "Forward P/E",
-            "N/A",
+            "19.5x",
             "Provider",
             "Alpha Vantage overview"
           ]
@@ -353,40 +737,82 @@
             "Revenue growth",
             "+18.3%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Sep '25",
+                "Dec '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "+18.4%",
+                "+16.7%",
+                "+18.3%"
+              ]
+            }
           ],
           [
             "EPS growth",
             "+23.4%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Sep '25",
+                "Dec '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "+12.7%",
+                "+59.8%",
+                "+23.4%"
+              ]
+            }
           ],
           [
             "Net margin",
             "38.3%",
             "+1.5 pts",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Sep '24",
+                "Dec '24",
+                "Mar '25",
+                "Sep '25",
+                "Dec '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "37.6%",
+                "34.6%",
+                "36.9%",
+                "35.7%",
+                "47.3%",
+                "38.3%"
+              ]
+            }
           ],
           [
             "Forward P/E",
             "N/A",
             "Provider",
-            "Alpha Vantage overview"
+            "Add Alpha Vantage key"
           ]
         ]
       },
       "signals": [
         [
           "FCF yield",
-          "N/A"
+          "2.5%"
         ],
         [
           "ROE",
-          "24.6%"
+          "29.6%"
         ],
         [
           "Debt / op. income",
-          "0.1x"
+          "0.0x"
         ],
         [
           "Revenue CAGR",
@@ -486,49 +912,191 @@
           "title": "Free cash flow",
           "value": "$71.6B",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$45.2B",
+              "$56.1B",
+              "$65.1B",
+              "$59.5B",
+              "$74.1B",
+              "$71.6B"
+            ]
+          }
         },
         {
           "title": "Operating cash flow",
           "value": "$136.2B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$60.7B",
+              "$76.7B",
+              "$89.0B",
+              "$87.6B",
+              "$118.5B",
+              "$136.2B"
+            ]
+          }
         },
         {
           "title": "Capital expenditures",
           "value": "$64.6B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$15.4B",
+              "$20.6B",
+              "$23.9B",
+              "$28.1B",
+              "$44.5B",
+              "$64.6B"
+            ]
+          }
         },
         {
           "title": "FCF margin",
           "value": "25.4%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "31.6%",
+              "33.4%",
+              "32.9%",
+              "28.1%",
+              "30.2%",
+              "25.4%"
+            ]
+          }
         },
         {
           "title": "Operating margin",
           "value": "45.6%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "37.0%",
+              "41.6%",
+              "42.1%",
+              "41.8%",
+              "44.6%",
+              "45.6%"
+            ]
+          }
         },
         {
           "title": "ROE",
-          "value": "24.6%",
+          "value": "29.6%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "37.4%",
+              "43.2%",
+              "43.7%",
+              "35.1%",
+              "32.8%",
+              "29.6%"
+            ]
+          }
         },
         {
           "title": "Debt / op. income",
-          "value": "0.1x",
+          "value": "0.0x",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "0.1x",
+              "0.1x",
+              "0.0x",
+              "0.1x",
+              "0.0x",
+              "0.0x"
+            ]
+          }
         },
         {
           "title": "Revenue CAGR",
           "value": "14.5%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "17.5%",
+              "17.7%",
+              "14.0%",
+              "14.4%",
+              "14.5%"
+            ]
+          }
         }
       ],
       "customMetrics": [],
@@ -560,7 +1128,7 @@
         "revenueGrowth": 14.9,
         "epsGrowth": 15.6,
         "netMargin": 36.1,
-        "pe": null,
+        "pe": 19.5,
         "score": 86
       },
       "sources": {
@@ -583,19 +1151,69 @@
           "Revenue growth",
           "+65.5%",
           "-48.7 pts",
-          "Latest reported fiscal year"
+          "Latest reported fiscal year",
+          {
+            "labels": [
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25",
+              "FY26"
+            ],
+            "displayValues": [
+              "+61.4%",
+              "+0.2%",
+              "+125.9%",
+              "+114.2%",
+              "+65.5%"
+            ]
+          }
         ],
         [
           "EPS growth",
           "+66.7%",
           "-79.5 pts",
-          "Diluted EPS, latest fiscal year"
+          "Diluted EPS, latest fiscal year",
+          {
+            "labels": [
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25",
+              "FY26"
+            ],
+            "displayValues": [
+              "+122.9%",
+              "-54.7%",
+              "+584.9%",
+              "+146.2%",
+              "+66.7%"
+            ]
+          }
         ],
         [
           "Net margin",
           "55.6%",
           "-0.2 pts",
-          "Calculated from SEC filings"
+          "Calculated from SEC filings",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25",
+              "FY26"
+            ],
+            "displayValues": [
+              "26.0%",
+              "36.2%",
+              "16.2%",
+              "48.8%",
+              "55.8%",
+              "55.6%"
+            ]
+          }
         ],
         [
           "Forward P/E",
@@ -610,19 +1228,69 @@
             "Revenue growth",
             "+65.5%",
             "-48.7 pts",
-            "Latest reported fiscal year"
+            "Latest reported fiscal year",
+            {
+              "labels": [
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25",
+                "FY26"
+              ],
+              "displayValues": [
+                "+61.4%",
+                "+0.2%",
+                "+125.9%",
+                "+114.2%",
+                "+65.5%"
+              ]
+            }
           ],
           [
             "EPS growth",
             "+66.7%",
             "-79.5 pts",
-            "Diluted EPS, latest fiscal year"
+            "Diluted EPS, latest fiscal year",
+            {
+              "labels": [
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25",
+                "FY26"
+              ],
+              "displayValues": [
+                "+122.9%",
+                "-54.7%",
+                "+584.9%",
+                "+146.2%",
+                "+66.7%"
+              ]
+            }
           ],
           [
             "Net margin",
             "55.6%",
             "-0.2 pts",
-            "Calculated from SEC filings"
+            "Calculated from SEC filings",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25",
+                "FY26"
+              ],
+              "displayValues": [
+                "26.0%",
+                "36.2%",
+                "16.2%",
+                "48.8%",
+                "55.8%",
+                "55.6%"
+              ]
+            }
           ],
           [
             "Forward P/E",
@@ -636,25 +1304,67 @@
             "Revenue growth",
             "+85.2%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jul '25",
+                "Oct '25",
+                "Apr '26"
+              ],
+              "displayValues": [
+                "+55.6%",
+                "+62.5%",
+                "+85.2%"
+              ]
+            }
           ],
           [
             "EPS growth",
-            "+213.3%",
+            "+214.5%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jul '25",
+                "Oct '25",
+                "Apr '26"
+              ],
+              "displayValues": [
+                "+61.2%",
+                "+66.7%",
+                "+214.5%"
+              ]
+            }
           ],
           [
             "Net margin",
             "71.5%",
             "+28.8 pts",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jul '24",
+                "Oct '24",
+                "Apr '25",
+                "Jul '25",
+                "Oct '25",
+                "Apr '26"
+              ],
+              "displayValues": [
+                "55.3%",
+                "55.0%",
+                "42.6%",
+                "56.5%",
+                "56.0%",
+                "71.5%"
+              ]
+            }
           ],
           [
             "Forward P/E",
             "N/A",
             "Provider",
-            "Alpha Vantage overview"
+            "Add Alpha Vantage key"
           ]
         ]
       },
@@ -665,7 +1375,7 @@
         ],
         [
           "ROE",
-          "61.4%"
+          "76.3%"
         ],
         [
           "Debt / op. income",
@@ -769,49 +1479,181 @@
           "title": "Free cash flow",
           "value": "$96.7B",
           "note": "Calculated",
-          "period": "FY26"
+          "period": "FY26",
+          "history": {
+            "labels": [
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25",
+              "FY26"
+            ],
+            "displayValues": [
+              "$8.1B",
+              "$3.8B",
+              "$27.0B",
+              "$60.9B",
+              "$96.7B"
+            ]
+          }
         },
         {
           "title": "Operating cash flow",
           "value": "$102.7B",
           "note": "SEC reported",
-          "period": "FY26"
+          "period": "FY26",
+          "history": {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25",
+              "FY26"
+            ],
+            "displayValues": [
+              "$5.8B",
+              "$9.1B",
+              "$5.6B",
+              "$28.1B",
+              "$64.1B",
+              "$102.7B"
+            ]
+          }
         },
         {
           "title": "Capital expenditures",
           "value": "$6.0B",
           "note": "SEC reported",
-          "period": "FY26"
+          "period": "FY26",
+          "history": {
+            "labels": [
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25",
+              "FY26"
+            ],
+            "displayValues": [
+              "$976.0M",
+              "$1.8B",
+              "$1.1B",
+              "$3.2B",
+              "$6.0B"
+            ]
+          }
         },
         {
           "title": "FCF margin",
           "value": "44.8%",
           "note": "Calculated",
-          "period": "FY26"
+          "period": "FY26",
+          "history": {
+            "labels": [
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25",
+              "FY26"
+            ],
+            "displayValues": [
+              "30.2%",
+              "14.1%",
+              "44.4%",
+              "46.6%",
+              "44.8%"
+            ]
+          }
         },
         {
           "title": "Operating margin",
           "value": "60.4%",
           "note": "Calculated",
-          "period": "FY26"
+          "period": "FY26",
+          "history": {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25",
+              "FY26"
+            ],
+            "displayValues": [
+              "27.2%",
+              "37.3%",
+              "15.7%",
+              "54.1%",
+              "62.4%",
+              "60.4%"
+            ]
+          }
         },
         {
           "title": "ROE",
-          "value": "61.4%",
+          "value": "76.3%",
           "note": "Calculated",
-          "period": "FY26"
+          "period": "FY26",
+          "history": {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25",
+              "FY26"
+            ],
+            "displayValues": [
+              "25.6%",
+              "36.6%",
+              "19.8%",
+              "69.2%",
+              "91.9%",
+              "76.3%"
+            ]
+          }
         },
         {
           "title": "Debt / op. income",
           "value": "0.0x",
           "note": "Calculated",
-          "period": "FY26"
+          "period": "FY26",
+          "history": {
+            "labels": [
+              "FY21",
+              "FY23",
+              "FY24",
+              "FY26"
+            ],
+            "displayValues": [
+              "0.2x",
+              "0.3x",
+              "0.0x",
+              "0.0x"
+            ]
+          }
         },
         {
           "title": "Revenue CAGR",
           "value": "66.9%",
           "note": "Calculated",
-          "period": "FY26"
+          "period": "FY26",
+          "history": {
+            "labels": [
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25",
+              "FY26"
+            ],
+            "displayValues": [
+              "61.4%",
+              "27.2%",
+              "54.0%",
+              "67.3%",
+              "66.9%"
+            ]
+          }
         }
       ],
       "customMetrics": [
@@ -887,19 +1729,69 @@
           "Revenue growth",
           "+12.4%",
           "+1.4 pts",
-          "Latest reported fiscal year"
+          "Latest reported fiscal year",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+21.7%",
+              "+9.4%",
+              "+11.8%",
+              "+11.0%",
+              "+12.4%"
+            ]
+          }
         ],
         [
           "EPS growth",
           "+29.8%",
           "-60.8 pts",
-          "Diluted EPS, latest fiscal year"
+          "Diluted EPS, latest fiscal year",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+54.9%",
+              "Profit to loss",
+              "Loss to profit",
+              "+90.6%",
+              "+29.8%"
+            ]
+          }
         ],
         [
           "Net margin",
           "10.8%",
           "+1.5 pts",
-          "Calculated from SEC filings"
+          "Calculated from SEC filings",
+          {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "5.5%",
+              "7.1%",
+              "-0.5%",
+              "5.3%",
+              "9.3%",
+              "10.8%"
+            ]
+          }
         ],
         [
           "Forward P/E",
@@ -914,19 +1806,69 @@
             "Revenue growth",
             "+12.4%",
             "+1.4 pts",
-            "Latest reported fiscal year"
+            "Latest reported fiscal year",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+21.7%",
+                "+9.4%",
+                "+11.8%",
+                "+11.0%",
+                "+12.4%"
+              ]
+            }
           ],
           [
             "EPS growth",
             "+29.8%",
             "-60.8 pts",
-            "Diluted EPS, latest fiscal year"
+            "Diluted EPS, latest fiscal year",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+54.9%",
+                "Profit to loss",
+                "Loss to profit",
+                "+90.6%",
+                "+29.8%"
+              ]
+            }
           ],
           [
             "Net margin",
             "10.8%",
             "+1.5 pts",
-            "Calculated from SEC filings"
+            "Calculated from SEC filings",
+            {
+              "labels": [
+                "FY20",
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "5.5%",
+                "7.1%",
+                "-0.5%",
+                "5.3%",
+                "9.3%",
+                "10.8%"
+              ]
+            }
           ],
           [
             "Forward P/E",
@@ -940,25 +1882,67 @@
             "Revenue growth",
             "+16.6%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '25",
+                "Sep '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "+13.3%",
+                "+13.4%",
+                "+16.6%"
+              ]
+            }
           ],
           [
             "EPS growth",
-            "+75.2%",
+            "+74.8%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '25",
+                "Sep '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "+33.3%",
+                "+36.4%",
+                "+74.8%"
+              ]
+            }
           ],
           [
             "Net margin",
             "16.7%",
             "+5.7 pts",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '24",
+                "Sep '24",
+                "Mar '25",
+                "Jun '25",
+                "Sep '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "9.1%",
+                "9.6%",
+                "11.0%",
+                "10.8%",
+                "11.8%",
+                "16.7%"
+              ]
+            }
           ],
           [
             "Forward P/E",
             "N/A",
             "Provider",
-            "Alpha Vantage overview"
+            "Add Alpha Vantage key"
           ]
         ]
       },
@@ -969,7 +1953,7 @@
         ],
         [
           "ROE",
-          "17.6%"
+          "18.9%"
         ],
         [
           "Debt / op. income",
@@ -1073,49 +2057,191 @@
           "title": "Free cash flow",
           "value": "$7.7B",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$25.9B",
+              "-$14.7B",
+              "-$16.9B",
+              "$32.2B",
+              "$32.9B",
+              "$7.7B"
+            ]
+          }
         },
         {
           "title": "Operating cash flow",
           "value": "$139.5B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$66.1B",
+              "$46.3B",
+              "$46.8B",
+              "$84.9B",
+              "$115.9B",
+              "$139.5B"
+            ]
+          }
         },
         {
           "title": "Capital expenditures",
           "value": "$131.8B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$40.1B",
+              "$61.1B",
+              "$63.6B",
+              "$52.7B",
+              "$83.0B",
+              "$131.8B"
+            ]
+          }
         },
         {
           "title": "FCF margin",
           "value": "1.1%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "6.7%",
+              "-3.1%",
+              "-3.3%",
+              "5.6%",
+              "5.2%",
+              "1.1%"
+            ]
+          }
         },
         {
           "title": "Operating margin",
           "value": "11.2%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "5.9%",
+              "5.3%",
+              "2.4%",
+              "6.4%",
+              "10.8%",
+              "11.2%"
+            ]
+          }
         },
         {
           "title": "ROE",
-          "value": "17.6%",
+          "value": "18.9%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "22.8%",
+              "24.1%",
+              "-1.9%",
+              "15.1%",
+              "20.7%",
+              "18.9%"
+            ]
+          }
         },
         {
           "title": "Debt / op. income",
           "value": "0.0x",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "0.1x",
+              "0.1x",
+              "0.2x",
+              "0.2x",
+              "0.1x",
+              "0.0x"
+            ]
+          }
         },
         {
           "title": "Revenue CAGR",
           "value": "13.2%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "21.7%",
+              "15.4%",
+              "14.2%",
+              "13.4%",
+              "13.2%"
+            ]
+          }
         }
       ],
       "customMetrics": [
@@ -1273,10 +2399,10 @@
     "GOOGL": {
       "name": "Alphabet Inc.",
       "ticker": "GOOGL",
-      "meta": "COMMUNICATION SERVICES · INTERNET CONTENT & INFORMATION · NASDAQ",
+      "meta": "Communication Services · Internet Content · NASDAQ",
       "price": 368.03,
       "change": 1.1655,
-      "cap": "$4.49T",
+      "cap": "Quote key required",
       "score": 92,
       "quality": "Exceptional quality",
       "copy": "Strong growth and profitability create an unusually resilient fundamental profile.",
@@ -1285,23 +2411,67 @@
           "Revenue growth",
           "+15.1%",
           "+1.2 pts",
-          "Latest reported fiscal year"
+          "Latest reported fiscal year",
+          {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+12.8%",
+              "+41.2%",
+              "+19.3%",
+              "+13.9%",
+              "+15.1%"
+            ]
+          }
         ],
         [
           "EPS growth",
           "+34.4%",
           "-4.3 pts",
-          "Diluted EPS, latest fiscal year"
+          "Diluted EPS, latest fiscal year",
+          {
+            "labels": [
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+27.3%",
+              "+38.7%",
+              "+34.4%"
+            ]
+          }
         ],
         [
           "Net margin",
           "32.8%",
           "+4.2 pts",
-          "Calculated from SEC filings"
+          "Calculated from SEC filings",
+          {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "22.1%",
+              "29.5%",
+              "24.0%",
+              "28.6%",
+              "32.8%"
+            ]
+          }
         ],
         [
           "Forward P/E",
-          "26.1x",
+          "N/A",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -1312,23 +2482,67 @@
             "Revenue growth",
             "+15.1%",
             "+1.2 pts",
-            "Latest reported fiscal year"
+            "Latest reported fiscal year",
+            {
+              "labels": [
+                "FY20",
+                "FY21",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+12.8%",
+                "+41.2%",
+                "+19.3%",
+                "+13.9%",
+                "+15.1%"
+              ]
+            }
           ],
           [
             "EPS growth",
             "+34.4%",
             "-4.3 pts",
-            "Diluted EPS, latest fiscal year"
+            "Diluted EPS, latest fiscal year",
+            {
+              "labels": [
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+27.3%",
+                "+38.7%",
+                "+34.4%"
+              ]
+            }
           ],
           [
             "Net margin",
             "32.8%",
             "+4.2 pts",
-            "Calculated from SEC filings"
+            "Calculated from SEC filings",
+            {
+              "labels": [
+                "FY20",
+                "FY21",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "22.1%",
+                "29.5%",
+                "24.0%",
+                "28.6%",
+                "32.8%"
+              ]
+            }
           ],
           [
             "Forward P/E",
-            "26.1x",
+            "N/A",
             "Provider",
             "Alpha Vantage overview"
           ]
@@ -1338,36 +2552,78 @@
             "Revenue growth",
             "+21.8%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '25",
+                "Sep '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "+13.8%",
+                "+15.9%",
+                "+21.8%"
+              ]
+            }
           ],
           [
             "EPS growth",
-            "+81.8%",
+            "+81.9%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '25",
+                "Sep '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "+22.2%",
+                "+35.4%",
+                "+81.9%"
+              ]
+            }
           ],
           [
             "Net margin",
             "56.9%",
             "+18.7 pts",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '24",
+                "Sep '24",
+                "Mar '25",
+                "Jun '25",
+                "Sep '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "27.9%",
+                "29.8%",
+                "38.3%",
+                "29.2%",
+                "34.2%",
+                "56.9%"
+              ]
+            }
           ],
           [
             "Forward P/E",
-            "26.1x",
+            "N/A",
             "Provider",
-            "Alpha Vantage overview"
+            "Add Alpha Vantage key"
           ]
         ]
       },
       "signals": [
         [
           "FCF yield",
-          "1.6%"
+          "N/A"
         ],
         [
           "ROE",
-          "27.6%"
+          "31.8%"
         ],
         [
           "Debt / op. income",
@@ -1462,49 +2718,175 @@
           "title": "Free cash flow",
           "value": "$73.3B",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$42.8B",
+              "$67.0B",
+              "$69.5B",
+              "$72.8B",
+              "$73.3B"
+            ]
+          }
         },
         {
           "title": "Operating cash flow",
           "value": "$164.7B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$65.1B",
+              "$91.7B",
+              "$101.7B",
+              "$125.3B",
+              "$164.7B"
+            ]
+          }
         },
         {
           "title": "Capital expenditures",
           "value": "$91.4B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$22.3B",
+              "$24.6B",
+              "$32.3B",
+              "$52.5B",
+              "$91.4B"
+            ]
+          }
         },
         {
           "title": "FCF margin",
           "value": "18.2%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "23.5%",
+              "26.0%",
+              "22.6%",
+              "20.8%",
+              "18.2%"
+            ]
+          }
         },
         {
           "title": "Operating margin",
           "value": "32.0%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "22.6%",
+              "30.6%",
+              "27.4%",
+              "32.1%",
+              "32.0%"
+            ]
+          }
         },
         {
           "title": "ROE",
-          "value": "27.6%",
+          "value": "31.8%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "18.1%",
+              "30.2%",
+              "26.0%",
+              "30.8%",
+              "31.8%"
+            ]
+          }
         },
         {
           "title": "Debt / op. income",
           "value": "0.0x",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "0.0x",
+              "0.0x",
+              "0.0x",
+              "0.0x"
+            ]
+          }
         },
         {
           "title": "Revenue CAGR",
           "value": "20.0%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "12.8%",
+              "26.2%",
+              "23.8%",
+              "21.3%",
+              "20.0%"
+            ]
+          }
         }
       ],
       "customMetrics": [],
@@ -1536,7 +2918,7 @@
         "revenueGrowth": 15.1,
         "epsGrowth": 34.4,
         "netMargin": 32.8,
-        "pe": 26.1,
+        "pe": null,
         "score": 92
       },
       "sources": {
@@ -1547,10 +2929,10 @@
     "META": {
       "name": "Meta Platforms, Inc.",
       "ticker": "META",
-      "meta": "COMMUNICATION SERVICES · INTERNET CONTENT & INFORMATION · NASDAQ",
+      "meta": "Communication Services · Internet Content · NASDAQ",
       "price": 577.22,
       "change": 1.6984,
-      "cap": "$1.47T",
+      "cap": "Quote key required",
       "score": 84,
       "quality": "Strong compounder",
       "copy": "Healthy growth and durable economics support long-term compounding potential.",
@@ -1559,23 +2941,73 @@
           "Revenue growth",
           "+22.2%",
           "+0.2 pts",
-          "Latest reported fiscal year"
+          "Latest reported fiscal year",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+37.2%",
+              "-1.1%",
+              "+15.7%",
+              "+21.9%",
+              "+22.2%"
+            ]
+          }
         ],
         [
           "EPS growth",
           "-1.5%",
           "-62.0 pts",
-          "Diluted EPS, latest fiscal year"
+          "Diluted EPS, latest fiscal year",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+36.4%",
+              "-37.6%",
+              "+73.2%",
+              "+60.4%",
+              "-1.5%"
+            ]
+          }
         ],
         [
           "Net margin",
           "30.1%",
           "-7.8 pts",
-          "Calculated from SEC filings"
+          "Calculated from SEC filings",
+          {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "33.9%",
+              "33.4%",
+              "19.9%",
+              "29.0%",
+              "37.9%",
+              "30.1%"
+            ]
+          }
         ],
         [
           "Forward P/E",
-          "18.4x",
+          "N/A",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -1586,23 +3018,73 @@
             "Revenue growth",
             "+22.2%",
             "+0.2 pts",
-            "Latest reported fiscal year"
+            "Latest reported fiscal year",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+37.2%",
+                "-1.1%",
+                "+15.7%",
+                "+21.9%",
+                "+22.2%"
+              ]
+            }
           ],
           [
             "EPS growth",
             "-1.5%",
             "-62.0 pts",
-            "Diluted EPS, latest fiscal year"
+            "Diluted EPS, latest fiscal year",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+36.4%",
+                "-37.6%",
+                "+73.2%",
+                "+60.4%",
+                "-1.5%"
+              ]
+            }
           ],
           [
             "Net margin",
             "30.1%",
             "-7.8 pts",
-            "Calculated from SEC filings"
+            "Calculated from SEC filings",
+            {
+              "labels": [
+                "FY20",
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "33.9%",
+                "33.4%",
+                "19.9%",
+                "29.0%",
+                "37.9%",
+                "30.1%"
+              ]
+            }
           ],
           [
             "Forward P/E",
-            "18.4x",
+            "N/A",
             "Provider",
             "Alpha Vantage overview"
           ]
@@ -1612,36 +3094,78 @@
             "Revenue growth",
             "+33.1%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '25",
+                "Sep '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "+21.6%",
+                "+26.2%",
+                "+33.1%"
+              ]
+            }
           ],
           [
             "EPS growth",
-            "+62.5%",
+            "+62.4%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '25",
+                "Sep '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "+38.4%",
+                "-82.6%",
+                "+62.4%"
+              ]
+            }
           ],
           [
             "Net margin",
             "47.5%",
             "+8.2 pts",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '24",
+                "Sep '24",
+                "Mar '25",
+                "Jun '25",
+                "Sep '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "34.5%",
+                "38.7%",
+                "39.3%",
+                "38.6%",
+                "5.3%",
+                "47.5%"
+              ]
+            }
           ],
           [
             "Forward P/E",
-            "18.4x",
+            "N/A",
             "Provider",
-            "Alpha Vantage overview"
+            "Add Alpha Vantage key"
           ]
         ]
       },
       "signals": [
         [
           "FCF yield",
-          "3.1%"
+          "N/A"
         ],
         [
           "ROE",
-          "24.8%"
+          "27.8%"
         ],
         [
           "Debt / op. income",
@@ -1745,49 +3269,187 @@
           "title": "Free cash flow",
           "value": "$46.1B",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$23.6B",
+              "$39.0B",
+              "$19.3B",
+              "$44.1B",
+              "$54.1B",
+              "$46.1B"
+            ]
+          }
         },
         {
           "title": "Operating cash flow",
           "value": "$115.8B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$38.7B",
+              "$57.7B",
+              "$50.5B",
+              "$71.1B",
+              "$91.3B",
+              "$115.8B"
+            ]
+          }
         },
         {
           "title": "Capital expenditures",
           "value": "$69.7B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$15.2B",
+              "$18.7B",
+              "$31.2B",
+              "$27.0B",
+              "$37.3B",
+              "$69.7B"
+            ]
+          }
         },
         {
           "title": "FCF margin",
           "value": "22.9%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "27.4%",
+              "33.1%",
+              "16.5%",
+              "32.7%",
+              "32.9%",
+              "22.9%"
+            ]
+          }
         },
         {
           "title": "Operating margin",
           "value": "41.4%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "38.0%",
+              "39.6%",
+              "24.8%",
+              "34.7%",
+              "42.2%",
+              "41.4%"
+            ]
+          }
         },
         {
           "title": "ROE",
-          "value": "24.8%",
+          "value": "27.8%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "22.7%",
+              "31.5%",
+              "18.5%",
+              "25.5%",
+              "34.1%",
+              "27.8%"
+            ]
+          }
         },
         {
           "title": "Debt / op. income",
           "value": "0.7x",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "0.3x",
+              "0.4x",
+              "0.4x",
+              "0.7x"
+            ]
+          }
         },
         {
           "title": "Revenue CAGR",
           "value": "18.5%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "37.2%",
+              "16.5%",
+              "16.2%",
+              "17.6%",
+              "18.5%"
+            ]
+          }
         }
       ],
       "customMetrics": [],
@@ -1819,7 +3481,7 @@
         "revenueGrowth": 22.2,
         "epsGrowth": -1.5,
         "netMargin": 30.1,
-        "pe": 18.4,
+        "pe": null,
         "score": 84
       },
       "sources": {
@@ -1842,19 +3504,69 @@
           "Revenue growth",
           "+48.9%",
           "-12.7 pts",
-          "Latest reported fiscal year"
+          "Latest reported fiscal year",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+29.3%",
+              "+11.0%",
+              "-49.5%",
+              "+61.6%",
+              "+48.9%"
+            ]
+          }
         ],
         [
           "EPS growth",
           "+990.7%",
           "+877.7 pts",
-          "Diluted EPS, latest fiscal year"
+          "Diluted EPS, latest fiscal year",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+116.2%",
+              "+50.7%",
+              "Profit to loss",
+              "Loss to profit",
+              "+990.7%"
+            ]
+          }
         ],
         [
           "Net margin",
           "22.8%",
           "+19.7 pts",
-          "Calculated from SEC filings"
+          "Calculated from SEC filings",
+          {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "12.5%",
+              "21.2%",
+              "28.2%",
+              "-37.5%",
+              "3.1%",
+              "22.8%"
+            ]
+          }
         ],
         [
           "Forward P/E",
@@ -1869,19 +3581,69 @@
             "Revenue growth",
             "+48.9%",
             "-12.7 pts",
-            "Latest reported fiscal year"
+            "Latest reported fiscal year",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+29.3%",
+                "+11.0%",
+                "-49.5%",
+                "+61.6%",
+                "+48.9%"
+              ]
+            }
           ],
           [
             "EPS growth",
             "+990.7%",
             "+877.7 pts",
-            "Diluted EPS, latest fiscal year"
+            "Diluted EPS, latest fiscal year",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+116.2%",
+                "+50.7%",
+                "Profit to loss",
+                "Loss to profit",
+                "+990.7%"
+              ]
+            }
           ],
           [
             "Net margin",
             "22.8%",
             "+19.7 pts",
-            "Calculated from SEC filings"
+            "Calculated from SEC filings",
+            {
+              "labels": [
+                "FY20",
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "12.5%",
+                "21.2%",
+                "28.2%",
+                "-37.5%",
+                "3.1%",
+                "22.8%"
+              ]
+            }
           ],
           [
             "Forward P/E",
@@ -1895,25 +3657,67 @@
             "Revenue growth",
             "+196.3%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "May '25",
+                "Nov '25",
+                "Feb '26"
+              ],
+              "displayValues": [
+                "+36.6%",
+                "+56.7%",
+                "+196.3%"
+              ]
+            }
           ],
           [
             "EPS growth",
-            "+756.3%",
+            "+756.0%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "May '25",
+                "Nov '25",
+                "Feb '26"
+              ],
+              "displayValues": [
+                "+460.0%",
+                "+175.4%",
+                "+756.0%"
+              ]
+            }
           ],
           [
             "Net margin",
             "57.8%",
             "+38.1 pts",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "May '24",
+                "Nov '24",
+                "Feb '25",
+                "May '25",
+                "Nov '25",
+                "Feb '26"
+              ],
+              "displayValues": [
+                "4.9%",
+                "21.5%",
+                "19.7%",
+                "20.3%",
+                "38.4%",
+                "57.8%"
+              ]
+            }
           ],
           [
             "Forward P/E",
             "N/A",
             "Provider",
-            "Alpha Vantage overview"
+            "Add Alpha Vantage key"
           ]
         ]
       },
@@ -1924,7 +3728,7 @@
         ],
         [
           "ROE",
-          "11.8%"
+          "15.8%"
         ],
         [
           "Debt / op. income",
@@ -2028,49 +3832,177 @@
           "title": "Free cash flow",
           "value": "$1.7B",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$83.0M",
+              "$2.4B",
+              "$3.1B",
+              "-$6.1B",
+              "$121.0M",
+              "$1.7B"
+            ]
+          }
         },
         {
           "title": "Operating cash flow",
           "value": "$17.5B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$8.3B",
+              "$12.5B",
+              "$15.2B",
+              "$1.6B",
+              "$8.5B",
+              "$17.5B"
+            ]
+          }
         },
         {
           "title": "Capital expenditures",
           "value": "$15.9B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$8.2B",
+              "$10.0B",
+              "$12.1B",
+              "$7.7B",
+              "$8.4B",
+              "$15.9B"
+            ]
+          }
         },
         {
           "title": "FCF margin",
           "value": "4.5%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "0.4%",
+              "8.8%",
+              "10.1%",
+              "-39.4%",
+              "0.5%",
+              "4.5%"
+            ]
+          }
         },
         {
           "title": "Operating margin",
           "value": "26.1%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "14.0%",
+              "22.7%",
+              "31.5%",
+              "-37.0%",
+              "5.2%",
+              "26.1%"
+            ]
+          }
         },
         {
           "title": "ROE",
-          "value": "11.8%",
+          "value": "15.8%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "6.9%",
+              "13.3%",
+              "17.4%",
+              "-13.2%",
+              "1.7%",
+              "15.8%"
+            ]
+          }
         },
         {
           "title": "Debt / op. income",
           "value": "0.0x",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [],
+            "displayValues": []
+          }
         },
         {
           "title": "Revenue CAGR",
           "value": "11.8%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "29.3%",
+              "19.8%",
+              "-10.2%",
+              "4.0%",
+              "11.8%"
+            ]
+          }
         }
       ],
       "customMetrics": [
@@ -2158,19 +4090,69 @@
           "Revenue growth",
           "+27.5%",
           "-29.0 pts",
-          "Latest reported fiscal year"
+          "Latest reported fiscal year",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "+297.3%",
+              "+115.6%",
+              "+47.9%",
+              "+56.5%",
+              "+27.5%"
+            ]
+          }
         ],
         [
           "EPS growth",
           "Profit to loss",
           "-$1.78",
-          "EPS changed from positive to negative"
+          "EPS changed from positive to negative",
+          {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "Loss widened",
+              "Loss narrowed",
+              "Loss narrowed",
+              "Loss to profit",
+              "Profit to loss"
+            ]
+          }
         ],
         [
           "Net margin",
           "-3.8%",
           "-4.1 pts",
-          "Calculated from SEC filings"
+          "Calculated from SEC filings",
+          {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "-87.9%",
+              "-31.1%",
+              "-15.3%",
+              "-4.6%",
+              "0.3%",
+              "-3.8%"
+            ]
+          }
         ],
         [
           "Forward P/E",
@@ -2185,19 +4167,69 @@
             "Revenue growth",
             "+27.5%",
             "-29.0 pts",
-            "Latest reported fiscal year"
+            "Latest reported fiscal year",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "+297.3%",
+                "+115.6%",
+                "+47.9%",
+                "+56.5%",
+                "+27.5%"
+              ]
+            }
           ],
           [
             "EPS growth",
             "Profit to loss",
             "-$1.78",
-            "EPS changed from positive to negative"
+            "EPS changed from positive to negative",
+            {
+              "labels": [
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "Loss widened",
+                "Loss narrowed",
+                "Loss narrowed",
+                "Loss to profit",
+                "Profit to loss"
+              ]
+            }
           ],
           [
             "Net margin",
             "-3.8%",
             "-4.1 pts",
-            "Calculated from SEC filings"
+            "Calculated from SEC filings",
+            {
+              "labels": [
+                "FY20",
+                "FY21",
+                "FY22",
+                "FY23",
+                "FY24",
+                "FY25"
+              ],
+              "displayValues": [
+                "-87.9%",
+                "-31.1%",
+                "-15.3%",
+                "-4.6%",
+                "0.3%",
+                "-3.8%"
+              ]
+            }
           ],
           [
             "Forward P/E",
@@ -2211,25 +4243,67 @@
             "Revenue growth",
             "+52.6%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '25",
+                "Sep '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "+29.0%",
+                "+23.2%",
+                "+52.6%"
+              ]
+            }
           ],
           [
             "EPS growth",
-            "+130.1%",
+            "+125.0%",
             "Same quarter prior year",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '25",
+                "Sep '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "Profit to loss",
+                "Loss widened",
+                "+125.0%"
+              ]
+            }
           ],
           [
             "Net margin",
             "14.6%",
             "+5.6 pts",
-            "Compared with same quarter last year"
+            "Compared with same quarter last year",
+            {
+              "labels": [
+                "Jun '24",
+                "Sep '24",
+                "Mar '25",
+                "Jun '25",
+                "Sep '25",
+                "Mar '26"
+              ],
+              "displayValues": [
+                "2.5%",
+                "-2.3%",
+                "9.0%",
+                "-8.0%",
+                "-4.6%",
+                "14.6%"
+              ]
+            }
           ],
           [
             "Forward P/E",
             "N/A",
             "Provider",
-            "Alpha Vantage overview"
+            "Add Alpha Vantage key"
           ]
         ]
       },
@@ -2240,7 +4314,7 @@
         ],
         [
           "ROE",
-          "-26.6%"
+          "-45.2%"
         ],
         [
           "Debt / op. income",
@@ -2364,49 +4438,189 @@
           "title": "Free cash flow",
           "value": "$1.1B",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$208.7M",
+              "-$207.6M",
+              "$351.3M",
+              "-$297.7M",
+              "$950.3M",
+              "$1.1B"
+            ]
+          }
         },
         {
           "title": "Operating cash flow",
           "value": "$1.1B",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$222.7M",
+              "-$181.7M",
+              "$380.3M",
+              "-$272.2M",
+              "$978.2M",
+              "$1.1B"
+            ]
+          }
         },
         {
           "title": "Capital expenditures",
           "value": "$36.4M",
           "note": "SEC reported",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "$14.0M",
+              "$25.9M",
+              "$29.0M",
+              "$25.6M",
+              "$27.9M",
+              "$36.4M"
+            ]
+          }
         },
         {
           "title": "FCF margin",
           "value": "9.0%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "45.1%",
+              "-11.3%",
+              "8.9%",
+              "-5.1%",
+              "10.4%",
+              "9.0%"
+            ]
+          }
         },
         {
           "title": "Operating margin",
           "value": "-3.4%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "-86.9%",
+              "-29.6%",
+              "-14.9%",
+              "-4.0%",
+              "0.6%",
+              "-3.4%"
+            ]
+          }
         },
         {
           "title": "ROE",
-          "value": "-26.6%",
+          "value": "-45.2%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "31.4%",
+              "-41.1%",
+              "-67.9%",
+              "-33.6%",
+              "2.5%",
+              "-45.2%"
+            ]
+          }
         },
         {
           "title": "Debt / op. income",
           "value": "-1.1x",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY20",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "-0.4x",
+              "-0.5x",
+              "-1.3x",
+              "5.2x",
+              "-1.1x"
+            ]
+          }
         },
         {
           "title": "Revenue CAGR",
           "value": "90.8%",
           "note": "Calculated",
-          "period": "FY25"
+          "period": "FY25",
+          "history": {
+            "labels": [
+              "FY21",
+              "FY22",
+              "FY23",
+              "FY24",
+              "FY25"
+            ],
+            "displayValues": [
+              "297.3%",
+              "192.7%",
+              "133.1%",
+              "111.0%",
+              "90.8%"
+            ]
+          }
         }
       ],
       "customMetrics": [
@@ -2549,7 +4763,7 @@
             "$2.9M",
             "$4.6M",
             "$7.6M",
-            "$-140000",
+            "-$140000",
             "$2.5M",
             "$2.7M",
             "$3.0M",
@@ -2678,10 +4892,10 @@
           ],
           "displayValues": [
             "$589000",
-            "$-30000",
+            "-$30000",
             "$534000",
-            "$-62000",
-            "$-855000",
+            "-$62000",
+            "-$855000",
             "$0",
             "$0",
             "$0"
@@ -2903,10 +5117,10 @@
           "displayValues": [
             "$20.0M",
             "$18.2M",
-            "$-2.4M",
-            "$-1.5M"
+            "-$2.4M",
+            "-$1.5M"
           ],
-          "latest": "$-1.5M",
+          "latest": "-$1.5M",
           "latestPeriod": "2023-09-30",
           "source": "SEC inline XBRL"
         },
@@ -2929,10 +5143,10 @@
           "displayValues": [
             "$339.8M",
             "$327.0M",
-            "$-50.8M",
-            "$-54.9M"
+            "-$50.8M",
+            "-$54.9M"
           ],
-          "latest": "$-54.9M",
+          "latest": "-$54.9M",
           "latestPeriod": "2023-09-30",
           "source": "SEC inline XBRL"
         },
@@ -3088,7 +5302,7 @@
       "ticker": "MSFT",
       "growth": 14.9,
       "eps": 15.6,
-      "pe": null,
+      "pe": 19.5,
       "margin": 36.1,
       "score": 86
     },
@@ -3112,7 +5326,7 @@
       "ticker": "GOOGL",
       "growth": 15.1,
       "eps": 34.4,
-      "pe": 26.1,
+      "pe": null,
       "margin": 32.8,
       "score": 92
     },
@@ -3120,7 +5334,7 @@
       "ticker": "META",
       "growth": 22.2,
       "eps": -1.5,
-      "pe": 18.4,
+      "pe": null,
       "margin": 30.1,
       "score": 84
     },

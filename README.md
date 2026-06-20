@@ -55,6 +55,8 @@ Users can hide discovered company-specific metrics independently for each ticker
 
 Common financial indicators are calculated consistently for every ticker from standardized SEC facts. These include free cash flow, operating cash flow, capital expenditures, FCF margin, operating margin, return on equity, leverage, and revenue CAGR. A value remains `N/A` when the required facts are not reported rather than being estimated or replaced with mock data.
 
+Historical observations are retained and displayed alongside the latest value for SEC-derived summary, financial, and company-specific metrics. The Annual/Quarterly selector changes both the revenue/EPS chart and the corresponding historical growth and margin series. Provider-only point-in-time metrics such as forward P/E remain current-only when no historical feed is available.
+
 ## Run locally
 
 ```bash

@@ -85,10 +85,12 @@ const formatPerShareChange = (value) =>
   Number.isFinite(value) ? `${value >= 0 ? "+" : "-"}$${Math.abs(value).toFixed(2)}` : "N/A";
 const formatMoney = (value) => {
   if (!Number.isFinite(value)) return "N/A";
-  if (Math.abs(value) >= 1e12) return `$${(value / 1e12).toFixed(2)}T`;
-  if (Math.abs(value) >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
-  if (Math.abs(value) >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
-  return `$${value.toFixed(0)}`;
+  const sign = value < 0 ? "-" : "";
+  const absolute = Math.abs(value);
+  if (absolute >= 1e12) return `${sign}$${(absolute / 1e12).toFixed(2)}T`;
+  if (absolute >= 1e9) return `${sign}$${(absolute / 1e9).toFixed(1)}B`;
+  if (absolute >= 1e6) return `${sign}$${(absolute / 1e6).toFixed(1)}M`;
+  return `${sign}$${absolute.toFixed(0)}`;
 };
 const formatCustomMetric = (value, format) => {
   if (!Number.isFinite(value)) return "N/A";
@@ -186,6 +188,25 @@ function latestInstant(facts) {
   return dedupeFacts(facts)
     .filter((fact) => ["10-K", "10-Q"].includes(fact.form))
     .sort((a, b) => String(b.end).localeCompare(String(a.end)))[0]?.val ?? null;
+}
+
+function instantSeries(facts, limit = 6) {
+  const candidates = dedupeFacts(facts)
+    .filter((fact) => fact.form === "10-K" && fact.fp === "FY" && fact.end)
+    .sort((a, b) => String(a.end).localeCompare(String(b.end)));
+  const byEnd = new Map();
+  for (const fact of candidates) byEnd.set(fact.end, fact);
+  return [...byEnd.values()].slice(-limit);
+}
+
+function displayHistory(items, valueFor, formatter = (value) => value) {
+  const entries = items
+    .map((item, index) => ({ label: item.label || labelAnnual(item), value: valueFor(item, index) }))
+    .filter((item) => item.value !== null && item.value !== undefined && item.value !== "N/A");
+  return {
+    labels: entries.map((item) => item.label),
+    displayValues: entries.map((item) => formatter(item.value)),
+  };
 }
 
 function labelAnnual(fact) {
@@ -522,6 +543,9 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const reportedEpsQuarterly = quarterlySeries(epsFacts);
   if (epsAnnual.length < 2) epsAnnual.push(...rawEpsAnnual);
   if (epsQuarterly.length < 2) epsQuarterly.push(...reportedEpsQuarterly);
+  const epsQuarterlyForComparison = reportedEpsQuarterly.length >= 2
+    ? reportedEpsQuarterly
+    : epsQuarterly;
   const operatingIncomeAnnual = annualSeries(operatingIncomeFacts);
   const operatingIncomeQuarterly = quarterlySeries(operatingIncomeFacts);
   const premiumsEarnedQuarterly = quarterlySeries(premiumsEarnedFacts);
@@ -529,6 +553,8 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const sellingGeneralAdministrativeQuarterly = quarterlySeries(sellingGeneralAdministrativeFacts);
   const cashFlowAnnual = annualSeries(operatingCashFlowFacts);
   const capexAnnual = annualSeries(capexFacts);
+  const equityAnnual = instantSeries(equityFacts);
+  const debtAnnual = instantSeries(debtFacts);
 
   const annual = alignSeries(revenueAnnual, epsAnnual, labelAnnual, 1e9);
   const quarterly = alignSeries(revenueQuarterly, epsQuarterly, labelQuarter, 1e9);
@@ -547,8 +573,9 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const priorEpsGrowth = epsAnnual.length > 2 ? percentChange(priorEps, epsAnnual.at(-3)?.val) : null;
   const netMargin = latestRevenue ? (latestNetIncome / latestRevenue) * 100 : null;
   const priorNetMargin = priorRevenue ? (priorNetIncome / priorRevenue) * 100 : null;
-  const debt = latestInstant(debtFacts);
-  const equity = latestInstant(equityFacts);
+  const latestFiscalEnd = revenueAnnual.at(-1)?.end;
+  const debt = closestPeriod(debtAnnual, latestFiscalEnd)?.val ?? latestInstant(debtFacts);
+  const equity = closestPeriod(equityAnnual, latestFiscalEnd)?.val ?? latestInstant(equityFacts);
   const debtToOperatingIncome = latestOperatingIncome ? debt / latestOperatingIncome : null;
   const revenueCagr = calculateCagr(revenueAnnual.map((fact) => fact.val));
   const latestOperatingCashFlow = cashFlowAnnual.at(-1)?.val;
@@ -563,6 +590,30 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     ? (latestOperatingIncome / latestRevenue) * 100
     : null;
   const latestFiscalPeriod = revenueAnnual.at(-1) ? labelAnnual(revenueAnnual.at(-1)) : null;
+  const annualFinancialPeriods = revenueAnnual.map((revenueFact, index) => {
+    const operatingCashFlowFact = closestPeriod(cashFlowAnnual, revenueFact.end);
+    const capexFact = closestPeriod(capexAnnual, revenueFact.end);
+    const netIncomeFact = closestPeriod(netIncomeAnnual, revenueFact.end);
+    const operatingIncomeFact = closestPeriod(operatingIncomeAnnual, revenueFact.end);
+    const equityFact = closestPeriod(equityAnnual, revenueFact.end);
+    const debtFact = closestPeriod(debtAnnual, revenueFact.end);
+    const periodFcf = Number.isFinite(operatingCashFlowFact?.val) && Number.isFinite(capexFact?.val)
+      ? operatingCashFlowFact.val - Math.abs(capexFact.val)
+      : null;
+    return {
+      label: labelAnnual(revenueFact),
+      revenue: revenueFact.val,
+      operatingCashFlow: operatingCashFlowFact?.val,
+      capex: capexFact?.val,
+      freeCashFlow: periodFcf,
+      fcfMargin: Number.isFinite(periodFcf) && revenueFact.val ? (periodFcf / revenueFact.val) * 100 : null,
+      operatingMargin: operatingIncomeFact?.val && revenueFact.val ? (operatingIncomeFact.val / revenueFact.val) * 100 : null,
+      netMargin: netIncomeFact?.val && revenueFact.val ? (netIncomeFact.val / revenueFact.val) * 100 : null,
+      roe: netIncomeFact?.val && equityFact?.val ? (netIncomeFact.val / equityFact.val) * 100 : null,
+      debtToOperatingIncome: debtFact?.val && operatingIncomeFact?.val ? debtFact.val / operatingIncomeFact.val : null,
+      revenueCagr: calculateCagr(revenueAnnual.slice(0, index + 1).map((fact) => fact.val)),
+    };
+  });
 
   const overview = alpha?.overview ?? {};
   const quote = alpha?.quote ?? {};
@@ -583,7 +634,7 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const latestQuarterSga = closestPeriod(sellingGeneralAdministrativeQuarterly, latestQuarterRevenue?.end);
   const latestQuarterEps = closestPeriod(reportedEpsQuarterly, latestQuarterRevenue?.end)
     || closestPeriod(epsQuarterly, latestQuarterRevenue?.end);
-  const priorYearQuarterEps = priorYearPeriod(epsQuarterly, latestQuarterEps);
+  const priorYearQuarterEps = priorYearPeriod(epsQuarterlyForComparison, latestQuarterEps);
   const priorYearQuarterNetIncome = priorYearPeriod(netIncomeQuarterly, latestQuarterNetIncome);
   const latestQuarterMargin = latestQuarterRevenue?.val && latestQuarterNetIncome?.val
     ? (latestQuarterNetIncome.val / latestQuarterRevenue.val) * 100
@@ -623,16 +674,54 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     "Same quarter prior year",
     "Compared with same quarter last year",
   );
+  const annualRevenueGrowthHistory = displayHistory(
+    revenueAnnual.slice(1),
+    (fact, index) => percentChange(fact.val, revenueAnnual[index].val),
+    (value) => formatPercent(value),
+  );
+  const annualEpsGrowthHistory = displayHistory(
+    epsAnnual.slice(1),
+    (fact, index) => describeEpsChange(fact.val, epsAnnual[index].val, "", "")[0],
+  );
+  const annualNetMarginHistory = displayHistory(
+    annualFinancialPeriods,
+    (period) => period.netMargin,
+    (value) => `${value.toFixed(1)}%`,
+  );
+  const quarterlyRevenueGrowthHistory = displayHistory(
+    revenueQuarterly.map((fact) => ({ ...fact, label: labelQuarter(fact) })),
+    (fact) => percentChange(fact.val, priorYearPeriod(revenueQuarterly, fact)?.val),
+    (value) => formatPercent(value),
+  );
+  const quarterlyEpsGrowthHistory = displayHistory(
+    epsQuarterlyForComparison.map((fact) => ({ ...fact, label: labelQuarter(fact) })),
+    (fact) => {
+      const prior = priorYearPeriod(epsQuarterlyForComparison, fact);
+      return prior ? describeEpsChange(fact.val, prior.val, "", "")[0] : null;
+    },
+  );
+  const quarterlyMarginPeriods = revenueQuarterly.map((revenueFact) => {
+    const incomeFact = closestPeriod(netIncomeQuarterly, revenueFact.end);
+    return {
+      label: labelQuarter(revenueFact),
+      value: incomeFact?.val && revenueFact.val ? (incomeFact.val / revenueFact.val) * 100 : null,
+    };
+  });
+  const quarterlyNetMarginHistory = displayHistory(
+    quarterlyMarginPeriods,
+    (period) => period.value,
+    (value) => `${value.toFixed(1)}%`,
+  );
   const annualSummaryMetrics = [
-    ["Revenue growth", formatPercent(revenueGrowth), formatPercent((revenueGrowth ?? 0) - (priorRevenueGrowth ?? 0), 1).replace("%", " pts"), "Latest reported fiscal year"],
-    ["EPS growth", ...annualEpsDisplay],
-    ["Net margin", Number.isFinite(netMargin) ? `${netMargin.toFixed(1)}%` : "N/A", formatPercent((netMargin ?? 0) - (priorNetMargin ?? 0), 1).replace("%", " pts"), "Calculated from SEC filings"],
+    ["Revenue growth", formatPercent(revenueGrowth), formatPercent((revenueGrowth ?? 0) - (priorRevenueGrowth ?? 0), 1).replace("%", " pts"), "Latest reported fiscal year", annualRevenueGrowthHistory],
+    ["EPS growth", ...annualEpsDisplay, annualEpsGrowthHistory],
+    ["Net margin", Number.isFinite(netMargin) ? `${netMargin.toFixed(1)}%` : "N/A", formatPercent((netMargin ?? 0) - (priorNetMargin ?? 0), 1).replace("%", " pts"), "Calculated from SEC filings", annualNetMarginHistory],
     ["Forward P/E", formatMultiple(pe), "Provider", alpha ? "Alpha Vantage overview" : "Add Alpha Vantage key"],
   ];
   const quarterlySummaryMetrics = [
-    ["Revenue growth", formatPercent(quarterlyRevenueGrowth), "Same quarter prior year", "Compared with same quarter last year"],
-    ["EPS growth", ...quarterlyEpsDisplay],
-    ["Net margin", Number.isFinite(latestQuarterMargin) ? `${latestQuarterMargin.toFixed(1)}%` : "N/A", Number.isFinite(latestQuarterMargin) && Number.isFinite(priorYearQuarterMargin) ? formatPercent(latestQuarterMargin - priorYearQuarterMargin, 1).replace("%", " pts") : "N/A", "Compared with same quarter last year"],
+    ["Revenue growth", formatPercent(quarterlyRevenueGrowth), "Same quarter prior year", "Compared with same quarter last year", quarterlyRevenueGrowthHistory],
+    ["EPS growth", ...quarterlyEpsDisplay, quarterlyEpsGrowthHistory],
+    ["Net margin", Number.isFinite(latestQuarterMargin) ? `${latestQuarterMargin.toFixed(1)}%` : "N/A", Number.isFinite(latestQuarterMargin) && Number.isFinite(priorYearQuarterMargin) ? formatPercent(latestQuarterMargin - priorYearQuarterMargin, 1).replace("%", " pts") : "N/A", "Compared with same quarter last year", quarterlyNetMarginHistory],
     ["Forward P/E", formatMultiple(pe), "Provider", alpha ? "Alpha Vantage overview" : "Add Alpha Vantage key"],
   ];
 
@@ -663,14 +752,14 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
       items: quarterDetails,
     },
     financialMetrics: [
-      { title: "Free cash flow", value: formatMoney(freeCashFlow), note: "Calculated", period: latestFiscalPeriod },
-      { title: "Operating cash flow", value: formatMoney(latestOperatingCashFlow), note: "SEC reported", period: latestFiscalPeriod },
-      { title: "Capital expenditures", value: formatMoney(latestCapex), note: "SEC reported", period: latestFiscalPeriod },
-      { title: "FCF margin", value: Number.isFinite(fcfMargin) ? `${fcfMargin.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod },
-      { title: "Operating margin", value: Number.isFinite(operatingMargin) ? `${operatingMargin.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod },
-      { title: "ROE", value: Number.isFinite(roe) ? `${roe.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod },
-      { title: "Debt / op. income", value: formatMultiple(debtToOperatingIncome), note: "Calculated", period: latestFiscalPeriod },
-      { title: "Revenue CAGR", value: Number.isFinite(revenueCagr) ? `${revenueCagr.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod },
+      { title: "Free cash flow", value: formatMoney(freeCashFlow), note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.freeCashFlow, formatMoney) },
+      { title: "Operating cash flow", value: formatMoney(latestOperatingCashFlow), note: "SEC reported", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.operatingCashFlow, formatMoney) },
+      { title: "Capital expenditures", value: formatMoney(latestCapex), note: "SEC reported", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.capex, formatMoney) },
+      { title: "FCF margin", value: Number.isFinite(fcfMargin) ? `${fcfMargin.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.fcfMargin, (value) => `${value.toFixed(1)}%`) },
+      { title: "Operating margin", value: Number.isFinite(operatingMargin) ? `${operatingMargin.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.operatingMargin, (value) => `${value.toFixed(1)}%`) },
+      { title: "ROE", value: Number.isFinite(roe) ? `${roe.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.roe, (value) => `${value.toFixed(1)}%`) },
+      { title: "Debt / op. income", value: formatMultiple(debtToOperatingIncome), note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.debtToOperatingIncome, formatMultiple) },
+      { title: "Revenue CAGR", value: Number.isFinite(revenueCagr) ? `${revenueCagr.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.revenueCagr, (value) => `${value.toFixed(1)}%`) },
     ],
     customMetrics,
     operating: {

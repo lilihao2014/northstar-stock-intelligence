@@ -775,7 +775,7 @@ function renderCompany() {
 function renderSummaryMetrics(company) {
   const metrics = company.periodMetrics?.[selectedPeriod] || company.metrics;
   $("#metrics-grid").innerHTML = metrics
-    .map(([label, value, delta, note], index) => {
+    .map(([label, value, delta, note, history], index) => {
       const isNegative = delta.startsWith("-");
       const neutral = label === "Forward P/E" || delta === "Same quarter prior year";
       return `
@@ -786,9 +786,21 @@ function renderSummaryMetrics(company) {
           </div>
           <strong>${tr(value)}</strong>
           <p>${tr(note)}</p>
+          ${renderMetricHistory(history, "metric-history")}
         </article>`;
     })
     .join("");
+}
+
+function renderMetricHistory(history, className) {
+  if (!history?.labels?.length) return "";
+  return `<div class="${className}">
+    ${history.labels.map((label, index) => `
+      <div>
+        <span>${label}</span>
+        <strong>${tr(history.displayValues[index])}</strong>
+      </div>`).join("")}
+  </div>`;
 }
 
 function renderFinancialMetrics(metrics) {
@@ -799,6 +811,7 @@ function renderFinancialMetrics(metrics) {
       <span>${tr(metric.title)}</span>
       <strong>${metric.value}</strong>
       <small>${tr(metric.note)}${metric.period ? ` · ${metric.period}` : ""}</small>
+      ${renderMetricHistory(metric.history, "financial-metric-history")}
     </article>`).join("");
 }
 
