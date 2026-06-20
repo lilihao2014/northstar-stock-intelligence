@@ -950,6 +950,7 @@ function setMetricHidden(metricId, hidden) {
 
 function renderFundamentals() {
   const svg = $("#fundamentals-chart");
+  const forecastColor = "#b9823d";
   const company = companies[selectedTicker];
   const baseData = company[selectedPeriod];
   const lastLabelIsEstimate = /E$/.test(baseData.labels.at(-1) || "");
@@ -995,16 +996,17 @@ function renderFundamentals() {
     const barHeight = hasRevenue ? (data.revenue[i] / maxRevenue) * chartH : 18;
     const bar = svgEl("rect", hasRevenue ? {
       x: centerX - barW / 2, y: pad.top + chartH - barHeight, width: barW, height: barHeight, rx: 3,
-      fill: isEstimate ? "#68a590" : "#1f6657", opacity: isEstimate ? 0.58 : 0.92, "data-index": i,
-      ...(isEstimate ? { stroke: "#397966", "stroke-width": 1, "stroke-dasharray": "4 3" } : {}),
+      fill: isEstimate ? forecastColor : "#1f6657", opacity: isEstimate ? 0.72 : 0.92, "data-index": i,
+      ...(isEstimate ? { stroke: "#8f642d", "stroke-width": 1, "stroke-dasharray": "4 3" } : {}),
     } : {
       x: centerX - barW / 2, y: pad.top + chartH - barHeight, width: barW, height: barHeight, rx: 3,
-      fill: "transparent", stroke: "#68a590", "stroke-width": 1.2, "stroke-dasharray": "4 3", "data-index": i,
+      fill: "transparent", stroke: forecastColor, "stroke-width": 1.4, "stroke-dasharray": "4 3", "data-index": i,
     });
     svg.appendChild(bar);
 
     if (!hasRevenue) {
       const unavailable = svgEl("text", { x: centerX, y: pad.top + chartH - 23, "text-anchor": "middle", fill: "#758580", "font-size": 7, "font-family": "DM Mono" });
+      unavailable.setAttribute("fill", forecastColor);
       unavailable.textContent = "N/A";
       svg.appendChild(unavailable);
     }
@@ -1031,10 +1033,10 @@ function renderFundamentals() {
   const forecastPoint = epsPoints.find((point) => point.estimated);
   const priorPoint = reportedPoints.at(-1);
   if (forecastPoint && priorPoint) {
-    svg.appendChild(svgEl("path", { d: `M ${priorPoint.x} ${priorPoint.y} L ${forecastPoint.x} ${forecastPoint.y}`, fill: "none", stroke: "#e77d61", "stroke-width": 2.2, "stroke-dasharray": "5 4" }));
+    svg.appendChild(svgEl("path", { d: `M ${priorPoint.x} ${priorPoint.y} L ${forecastPoint.x} ${forecastPoint.y}`, fill: "none", stroke: forecastColor, "stroke-width": 2.2, "stroke-dasharray": "5 4" }));
   }
   epsPoints.forEach(({ x, y, estimated }) => {
-    svg.appendChild(svgEl("circle", { cx: x, cy: y, r: 3.4, fill: "#fffefa", stroke: "#e77d61", "stroke-width": 2, ...(estimated ? { "stroke-dasharray": "3 2" } : {}) }));
+    svg.appendChild(svgEl("circle", { cx: x, cy: y, r: 3.4, fill: "#fffefa", stroke: estimated ? forecastColor : "#e77d61", "stroke-width": 2, ...(estimated ? { "stroke-dasharray": "3 2" } : {}) }));
   });
 }
 

@@ -7,6 +7,7 @@
   --line: #dedbd0;
   --green: #1f6657;
   --green-2: #68a590;
+  --forecast: #b9823d;
   --lime: #cadd80;
   --coral: #e77d61;
   --gold: #d7a84b;
@@ -1154,8 +1155,9 @@ kbd {
 }
 
 .legend-block.estimate {
-  background: transparent;
-  border: 1px dashed #68a590;
+  background: var(--forecast);
+  border: 1px dashed #8f642d;
+  opacity: 0.78;
 }
 
 .chart-wrap {
