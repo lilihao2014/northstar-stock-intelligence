@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-06-20T04:06:09.442Z",
+  "generatedAt": "2026-06-20T04:18:05.585Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
       "name": "Apple Inc.",
       "ticker": "AAPL",
       "meta": "Technology · Consumer Electronics · NASDAQ",
-      "price": 291.13,
-      "change": -1.5222,
+      "price": 298.01,
+      "change": 0.6961,
       "cap": "Quote key required",
       "score": 79,
       "quality": "Solid fundamentals",
@@ -144,6 +144,7 @@
           ]
         ]
       },
+      "customMetrics": [],
       "operating": {
         "title": "Quarterly revenue",
         "value": "$111.2B",
@@ -184,8 +185,8 @@
       "name": "MICROSOFT CORPORATION",
       "ticker": "MSFT",
       "meta": "Technology · Software Infrastructure · NASDAQ",
-      "price": 390.74,
-      "change": 0.1025,
+      "price": 379.4,
+      "change": 0.1293,
       "cap": "Quote key required",
       "score": 86,
       "quality": "Strong compounder",
@@ -322,6 +323,7 @@
           ]
         ]
       },
+      "customMetrics": [],
       "operating": {
         "title": "Quarterly revenue",
         "value": "$82.9B",
@@ -361,10 +363,10 @@
     "NVDA": {
       "name": "NVIDIA CORP",
       "ticker": "NVDA",
-      "meta": "TECHNOLOGY · SEMICONDUCTORS · NASDAQ",
-      "price": 205.19,
-      "change": 0.1562,
-      "cap": "$4.97T",
+      "meta": "Technology · Semiconductors · NASDAQ",
+      "price": 210.69,
+      "change": 2.9514,
+      "cap": "$5.10T",
       "score": 96,
       "quality": "Exceptional quality",
       "copy": "Strong growth and profitability create an unusually resilient fundamental profile.",
@@ -389,7 +391,7 @@
         ],
         [
           "Forward P/E",
-          "23.4x",
+          "24.0x",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -397,7 +399,7 @@
       "signals": [
         [
           "FCF yield",
-          "2.1%"
+          "2.0%"
         ],
         [
           "ROE",
@@ -500,6 +502,28 @@
           ]
         ]
       },
+      "customMetrics": [
+        {
+          "id": "ProductWarrantyAndReturnProvisions",
+          "title": "Product Warranty and Return Provisions",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Jan '23",
+            "Jan '24"
+          ],
+          "values": [
+            108000000,
+            415000000
+          ],
+          "displayValues": [
+            "$108.0M",
+            "$415.0M"
+          ],
+          "latest": "$415.0M",
+          "latestPeriod": "2024-01-28",
+          "source": "SEC inline XBRL"
+        }
+      ],
       "operating": {
         "title": "Quarterly revenue",
         "value": "$81.6B",
@@ -528,7 +552,7 @@
         "revenueGrowth": 65.5,
         "epsGrowth": 66.7,
         "netMargin": 55.6,
-        "pe": 23.4,
+        "pe": 24,
         "score": 96
       },
       "sources": {
@@ -539,9 +563,9 @@
     "AMZN": {
       "name": "AMAZON COM INC",
       "ticker": "AMZN",
-      "meta": "CONSUMER CYCLICAL · INTERNET RETAIL · NASDAQ",
-      "price": 238.55,
-      "change": -1.2256,
+      "meta": "Consumer Cyclical · Internet Retail · NASDAQ",
+      "price": 244.39,
+      "change": 2.9011,
       "cap": "Quote key required",
       "score": 80,
       "quality": "Solid fundamentals",
@@ -678,6 +702,122 @@
           ]
         ]
       },
+      "customMetrics": [
+        {
+          "id": "FulfillmentExpense",
+          "title": "Fulfillment Expense",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Sep '23",
+            "Mar '24",
+            "Jun '24",
+            "Sep '24",
+            "Mar '25",
+            "Jun '25",
+            "Sep '25",
+            "Mar '26"
+          ],
+          "values": [
+            22314000000,
+            22317000000,
+            23566000000,
+            24660000000,
+            24593000000,
+            25976000000,
+            27679000000,
+            27289000000
+          ],
+          "displayValues": [
+            "$22.3B",
+            "$22.3B",
+            "$23.6B",
+            "$24.7B",
+            "$24.6B",
+            "$26.0B",
+            "$27.7B",
+            "$27.3B"
+          ],
+          "latest": "$27.3B",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "TechnologyAndInfrastructureExpense",
+          "title": "Technology and Infrastructure Expense",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Sep '23",
+            "Mar '24",
+            "Jun '24",
+            "Sep '24",
+            "Mar '25",
+            "Jun '25",
+            "Sep '25",
+            "Mar '26"
+          ],
+          "values": [
+            21203000000,
+            20424000000,
+            22304000000,
+            22245000000,
+            22994000000,
+            27166000000,
+            28962000000,
+            29567000000
+          ],
+          "displayValues": [
+            "$21.2B",
+            "$20.4B",
+            "$22.3B",
+            "$22.2B",
+            "$23.0B",
+            "$27.2B",
+            "$29.0B",
+            "$29.6B"
+          ],
+          "latest": "$29.6B",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "VideoAndMusicContentExpense",
+          "title": "Video and Music Content Expense",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Sep '23",
+            "Mar '24",
+            "Jun '24",
+            "Sep '24",
+            "Mar '25",
+            "Jun '25",
+            "Sep '25",
+            "Mar '26"
+          ],
+          "values": [
+            4600000000,
+            4600000000,
+            4600000000,
+            5000000000,
+            5100000000,
+            5100000000,
+            5500000000,
+            6000000000
+          ],
+          "displayValues": [
+            "$4.6B",
+            "$4.6B",
+            "$4.6B",
+            "$5.0B",
+            "$5.1B",
+            "$5.1B",
+            "$5.5B",
+            "$6.0B"
+          ],
+          "latest": "$6.0B",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        }
+      ],
       "operating": {
         "title": "Quarterly revenue",
         "value": "$181.5B",
@@ -717,9 +857,9 @@
     "GOOGL": {
       "name": "Alphabet Inc.",
       "ticker": "GOOGL",
-      "meta": "COMMUNICATION SERVICES · INTERNET CONTENT & INFORMATION · NASDAQ",
-      "price": 359.68,
-      "change": 0.5339,
+      "meta": "Communication Services · Internet Content · NASDAQ",
+      "price": 368.03,
+      "change": 1.1655,
       "cap": "Quote key required",
       "score": 92,
       "quality": "Exceptional quality",
@@ -847,6 +987,7 @@
           ]
         ]
       },
+      "customMetrics": [],
       "operating": {
         "title": "Quarterly revenue",
         "value": "$109.9B",
@@ -886,10 +1027,10 @@
     "META": {
       "name": "Meta Platforms, Inc.",
       "ticker": "META",
-      "meta": "COMMUNICATION SERVICES · INTERNET CONTENT & INFORMATION · NASDAQ",
-      "price": 566.98,
-      "change": -0.2551,
-      "cap": "Quote key required",
+      "meta": "Communication Services · Internet Content · NASDAQ",
+      "price": 577.22,
+      "change": 1.6984,
+      "cap": "$1.47T",
       "score": 84,
       "quality": "Strong compounder",
       "copy": "Healthy growth and durable economics support long-term compounding potential.",
@@ -914,7 +1055,7 @@
         ],
         [
           "Forward P/E",
-          "N/A",
+          "18.4x",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -922,7 +1063,7 @@
       "signals": [
         [
           "FCF yield",
-          "N/A"
+          "3.1%"
         ],
         [
           "ROE",
@@ -1025,6 +1166,7 @@
           ]
         ]
       },
+      "customMetrics": [],
       "operating": {
         "title": "Quarterly revenue",
         "value": "$56.3B",
@@ -1053,7 +1195,7 @@
         "revenueGrowth": 22.2,
         "epsGrowth": -1.5,
         "netMargin": 30.1,
-        "pe": null,
+        "pe": 18.4,
         "score": 84
       },
       "sources": {
@@ -1064,9 +1206,9 @@
     "MU": {
       "name": "MICRON TECHNOLOGY INC",
       "ticker": "MU",
-      "meta": "TECHNOLOGY · SEMICONDUCTORS · NASDAQ",
-      "price": 981.61,
-      "change": -1.4319,
+      "meta": "Technology · Semiconductors · NASDAQ",
+      "price": 1133.99,
+      "change": 8.7041,
       "cap": "Quote key required",
       "score": 96,
       "quality": "Exceptional quality",
@@ -1203,6 +1345,40 @@
           ]
         ]
       },
+      "customMetrics": [
+        {
+          "id": "LicenseAgreementIncomeExpense",
+          "title": "License Agreement Income Expense",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Mar '23",
+            "Jun '23",
+            "Feb '24",
+            "May '24",
+            "Feb '25",
+            "May '25"
+          ],
+          "values": [
+            0,
+            0,
+            200000000,
+            0,
+            0,
+            57000000
+          ],
+          "displayValues": [
+            "$0",
+            "$0",
+            "$200.0M",
+            "$0",
+            "$0",
+            "$57.0M"
+          ],
+          "latest": "$57.0M",
+          "latestPeriod": "2025-05-29",
+          "source": "SEC inline XBRL"
+        }
+      ],
       "operating": {
         "title": "Quarterly revenue",
         "value": "$23.9B",
@@ -1439,6 +1615,595 @@
           "latest": "3.2M",
           "latestPeriod": "2026-03-31",
           "source": "SEC inline XBRL"
+        },
+        {
+          "id": "SellingGeneralAndAdministrationExpenseMemberAcquisitionAndServicingCosts",
+          "title": "Selling General and Administration Expense Member Acquisition and Servicing Costs",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Mar '24",
+            "Jun '24",
+            "Sep '24",
+            "Mar '25",
+            "Jun '25",
+            "Sep '25",
+            "Mar '26"
+          ],
+          "values": [
+            171116000,
+            185061000,
+            195500000,
+            235351000,
+            261045000,
+            247162000,
+            349646000
+          ],
+          "displayValues": [
+            "$171.1M",
+            "$185.1M",
+            "$195.5M",
+            "$235.4M",
+            "$261.0M",
+            "$247.2M",
+            "$349.6M"
+          ],
+          "latest": "$349.6M",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "PremiumsEarnedRiskAdjustment",
+          "title": "Premiums Earned Risk Adjustment",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Sep '23",
+            "Mar '24",
+            "Jun '24",
+            "Sep '24",
+            "Mar '25",
+            "Jun '25",
+            "Sep '25",
+            "Mar '26"
+          ],
+          "values": [
+            211422000,
+            269398000,
+            432895000,
+            374828000,
+            373749000,
+            692245000,
+            727538000,
+            1442811000
+          ],
+          "displayValues": [
+            "$211.4M",
+            "$269.4M",
+            "$432.9M",
+            "$374.8M",
+            "$373.7M",
+            "$692.2M",
+            "$727.5M",
+            "$1.4B"
+          ],
+          "latest": "$1.4B",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "CededPremiumsEarnedIncludingPriorPeriodAdjustments",
+          "title": "Ceded Premiums Earned Including Prior Period Adjustments",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Sep '23",
+            "Mar '24",
+            "Jun '24",
+            "Sep '24",
+            "Mar '25",
+            "Jun '25",
+            "Sep '25",
+            "Mar '26"
+          ],
+          "values": [
+            2903000,
+            4632000,
+            7564000,
+            -140000,
+            2542000,
+            2690000,
+            3048000,
+            5618000
+          ],
+          "displayValues": [
+            "$2.9M",
+            "$4.6M",
+            "$7.6M",
+            "$-140000",
+            "$2.5M",
+            "$2.7M",
+            "$3.0M",
+            "$5.6M"
+          ],
+          "latest": "$5.6M",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "PremiumsEarnedBeforePremiumsCeded",
+          "title": "Premiums Earned Before Premiums Ceded",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Jun '22",
+            "Sep '22",
+            "Mar '23",
+            "Jun '23",
+            "Sep '23",
+            "Mar '24"
+          ],
+          "values": [
+            1368477000,
+            1318048000,
+            1426262000,
+            1484538000,
+            1394985000,
+            2098314000
+          ],
+          "displayValues": [
+            "$1.4B",
+            "$1.3B",
+            "$1.4B",
+            "$1.5B",
+            "$1.4B",
+            "$2.1B"
+          ],
+          "latest": "$2.1B",
+          "latestPeriod": "2024-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "DirectAndAssumedPremiumsEarned",
+          "title": "Direct and Assumed Premiums Earned",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Jun '22",
+            "Sep '22",
+            "Jun '23",
+            "Sep '23"
+          ],
+          "values": [
+            1694927000,
+            1682289000,
+            1645169000,
+            1606407000
+          ],
+          "displayValues": [
+            "$1.7B",
+            "$1.7B",
+            "$1.6B",
+            "$1.6B"
+          ],
+          "latest": "$1.6B",
+          "latestPeriod": "2023-09-30",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "SellingGeneralAndAdministrationExpenseAllOtherServicingCosts",
+          "title": "Selling General and Administration Expense All Other Servicing Costs",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Mar '24",
+            "Jun '24",
+            "Sep '24",
+            "Mar '25",
+            "Jun '25",
+            "Sep '25",
+            "Mar '26"
+          ],
+          "values": [
+            130640000,
+            141640000,
+            149794000,
+            149773000,
+            163312000,
+            153238000,
+            160080000
+          ],
+          "displayValues": [
+            "$130.6M",
+            "$141.6M",
+            "$149.8M",
+            "$149.8M",
+            "$163.3M",
+            "$153.2M",
+            "$160.1M"
+          ],
+          "latest": "$160.1M",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "CededCommissionIncome",
+          "title": "Ceded Commission Income",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Jun '23",
+            "Sep '23",
+            "Mar '24",
+            "Jun '24",
+            "Sep '24",
+            "Mar '25",
+            "Jun '25",
+            "Sep '25"
+          ],
+          "values": [
+            589000,
+            -30000,
+            534000,
+            -62000,
+            -855000,
+            0,
+            0,
+            0
+          ],
+          "displayValues": [
+            "$589000",
+            "$-30000",
+            "$534000",
+            "$-62000",
+            "$-855000",
+            "$0",
+            "$0",
+            "$0"
+          ],
+          "latest": "$0",
+          "latestPeriod": "2025-09-30",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "SellingGeneralAndAdministrativeExpenseGross",
+          "title": "Selling General and Administrative Expense Gross",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Jun '23",
+            "Sep '23",
+            "Mar '24",
+            "Jun '24",
+            "Sep '24",
+            "Mar '25",
+            "Jun '25",
+            "Sep '25"
+          ],
+          "values": [
+            337833000,
+            325820000,
+            394696000,
+            435144000,
+            459522000,
+            482759000,
+            534485000,
+            521592000
+          ],
+          "displayValues": [
+            "$337.8M",
+            "$325.8M",
+            "$394.7M",
+            "$435.1M",
+            "$459.5M",
+            "$482.8M",
+            "$534.5M",
+            "$521.6M"
+          ],
+          "latest": "$521.6M",
+          "latestPeriod": "2025-09-30",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "ClaimsAdjustmentExpenseClaimsPaid",
+          "title": "Claims Adjustment Expense Claims Paid",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Mar '23",
+            "Mar '24",
+            "Mar '25",
+            "Mar '26"
+          ],
+          "values": [
+            25420000,
+            19868000,
+            27722000,
+            15048000
+          ],
+          "displayValues": [
+            "$25.4M",
+            "$19.9M",
+            "$27.7M",
+            "$15.0M"
+          ],
+          "latest": "$15.0M",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "ClaimsAdjustmentExpenseIncurredClaims",
+          "title": "Claims Adjustment Expense Incurred Claims",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Mar '23",
+            "Mar '24",
+            "Mar '25",
+            "Mar '26"
+          ],
+          "values": [
+            25815000,
+            23556000,
+            28933000,
+            18317000
+          ],
+          "displayValues": [
+            "$25.8M",
+            "$23.6M",
+            "$28.9M",
+            "$18.3M"
+          ],
+          "latest": "$18.3M",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "ClaimsAdjustmentExpenseClaimsPaidPriorYear",
+          "title": "Claims Adjustment Expense Claims Paid Prior Year",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Mar '23",
+            "Mar '24",
+            "Mar '25",
+            "Mar '26"
+          ],
+          "values": [
+            5728000,
+            5722000,
+            9969000,
+            7720000
+          ],
+          "displayValues": [
+            "$5.7M",
+            "$5.7M",
+            "$10.0M",
+            "$7.7M"
+          ],
+          "latest": "$7.7M",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "ClaimsAdjustmentExpenseClaimsPaidCurrentYear",
+          "title": "Claims Adjustment Expense Claims Paid Current Year",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Mar '23",
+            "Mar '24",
+            "Mar '25",
+            "Mar '26"
+          ],
+          "values": [
+            19692000,
+            14146000,
+            17753000,
+            7328000
+          ],
+          "displayValues": [
+            "$19.7M",
+            "$14.1M",
+            "$17.8M",
+            "$7.3M"
+          ],
+          "latest": "$7.3M",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "ClaimsAdjustmentExpenseIncurredClaimsCurrentYear",
+          "title": "Claims Adjustment Expense Incurred Claims Current Year",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Mar '23",
+            "Mar '24",
+            "Mar '25",
+            "Mar '26"
+          ],
+          "values": [
+            25815000,
+            23556000,
+            28933000,
+            18317000
+          ],
+          "displayValues": [
+            "$25.8M",
+            "$23.6M",
+            "$28.9M",
+            "$18.3M"
+          ],
+          "latest": "$18.3M",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "CededPremiumsEarnedGross",
+          "title": "Ceded Premiums Earned Gross",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Jun '22",
+            "Sep '22",
+            "Jun '23",
+            "Sep '23"
+          ],
+          "values": [
+            393857000,
+            382597000,
+            7210000,
+            1354000
+          ],
+          "displayValues": [
+            "$393.9M",
+            "$382.6M",
+            "$7.2M",
+            "$1.4M"
+          ],
+          "latest": "$1.4M",
+          "latestPeriod": "2023-09-30",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "CededPremiumsExperienceRefund",
+          "title": "Ceded Premiums Experience Refund",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Jun '22",
+            "Sep '22",
+            "Jun '23",
+            "Sep '23"
+          ],
+          "values": [
+            19975000,
+            18213000,
+            -2362000,
+            -1549000
+          ],
+          "displayValues": [
+            "$20.0M",
+            "$18.2M",
+            "$-2.4M",
+            "$-1.5M"
+          ],
+          "latest": "$-1.5M",
+          "latestPeriod": "2023-09-30",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "CededPremiumsEarnedNetOfAssumedPremiumsEarned",
+          "title": "Ceded Premiums Earned Net Of Assumed Premiums Earned",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Jun '22",
+            "Sep '22",
+            "Jun '23",
+            "Sep '23"
+          ],
+          "values": [
+            339787000,
+            326975000,
+            -50823000,
+            -54933000
+          ],
+          "displayValues": [
+            "$339.8M",
+            "$327.0M",
+            "$-50.8M",
+            "$-54.9M"
+          ],
+          "latest": "$-54.9M",
+          "latestPeriod": "2023-09-30",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "ClaimsAdjustmentExpenseIncurredClaimsPriorYear",
+          "title": "Claims Adjustment Expense Incurred Claims Prior Year",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Mar '23",
+            "Mar '24",
+            "Mar '25"
+          ],
+          "values": [
+            0,
+            0,
+            0
+          ],
+          "displayValues": [
+            "$0",
+            "$0",
+            "$0"
+          ],
+          "latest": "$0",
+          "latestPeriod": "2025-03-31",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "FederalAndStateAssessmentExpense",
+          "title": "Federal and State Assessment Expense",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Jun '22",
+            "Sep '22",
+            "Jun '23",
+            "Sep '23"
+          ],
+          "values": [
+            68749000,
+            71114000,
+            72647000,
+            69876000
+          ],
+          "displayValues": [
+            "$68.7M",
+            "$71.1M",
+            "$72.6M",
+            "$69.9M"
+          ],
+          "latest": "$69.9M",
+          "latestPeriod": "2023-09-30",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "OtherInsuranceExpenseNet",
+          "title": "Other Insurance Expense Net",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Jun '22",
+            "Sep '22",
+            "Jun '23",
+            "Sep '23"
+          ],
+          "values": [
+            170200000,
+            174978000,
+            197784000,
+            192863000
+          ],
+          "displayValues": [
+            "$170.2M",
+            "$175.0M",
+            "$197.8M",
+            "$192.9M"
+          ],
+          "latest": "$192.9M",
+          "latestPeriod": "2023-09-30",
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "OtherInsuranceExpenseGross",
+          "title": "Other Insurance Expense Gross",
+          "description": "Company-specific metric reported in SEC filings.",
+          "labels": [
+            "Jun '22",
+            "Sep '22",
+            "Jun '23",
+            "Sep '23"
+          ],
+          "values": [
+            211216000,
+            215064000,
+            198373000,
+            192833000
+          ],
+          "displayValues": [
+            "$211.2M",
+            "$215.1M",
+            "$198.4M",
+            "$192.8M"
+          ],
+          "latest": "$192.8M",
+          "latestPeriod": "2023-09-30",
+          "source": "SEC inline XBRL"
         }
       ],
       "operating": {
@@ -1499,7 +2264,7 @@
       "ticker": "NVDA",
       "growth": 65.5,
       "eps": 66.7,
-      "pe": 23.4,
+      "pe": 24,
       "margin": 55.6,
       "score": 96
     },
@@ -1523,7 +2288,7 @@
       "ticker": "META",
       "growth": 22.2,
       "eps": -1.5,
-      "pe": null,
+      "pe": 18.4,
       "margin": 30.1,
       "score": 84
     },
@@ -1548,16 +2313,23 @@
     {
       "symbol": "SPY",
       "name": "S&P 500 ETF",
-      "price": 741.75,
-      "change": 0.5408,
-      "tradingDay": "2026-06-12"
+      "price": 746.74,
+      "change": 1.037,
+      "tradingDay": "2026-06-18"
     },
     {
       "symbol": "DIA",
       "name": "Dow Jones ETF",
-      "price": 513.06,
-      "change": 0.7264,
-      "tradingDay": "2026-06-12"
+      "price": 515.52,
+      "change": 0.1211,
+      "tradingDay": "2026-06-18"
+    },
+    {
+      "symbol": "IWM",
+      "name": "Russell 2000 ETF",
+      "price": 295.59,
+      "change": 1.9698,
+      "tradingDay": "2026-06-18"
     },
     {
       "symbol": "VXX",
@@ -1569,12 +2341,28 @@
   ],
   "sectors": [
     {
+      "symbol": "XLK",
+      "name": "Technology",
+      "color": "#1f6657",
+      "price": 191.44,
+      "change": 3.0355,
+      "tradingDay": "2026-06-18"
+    },
+    {
       "symbol": "XLF",
       "name": "Financials",
       "color": "#68a590",
       "price": 53.34,
       "change": 1.3683,
       "tradingDay": "2026-06-12"
+    },
+    {
+      "symbol": "XLV",
+      "name": "Healthcare",
+      "color": "#cadd80",
+      "price": 149.4,
+      "change": -0.8692,
+      "tradingDay": "2026-06-18"
     },
     {
       "symbol": "XLY",
@@ -1585,12 +2373,20 @@
       "tradingDay": "2026-06-12"
     },
     {
+      "symbol": "XLC",
+      "name": "Communication",
+      "color": "#e77d61",
+      "price": 109.45,
+      "change": 0.2289,
+      "tradingDay": "2026-06-18"
+    },
+    {
       "symbol": "XLI",
       "name": "Industrials",
       "color": "#7196ab",
-      "price": 176.18,
-      "change": 0.5881,
-      "tradingDay": "2026-06-12"
+      "price": 180.91,
+      "change": 0.7294,
+      "tradingDay": "2026-06-18"
     }
   ],
   "failures": []

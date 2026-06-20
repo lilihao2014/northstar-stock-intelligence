@@ -92,6 +92,9 @@ const formatCustomMetric = (value, format) => {
   }
   if (format === "thousands") return `${(value / 1e3).toFixed(1)}K`;
   if (format === "percent") return `${value.toFixed(1)}%`;
+  if (format === "money") return formatMoney(value);
+  if (format === "ratio") return `${(value * 100).toFixed(1)}%`;
+  if (format === "number") return value.toLocaleString("en-US", { maximumFractionDigits: 2 });
   return value.toLocaleString("en-US");
 };
 
@@ -288,13 +291,23 @@ function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function extractInlineMetric(xml, definition) {
+function parseInlineContexts(xml) {
   const contexts = new Map();
   for (const match of xml.matchAll(/<context\s+id="([^"]+)"[^>]*>([\s\S]*?)<\/context>/g)) {
     const instant = match[2].match(/<instant>([^<]+)<\/instant>/)?.[1];
-    if (instant) contexts.set(match[1], instant);
+    const end = instant || match[2].match(/<endDate>([^<]+)<\/endDate>/)?.[1];
+    const start = match[2].match(/<startDate>([^<]+)<\/startDate>/)?.[1];
+    const duration = start && end ? Math.round((new Date(end) - new Date(start)) / 86400000) : 0;
+    if (end) contexts.set(match[1], {
+      end,
+      duration,
+      consolidated: !/<segment>|<scenario>/.test(match[2]),
+    });
   }
+  return contexts;
+}
 
+function extractInlineMetric(xml, definition, contexts = parseInlineContexts(xml)) {
   const concept = escapeRegex(definition.concept);
   const pattern = new RegExp(`<${concept}\\s+([^>]*)>([^<]+)<\\/${concept}>`, "g");
   const facts = [];
@@ -303,16 +316,95 @@ function extractInlineMetric(xml, definition) {
       [...match[1].matchAll(/([\w:]+)="([^"]*)"/g)].map((item) => [item[1], item[2]]),
     );
     if (definition.unit && attributes.unitRef !== definition.unit) continue;
-    const period = contexts.get(attributes.contextRef);
+    const context = contexts.get(attributes.contextRef);
     const value = Number(String(match[2]).replace(/,/g, ""));
-    if (period && Number.isFinite(value)) facts.push({ period, value });
+    if (context?.consolidated && context.duration <= 120 && Number.isFinite(value)) {
+      facts.push({ period: context.end, value });
+    }
   }
   return facts;
 }
 
+function humanizeConcept(concept) {
+  return concept
+    .replace(/^.*:/, "")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+    .replace(/\bAnd\b/g, "and")
+    .trim();
+}
+
+function inferCustomFormat(unit, values) {
+  const normalized = String(unit || "").toLowerCase();
+  if (normalized === "usd") return "money";
+  if (["shares", "member"].includes(normalized)) return "millions";
+  if (normalized === "number") return "number";
+  if (normalized === "pure" && values.every((value) => Math.abs(value) <= 2)) return "ratio";
+  return null;
+}
+
+function discoverInlineMetrics(xml, contexts = parseInlineContexts(xml)) {
+  const standardNamespaces = new Set(["us-gaap", "dei", "srt", "country", "currency", "xbrli", "link"]);
+  const excluded = /TextBlock|Abstract|Axis|Domain|Table|Policy|Disclosure|Schedule|Member$/i;
+  const operatingConcept = /Revenue|Sales|Member|User|Subscriber|Customer|Shipment|Deliver|Device|Premium|Claim|Fulfillment|Technology|Infrastructure|DataCenter|Cloud|Advertising|Booking|Backlog|RemainingPerformance|Warranty|Inventory|Capacity|Royalty|License|Product|Service|Expense|Income|Margin|Rate|Percentage/i;
+  const accountingConcept = /Liabilit|Payable|Receivable|Lease|Tax|Deferred|Debt|Securit|Investment|Hedge|Derivative|Obligation|Commitment|Accru|Reinsurance|Goodwill|Intangible|Stock|Share|FairValue|RightOfUse|Prepaid|Proceeds|Allowance|PropertyPlant|Miscellaneous|OtherOther|CrossLicense/i;
+  const discovered = [];
+  const pattern = /<([a-z][\w-]*:[A-Za-z][\w]*)\s+([^>]*)>([^<]+)<\/\1>/g;
+  for (const match of xml.matchAll(pattern)) {
+    if (standardNamespaces.has(match[1].split(":")[0])) continue;
+    if (excluded.test(match[1])) continue;
+    if (!operatingConcept.test(match[1]) || accountingConcept.test(match[1])) continue;
+    const attributes = Object.fromEntries(
+      [...match[2].matchAll(/([\w:]+)="([^"]*)"/g)].map((item) => [item[1], item[2]]),
+    );
+    const context = contexts.get(attributes.contextRef);
+    const value = Number(String(match[3]).replace(/,/g, ""));
+    if (!context?.consolidated || context.duration > 120 || !Number.isFinite(value)) continue;
+    discovered.push({
+      concept: match[1],
+      period: context.end,
+      value,
+      unit: attributes.unitRef,
+    });
+  }
+  return discovered;
+}
+
+function scoreDiscoveredMetric(concept, facts) {
+  const name = concept.replace(/^.*:/, "");
+  let score = Math.min(facts.length, 8) * 10;
+  if (/Member|User|Subscriber|Customer|Shipment|Deliver|Booking|Backlog|RemainingPerformance/i.test(name)) score += 45;
+  if (/Revenue|Sales|Premium|Claim|Margin|Rate|Percentage/i.test(name)) score += 35;
+  if (/Fulfillment|Technology|Infrastructure|DataCenter|Cloud|Advertising|Capacity|Warranty|Royalty|License|Product|Service/i.test(name)) score += 20;
+  if (/Expense|Income/i.test(name)) score += 5;
+  if (/Adjustment|Ceded|Commission|Gross|Net|Current|Noncurrent/i.test(name)) score -= 15;
+  return score;
+}
+
+function buildMetric(metric, facts) {
+  const byPeriod = new Map();
+  for (const fact of facts) byPeriod.set(fact.period, fact);
+  const series = [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period)).slice(-8);
+  return {
+    id: metric.id,
+    title: metric.title,
+    description: metric.description,
+    labels: series.map((fact) => labelQuarter({ end: fact.period })),
+    values: series.map((fact) => fact.value),
+    displayValues: series.map((fact) => formatCustomMetric(fact.value, metric.format)),
+    latest: formatCustomMetric(series.at(-1)?.value, metric.format),
+    latestPeriod: series.at(-1)?.period || null,
+    source: "SEC inline XBRL",
+  };
+}
+
 async function fetchCompanySpecificMetrics(config) {
-  const configured = companyMetricConfig[config.ticker]?.metrics || [];
-  if (!configured.length) return [];
+  const tickerConfig = companyMetricConfig[config.ticker] || {};
+  const defaults = companyMetricConfig._defaults || {};
+  const configured = tickerConfig.metrics || [];
+  const autoDiscover = tickerConfig.autoDiscover ?? defaults.autoDiscover ?? false;
+  const maxMetrics = tickerConfig.maxMetrics ?? defaults.maxMetrics ?? 20;
+  if (!configured.length && !autoDiscover) return [];
 
   const submissions = await fetchJson(
     `https://data.sec.gov/submissions/CIK${config.cik}.json`,
@@ -329,6 +421,7 @@ async function fetchCompanySpecificMetrics(config) {
     .slice(0, 12);
 
   const valuesByMetric = new Map(configured.map((metric) => [metric.id, []]));
+  const discoveredByConcept = new Map();
   for (const filing of filings) {
     const accession = filing.accession.replace(/-/g, "");
     const instanceName = filing.document.replace(/\.htm$/i, "_htm.xml");
@@ -337,8 +430,15 @@ async function fetchCompanySpecificMetrics(config) {
       const response = await fetch(url, { headers: { "User-Agent": secIdentity } });
       if (!response.ok) continue;
       const xml = await response.text();
+      const contexts = parseInlineContexts(xml);
       for (const metric of configured) {
-        valuesByMetric.get(metric.id).push(...extractInlineMetric(xml, metric));
+        valuesByMetric.get(metric.id).push(...extractInlineMetric(xml, metric, contexts));
+      }
+      if (autoDiscover) {
+        for (const fact of discoverInlineMetrics(xml, contexts)) {
+          if (!discoveredByConcept.has(fact.concept)) discoveredByConcept.set(fact.concept, []);
+          discoveredByConcept.get(fact.concept).push(fact);
+        }
       }
     } catch {
       // A missing older inline instance should not block the company refresh.
@@ -346,22 +446,32 @@ async function fetchCompanySpecificMetrics(config) {
     await delay(120);
   }
 
-  return configured.map((metric) => {
-    const byPeriod = new Map();
-    for (const fact of valuesByMetric.get(metric.id)) byPeriod.set(fact.period, fact);
-    const facts = [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period)).slice(-8);
-    return {
-      id: metric.id,
-      title: metric.title,
-      description: metric.description,
-      labels: facts.map((fact) => labelQuarter({ end: fact.period })),
-      values: facts.map((fact) => fact.value),
-      displayValues: facts.map((fact) => formatCustomMetric(fact.value, metric.format)),
-      latest: formatCustomMetric(facts.at(-1)?.value, metric.format),
-      latestPeriod: facts.at(-1)?.period || null,
-      source: "SEC inline XBRL",
-    };
-  }).filter((metric) => metric.values.length);
+  const explicitConcepts = new Set(configured.map((metric) => metric.concept));
+  const explicitMetrics = configured
+    .map((metric) => buildMetric(metric, valuesByMetric.get(metric.id)))
+    .filter((metric) => metric.values.length);
+  const discoveredMetrics = [...discoveredByConcept.entries()]
+    .filter(([concept]) => !explicitConcepts.has(concept))
+    .map(([concept, facts]) => {
+      const byPeriod = new Map(facts.map((fact) => [fact.period, fact]));
+      const series = [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period));
+      const format = inferCustomFormat(series.at(-1)?.unit, series.map((fact) => fact.value));
+      if (!format || series.length < 2) return null;
+      return {
+        score: scoreDiscoveredMetric(concept, series),
+        metric: buildMetric({
+          id: concept.replace(/^.*:/, ""),
+          title: humanizeConcept(concept),
+          description: "Company-specific metric reported in SEC filings.",
+          format,
+        }, series),
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score || a.metric.title.length - b.metric.title.length)
+    .slice(0, Math.max(0, maxMetrics - explicitMetrics.length))
+    .map(({ metric }) => metric);
+  return [...explicitMetrics, ...discoveredMetrics];
 }
 
 function buildCompany(config, companyFacts, alpha, customMetrics = []) {

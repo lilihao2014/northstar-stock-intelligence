@@ -325,6 +325,7 @@ const translations = {
     "Operating metrics": "经营指标",
     Members: "会员人数",
     "Total members reported at period end.": "期末报告会员总数。",
+    "Company-specific metric reported in SEC filings.": "公司在 SEC 文件中报告的特定指标。",
     "SEC reported": "SEC 报告值",
     "Same quarter prior year": "上年同期",
     Calculated: "计算值",

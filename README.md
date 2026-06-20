@@ -49,7 +49,7 @@ API keys stay in your terminal environment and are never sent to the browser.
 
 To change the companies being tracked, edit `config/watchlist.json`.
 
-Ticker-specific operating metrics are declared in `config/company-metrics.json`. Each entry maps a ticker to its own SEC inline XBRL concepts, units, and display format. The shared dashboard renders only the metrics configured and reported for the selected company; for example, OSCR shows quarterly members while AAPL does not.
+Ticker-specific operating metrics are controlled by `config/company-metrics.json`. By default, the refresh process discovers useful company-extension concepts from recent SEC inline XBRL filings, ranks recurring operating metrics above accounting details, and keeps up to the configured `maxMetrics`. Explicit ticker entries map important concepts, units, and display formats so metrics such as OSCR quarterly members are always retained. The dashboard renders only metrics actually reported for the selected company; it does not apply OSCR metrics to AAPL or manufacture a common KPI set.
 
 ## Run locally
 
