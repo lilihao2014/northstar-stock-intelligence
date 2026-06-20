@@ -310,6 +310,25 @@ const translations = {
     "Data center remains the engine, though comparisons are becoming increasingly demanding.": "数据中心仍是增长引擎，但同比基数正变得更具挑战。",
     "AWS demand remains healthy while capacity investment positions it for AI workloads.": "AWS 需求保持健康，产能投资正在为 AI 工作负载做好准备。",
     "Quarterly revenue": "季度营收",
+    "Quarterly drill-down": "季度明细",
+    "Latest reported details": "最新报告明细",
+    "Revenue YoY": "营收同比",
+    "Diluted EPS": "摊薄每股收益",
+    "Net income": "净利润",
+    "Operating income": "营业利润",
+    "Premiums earned": "已赚保费",
+    "Claims incurred": "已发生赔付",
+    "Medical loss ratio": "医疗赔付率",
+    "SG&A expense": "销售及管理费用",
+    "Quarter details unavailable": "季度明细暂不可用",
+    "Company-specific metrics": "公司特定指标",
+    "Operating metrics": "经营指标",
+    Members: "会员人数",
+    "Total members reported at period end.": "期末报告会员总数。",
+    "SEC reported": "SEC 报告值",
+    "Same quarter prior year": "上年同期",
+    Calculated: "计算值",
+    Filed: "申报日期",
     "latest reported quarter": "最近报告季度",
     "Reported revenue trend derived from SEC 10-Q and 10-K filings.": "营收趋势根据 SEC 10-Q 和 10-K 文件计算。",
     "Market quotes unavailable": "市场行情暂不可用",
@@ -365,6 +384,10 @@ function applyLanguage() {
     [".market-source", "", "Alpha Vantage · ETF proxies"],
     [".revenue-card .section-label", "", "Fundamental growth"],
     [".revenue-card h2", "", "Revenue & EPS"],
+    [".detail-card .section-label", "", "Quarterly drill-down"],
+    [".detail-card h2", "", "Latest reported details"],
+    [".custom-metrics-card .section-label", "", "Company-specific metrics"],
+    [".custom-metrics-card h2", "", "Operating metrics"],
     [".peer-card .section-label", "", "Relative view"],
     [".peer-card h2", "", "Peer comparison"],
     ["#sort-peers", "", "Sort by score ↕"],
@@ -705,10 +728,50 @@ function renderCompany() {
   $("#operating-label").textContent = tr(op.label);
   $("#operating-change").textContent = currentLanguage === "zh" ? op.change.replace("YoY", "同比") : op.change;
   $("#operating-insight").textContent = tr(op.insight);
+  const detail = company.quarterDetail;
+  $("#detail-period").textContent = detail
+    ? `${detail.period}${detail.filed ? ` · ${tr("Filed")} ${detail.filed}` : ""}`
+    : "";
+  $("#detail-grid").innerHTML = detail?.items?.length
+    ? detail.items.map(([label, value, note]) => `
+        <article class="detail-item">
+          <span>${tr(label)}</span>
+          <strong>${value}</strong>
+          <small>${tr(note)}</small>
+        </article>`).join("")
+    : `<div class="detail-empty">${tr("Quarter details unavailable")}</div>`;
+  renderCustomMetrics(company.customMetrics || []);
 
   renderFundamentals();
   renderOperatingChart();
   renderWatchlist();
+}
+
+function renderCustomMetrics(metrics) {
+  const card = $("#custom-metrics-card");
+  card.hidden = !metrics.length;
+  if (!metrics.length) {
+    $("#custom-metrics-grid").innerHTML = "";
+    return;
+  }
+  $("#custom-metrics-grid").innerHTML = metrics.map((metric) => `
+    <article class="custom-metric">
+      <div class="custom-metric-heading">
+        <div>
+          <span>${tr(metric.title)}</span>
+          <strong>${metric.latest}</strong>
+        </div>
+        <small>${metric.source}</small>
+      </div>
+      <div class="custom-metric-series">
+        ${metric.labels.map((label, index) => `
+          <div>
+            <span>${label}</span>
+            <strong>${metric.displayValues[index]}</strong>
+          </div>`).join("")}
+      </div>
+      <p>${tr(metric.description)}</p>
+    </article>`).join("");
 }
 
 function renderFundamentals() {
@@ -1023,6 +1086,8 @@ function mergeCompany(realCompany) {
     cap: realCompany.cap,
     color: realCompany.color || fallback.color || "#1f6657",
     operating: realCompany.operating || fallback.operating,
+    quarterDetail: realCompany.quarterDetail || null,
+    customMetrics: realCompany.customMetrics || [],
   };
 }
 

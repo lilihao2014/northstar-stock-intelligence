@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260615" />
+    <link rel="stylesheet" href="styles.css?v=20260619" />
   </head>
   <body>
     <div class="app-shell">
@@ -172,6 +172,28 @@
             </p>
           </section>
 
+          <section class="card detail-card">
+            <div class="card-heading">
+              <div>
+                <span class="section-label">Quarterly drill-down</span>
+                <h2>Latest reported details</h2>
+              </div>
+              <span class="as-of" id="detail-period"></span>
+            </div>
+            <div class="detail-grid" id="detail-grid"></div>
+          </section>
+
+          <section class="card custom-metrics-card" id="custom-metrics-card" hidden>
+            <div class="card-heading">
+              <div>
+                <span class="section-label">Company-specific metrics</span>
+                <h2>Operating metrics</h2>
+              </div>
+              <span class="as-of">SEC inline XBRL</span>
+            </div>
+            <div class="custom-metrics-grid" id="custom-metrics-grid"></div>
+          </section>
+
           <section class="card peer-card">
             <div class="card-heading">
               <div>
@@ -231,6 +253,6 @@
         </footer>
       </main>
     </div>
-    <script src="app.js?v=20260615"></script>
+    <script src="app.js?v=20260619"></script>
   </body>
 </html>

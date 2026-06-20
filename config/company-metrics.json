@@ -1,0 +1,14 @@
+{
+  "OSCR": {
+    "metrics": [
+      {
+        "id": "members",
+        "title": "Members",
+        "concept": "oscr:NumberOfMembers",
+        "unit": "member",
+        "format": "millions",
+        "description": "Total members reported at period end."
+      }
+    ]
+  }
+}

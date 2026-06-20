@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-15T13:51:27.500Z",
+  "generatedAt": "2026-06-20T04:06:09.442Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
@@ -106,6 +106,42 @@
           1.57,
           2.84,
           2.01
+        ]
+      },
+      "quarterDetail": {
+        "period": "Mar '26",
+        "filed": "2026-05-01",
+        "items": [
+          [
+            "Revenue",
+            "$111.2B",
+            "SEC reported"
+          ],
+          [
+            "Revenue YoY",
+            "+16.6%",
+            "Same quarter prior year"
+          ],
+          [
+            "Diluted EPS",
+            "$2.01",
+            "SEC reported"
+          ],
+          [
+            "Net income",
+            "$29.6B",
+            "SEC reported"
+          ],
+          [
+            "Net margin",
+            "26.6%",
+            "Calculated"
+          ],
+          [
+            "Operating income",
+            "$35.9B",
+            "SEC reported"
+          ]
         ]
       },
       "operating": {
@@ -250,6 +286,42 @@
           4.27
         ]
       },
+      "quarterDetail": {
+        "period": "Mar '26",
+        "filed": "2026-04-29",
+        "items": [
+          [
+            "Revenue",
+            "$82.9B",
+            "SEC reported"
+          ],
+          [
+            "Revenue YoY",
+            "+18.3%",
+            "Same quarter prior year"
+          ],
+          [
+            "Diluted EPS",
+            "$4.27",
+            "SEC reported"
+          ],
+          [
+            "Net income",
+            "$31.8B",
+            "SEC reported"
+          ],
+          [
+            "Net margin",
+            "38.3%",
+            "Calculated"
+          ],
+          [
+            "Operating income",
+            "$38.4B",
+            "SEC reported"
+          ]
+        ]
+      },
       "operating": {
         "title": "Quarterly revenue",
         "value": "$82.9B",
@@ -289,10 +361,10 @@
     "NVDA": {
       "name": "NVIDIA CORP",
       "ticker": "NVDA",
-      "meta": "Technology · Semiconductors · NASDAQ",
+      "meta": "TECHNOLOGY · SEMICONDUCTORS · NASDAQ",
       "price": 205.19,
       "change": 0.1562,
-      "cap": "Quote key required",
+      "cap": "$4.97T",
       "score": 96,
       "quality": "Exceptional quality",
       "copy": "Strong growth and profitability create an unusually resilient fundamental profile.",
@@ -317,7 +389,7 @@
         ],
         [
           "Forward P/E",
-          "N/A",
+          "23.4x",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -325,7 +397,7 @@
       "signals": [
         [
           "FCF yield",
-          "N/A"
+          "2.1%"
         ],
         [
           "ROE",
@@ -392,6 +464,42 @@
           2.39
         ]
       },
+      "quarterDetail": {
+        "period": "Apr '26",
+        "filed": "2026-05-20",
+        "items": [
+          [
+            "Revenue",
+            "$81.6B",
+            "SEC reported"
+          ],
+          [
+            "Revenue YoY",
+            "+85.2%",
+            "Same quarter prior year"
+          ],
+          [
+            "Diluted EPS",
+            "$2.39",
+            "SEC reported"
+          ],
+          [
+            "Net income",
+            "$58.3B",
+            "SEC reported"
+          ],
+          [
+            "Net margin",
+            "71.5%",
+            "Calculated"
+          ],
+          [
+            "Operating income",
+            "$53.5B",
+            "SEC reported"
+          ]
+        ]
+      },
       "operating": {
         "title": "Quarterly revenue",
         "value": "$81.6B",
@@ -420,7 +528,7 @@
         "revenueGrowth": 65.5,
         "epsGrowth": 66.7,
         "netMargin": 55.6,
-        "pe": null,
+        "pe": 23.4,
         "score": 96
       },
       "sources": {
@@ -431,7 +539,7 @@
     "AMZN": {
       "name": "AMAZON COM INC",
       "ticker": "AMZN",
-      "meta": "Consumer Cyclical · Internet Retail · NASDAQ",
+      "meta": "CONSUMER CYCLICAL · INTERNET RETAIL · NASDAQ",
       "price": 238.55,
       "change": -1.2256,
       "cap": "Quote key required",
@@ -534,6 +642,42 @@
           2.78
         ]
       },
+      "quarterDetail": {
+        "period": "Mar '26",
+        "filed": "2026-04-30",
+        "items": [
+          [
+            "Revenue",
+            "$181.5B",
+            "SEC reported"
+          ],
+          [
+            "Revenue YoY",
+            "+16.6%",
+            "Same quarter prior year"
+          ],
+          [
+            "Diluted EPS",
+            "$2.78",
+            "SEC reported"
+          ],
+          [
+            "Net income",
+            "$30.3B",
+            "SEC reported"
+          ],
+          [
+            "Net margin",
+            "16.7%",
+            "Calculated"
+          ],
+          [
+            "Operating income",
+            "$23.9B",
+            "SEC reported"
+          ]
+        ]
+      },
       "operating": {
         "title": "Quarterly revenue",
         "value": "$181.5B",
@@ -573,7 +717,7 @@
     "GOOGL": {
       "name": "Alphabet Inc.",
       "ticker": "GOOGL",
-      "meta": "Communication Services · Internet Content · NASDAQ",
+      "meta": "COMMUNICATION SERVICES · INTERNET CONTENT & INFORMATION · NASDAQ",
       "price": 359.68,
       "change": 0.5339,
       "cap": "Quote key required",
@@ -667,6 +811,42 @@
           5.11
         ]
       },
+      "quarterDetail": {
+        "period": "Mar '26",
+        "filed": "2026-04-30",
+        "items": [
+          [
+            "Revenue",
+            "$109.9B",
+            "SEC reported"
+          ],
+          [
+            "Revenue YoY",
+            "+21.8%",
+            "Same quarter prior year"
+          ],
+          [
+            "Diluted EPS",
+            "$5.11",
+            "SEC reported"
+          ],
+          [
+            "Net income",
+            "$62.6B",
+            "SEC reported"
+          ],
+          [
+            "Net margin",
+            "56.9%",
+            "Calculated"
+          ],
+          [
+            "Operating income",
+            "$39.7B",
+            "SEC reported"
+          ]
+        ]
+      },
       "operating": {
         "title": "Quarterly revenue",
         "value": "$109.9B",
@@ -706,7 +886,7 @@
     "META": {
       "name": "Meta Platforms, Inc.",
       "ticker": "META",
-      "meta": "Communication Services · Internet Content · NASDAQ",
+      "meta": "COMMUNICATION SERVICES · INTERNET CONTENT & INFORMATION · NASDAQ",
       "price": 566.98,
       "change": -0.2551,
       "cap": "Quote key required",
@@ -809,6 +989,42 @@
           10.44
         ]
       },
+      "quarterDetail": {
+        "period": "Mar '26",
+        "filed": "2026-04-30",
+        "items": [
+          [
+            "Revenue",
+            "$56.3B",
+            "SEC reported"
+          ],
+          [
+            "Revenue YoY",
+            "+33.1%",
+            "Same quarter prior year"
+          ],
+          [
+            "Diluted EPS",
+            "$10.44",
+            "SEC reported"
+          ],
+          [
+            "Net income",
+            "$26.8B",
+            "SEC reported"
+          ],
+          [
+            "Net margin",
+            "47.5%",
+            "Calculated"
+          ],
+          [
+            "Operating income",
+            "$22.9B",
+            "SEC reported"
+          ]
+        ]
+      },
       "operating": {
         "title": "Quarterly revenue",
         "value": "$56.3B",
@@ -848,7 +1064,7 @@
     "MU": {
       "name": "MICRON TECHNOLOGY INC",
       "ticker": "MU",
-      "meta": "Technology · Semiconductors · NASDAQ",
+      "meta": "TECHNOLOGY · SEMICONDUCTORS · NASDAQ",
       "price": 981.61,
       "change": -1.4319,
       "cap": "Quote key required",
@@ -951,6 +1167,42 @@
           12.07
         ]
       },
+      "quarterDetail": {
+        "period": "Feb '26",
+        "filed": "2026-03-19",
+        "items": [
+          [
+            "Revenue",
+            "$23.9B",
+            "SEC reported"
+          ],
+          [
+            "Revenue YoY",
+            "+196.3%",
+            "Same quarter prior year"
+          ],
+          [
+            "Diluted EPS",
+            "$12.07",
+            "SEC reported"
+          ],
+          [
+            "Net income",
+            "$13.8B",
+            "SEC reported"
+          ],
+          [
+            "Net margin",
+            "57.8%",
+            "Calculated"
+          ],
+          [
+            "Operating income",
+            "$16.1B",
+            "SEC reported"
+          ]
+        ]
+      },
       "operating": {
         "title": "Quarterly revenue",
         "value": "$23.9B",
@@ -991,8 +1243,8 @@
       "name": "Oscar Health, Inc.",
       "ticker": "OSCR",
       "meta": "Healthcare · Health Plans · NYSE",
-      "price": 28.26,
-      "change": -2.2484,
+      "price": 28.4,
+      "change": 0.4599,
       "cap": "Quote key required",
       "score": 63,
       "quality": "Mixed profile",
@@ -1093,6 +1345,102 @@
           2.06
         ]
       },
+      "quarterDetail": {
+        "period": "Mar '26",
+        "filed": "2026-05-07",
+        "items": [
+          [
+            "Revenue",
+            "$4.6B",
+            "SEC reported"
+          ],
+          [
+            "Revenue YoY",
+            "+52.6%",
+            "Same quarter prior year"
+          ],
+          [
+            "Diluted EPS",
+            "$2.07",
+            "SEC reported"
+          ],
+          [
+            "Net income",
+            "$679.0M",
+            "SEC reported"
+          ],
+          [
+            "Net margin",
+            "14.6%",
+            "Calculated"
+          ],
+          [
+            "Operating income",
+            "$704.1M",
+            "SEC reported"
+          ],
+          [
+            "Premiums earned",
+            "$4.6B",
+            "SEC reported"
+          ],
+          [
+            "Claims incurred",
+            "$3.2B",
+            "SEC reported"
+          ],
+          [
+            "Medical loss ratio",
+            "70.5%",
+            "Calculated"
+          ],
+          [
+            "SG&A expense",
+            "$706.2M",
+            "SEC reported"
+          ]
+        ]
+      },
+      "customMetrics": [
+        {
+          "id": "members",
+          "title": "Members",
+          "description": "Total members reported at period end.",
+          "labels": [
+            "Jun '24",
+            "Sep '24",
+            "Dec '24",
+            "Mar '25",
+            "Jun '25",
+            "Sep '25",
+            "Dec '25",
+            "Mar '26"
+          ],
+          "values": [
+            1600000,
+            1650000,
+            1680000,
+            2000000,
+            2000000,
+            2100000,
+            2000000,
+            3200000
+          ],
+          "displayValues": [
+            "1.6M",
+            "1.65M",
+            "1.68M",
+            "2M",
+            "2M",
+            "2.1M",
+            "2M",
+            "3.2M"
+          ],
+          "latest": "3.2M",
+          "latestPeriod": "2026-03-31",
+          "source": "SEC inline XBRL"
+        }
+      ],
       "operating": {
         "title": "Quarterly revenue",
         "value": "$4.6B",
@@ -1151,7 +1499,7 @@
       "ticker": "NVDA",
       "growth": 65.5,
       "eps": 66.7,
-      "pe": null,
+      "pe": 23.4,
       "margin": 55.6,
       "score": 96
     },

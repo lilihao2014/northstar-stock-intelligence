@@ -742,6 +742,109 @@ kbd {
   padding: 20px 23px;
 }
 
+.detail-card {
+  grid-column: span 12;
+  padding: 20px 23px;
+}
+
+.custom-metrics-card {
+  grid-column: span 12;
+  padding: 20px 23px;
+}
+
+.custom-metrics-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.custom-metric {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.custom-metric-heading,
+.custom-metric-series {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.custom-metric-heading span,
+.custom-metric-heading small,
+.custom-metric-series span,
+.custom-metric p {
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.custom-metric-heading strong {
+  display: block;
+  margin-top: 4px;
+  font: 600 20px "DM Mono", monospace;
+}
+
+.custom-metric-series {
+  align-items: stretch;
+  margin-top: 14px;
+  overflow-x: auto;
+}
+
+.custom-metric-series div {
+  min-width: 70px;
+  padding: 8px;
+  border-left: 2px solid var(--green-soft);
+  background: rgba(255, 255, 255, 0.32);
+}
+
+.custom-metric-series strong,
+.custom-metric-series span {
+  display: block;
+}
+
+.custom-metric-series strong {
+  margin-top: 4px;
+  font: 600 10px "DM Mono", monospace;
+}
+
+.custom-metric p {
+  margin: 10px 0 0;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.detail-item {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.detail-item span,
+.detail-item small {
+  display: block;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.detail-item strong {
+  display: block;
+  margin: 7px 0 5px;
+  font: 600 14px "DM Mono", monospace;
+}
+
+.detail-empty {
+  color: var(--muted);
+  font-size: 9px;
+}
+
 .peer-card,
 .sector-card,
 .scatter-card {
@@ -1203,6 +1306,10 @@ footer {
 
   .metrics-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .signal-list {

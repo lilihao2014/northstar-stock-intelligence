@@ -5,6 +5,9 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputPath = path.join(root, "data", "dashboard.json");
 const configuredWatchlist = JSON.parse(await readFile(path.join(root, "config", "watchlist.json"), "utf8"));
+const companyMetricConfig = JSON.parse(
+  await readFile(path.join(root, "config", "company-metrics.json"), "utf8").catch(() => "{}"),
+);
 const requestedTicker = process.env.REFRESH_TICKER?.trim().toUpperCase() || null;
 const watchlist = requestedTicker
   ? configuredWatchlist.filter((item) => item.ticker === requestedTicker)
@@ -58,6 +61,9 @@ const conceptCandidates = {
     "LongTermDebtNoncurrent",
   ],
   operatingIncome: ["OperatingIncomeLoss"],
+  premiumsEarned: ["PremiumsEarnedNet"],
+  claimsIncurred: ["PolicyholderBenefitsAndClaimsIncurredNet"],
+  sellingGeneralAdministrative: ["SellingGeneralAndAdministrativeExpense"],
   operatingCashFlow: ["NetCashProvidedByUsedInOperatingActivities"],
   capex: ["PaymentsToAcquirePropertyPlantAndEquipment"],
 };
@@ -78,6 +84,15 @@ const formatMoney = (value) => {
   if (Math.abs(value) >= 1e9) return `$${(value / 1e9).toFixed(1)}B`;
   if (Math.abs(value) >= 1e6) return `$${(value / 1e6).toFixed(1)}M`;
   return `$${value.toFixed(0)}`;
+};
+const formatCustomMetric = (value, format) => {
+  if (!Number.isFinite(value)) return "N/A";
+  if (format === "millions") {
+    return `${(value / 1e6).toLocaleString("en-US", { maximumFractionDigits: 2 })}M`;
+  }
+  if (format === "thousands") return `${(value / 1e3).toFixed(1)}K`;
+  if (format === "percent") return `${value.toFixed(1)}%`;
+  return value.toLocaleString("en-US");
 };
 
 async function fetchJson(url, headers = {}) {
@@ -171,6 +186,16 @@ function closestPeriod(facts, end, toleranceDays = 8) {
   });
 }
 
+function priorYearPeriod(facts, fact, toleranceDays = 12) {
+  if (!fact?.end) return null;
+  const target = new Date(`${fact.end}T00:00:00Z`);
+  target.setUTCFullYear(target.getUTCFullYear() - 1);
+  return facts.find((candidate) => {
+    const difference = Math.abs(new Date(`${candidate.end}T00:00:00Z`) - target) / 86400000;
+    return difference <= toleranceDays;
+  });
+}
+
 function alignSeries(primary, secondary, labeler, scalePrimary = 1) {
   const aligned = primary
     .map((fact) => ({ primary: fact, secondary: closestPeriod(secondary, fact.end) }))
@@ -259,12 +284,99 @@ async function fetchMarketQuote(symbol) {
   };
 }
 
-function buildCompany(config, companyFacts, alpha) {
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function extractInlineMetric(xml, definition) {
+  const contexts = new Map();
+  for (const match of xml.matchAll(/<context\s+id="([^"]+)"[^>]*>([\s\S]*?)<\/context>/g)) {
+    const instant = match[2].match(/<instant>([^<]+)<\/instant>/)?.[1];
+    if (instant) contexts.set(match[1], instant);
+  }
+
+  const concept = escapeRegex(definition.concept);
+  const pattern = new RegExp(`<${concept}\\s+([^>]*)>([^<]+)<\\/${concept}>`, "g");
+  const facts = [];
+  for (const match of xml.matchAll(pattern)) {
+    const attributes = Object.fromEntries(
+      [...match[1].matchAll(/([\w:]+)="([^"]*)"/g)].map((item) => [item[1], item[2]]),
+    );
+    if (definition.unit && attributes.unitRef !== definition.unit) continue;
+    const period = contexts.get(attributes.contextRef);
+    const value = Number(String(match[2]).replace(/,/g, ""));
+    if (period && Number.isFinite(value)) facts.push({ period, value });
+  }
+  return facts;
+}
+
+async function fetchCompanySpecificMetrics(config) {
+  const configured = companyMetricConfig[config.ticker]?.metrics || [];
+  if (!configured.length) return [];
+
+  const submissions = await fetchJson(
+    `https://data.sec.gov/submissions/CIK${config.cik}.json`,
+    { "User-Agent": secIdentity },
+  );
+  const recent = submissions.filings?.recent || {};
+  const filings = (recent.form || [])
+    .map((form, index) => ({
+      form,
+      accession: recent.accessionNumber[index],
+      document: recent.primaryDocument[index],
+    }))
+    .filter((filing) => ["10-Q", "10-K"].includes(filing.form) && filing.document)
+    .slice(0, 12);
+
+  const valuesByMetric = new Map(configured.map((metric) => [metric.id, []]));
+  for (const filing of filings) {
+    const accession = filing.accession.replace(/-/g, "");
+    const instanceName = filing.document.replace(/\.htm$/i, "_htm.xml");
+    const url = `https://www.sec.gov/Archives/edgar/data/${Number(config.cik)}/${accession}/${instanceName}`;
+    try {
+      const response = await fetch(url, { headers: { "User-Agent": secIdentity } });
+      if (!response.ok) continue;
+      const xml = await response.text();
+      for (const metric of configured) {
+        valuesByMetric.get(metric.id).push(...extractInlineMetric(xml, metric));
+      }
+    } catch {
+      // A missing older inline instance should not block the company refresh.
+    }
+    await delay(120);
+  }
+
+  return configured.map((metric) => {
+    const byPeriod = new Map();
+    for (const fact of valuesByMetric.get(metric.id)) byPeriod.set(fact.period, fact);
+    const facts = [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period)).slice(-8);
+    return {
+      id: metric.id,
+      title: metric.title,
+      description: metric.description,
+      labels: facts.map((fact) => labelQuarter({ end: fact.period })),
+      values: facts.map((fact) => fact.value),
+      displayValues: facts.map((fact) => formatCustomMetric(fact.value, metric.format)),
+      latest: formatCustomMetric(facts.at(-1)?.value, metric.format),
+      latestPeriod: facts.at(-1)?.period || null,
+      source: "SEC inline XBRL",
+    };
+  }).filter((metric) => metric.values.length);
+}
+
+function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const revenueFacts = getUnitFacts(companyFacts, conceptCandidates.revenue, ["USD"]);
   const epsFacts = getUnitFacts(companyFacts, conceptCandidates.eps, ["USD/shares", "USD / shares"]);
   const dilutedShareFacts = getUnitFacts(companyFacts, conceptCandidates.dilutedShares, ["shares"]);
   const netIncomeFacts = getUnitFacts(companyFacts, conceptCandidates.netIncome, ["USD"]);
   const operatingIncomeFacts = getUnitFacts(companyFacts, conceptCandidates.operatingIncome, ["USD"]);
+  const premiumsEarnedFacts = getUnitFacts(companyFacts, conceptCandidates.premiumsEarned, ["USD"]);
+  const claimsIncurredFacts = getUnitFacts(companyFacts, conceptCandidates.claimsIncurred, ["USD"]);
+  const sellingGeneralAdministrativeFacts = getUnitFacts(
+    companyFacts,
+    conceptCandidates.sellingGeneralAdministrative,
+    ["USD"],
+  );
   const equityFacts = getUnitFacts(companyFacts, conceptCandidates.equity, ["USD"]);
   const operatingCashFlowFacts = getUnitFacts(companyFacts, conceptCandidates.operatingCashFlow, ["USD"]);
   const capexFacts = getUnitFacts(companyFacts, conceptCandidates.capex, ["USD"]);
@@ -284,6 +396,10 @@ function buildCompany(config, companyFacts, alpha) {
   if (epsAnnual.length < 2) epsAnnual.push(...rawEpsAnnual);
   if (epsQuarterly.length < 2) epsQuarterly.push(...quarterlySeries(epsFacts));
   const operatingIncomeAnnual = annualSeries(operatingIncomeFacts);
+  const operatingIncomeQuarterly = quarterlySeries(operatingIncomeFacts);
+  const premiumsEarnedQuarterly = quarterlySeries(premiumsEarnedFacts);
+  const claimsIncurredQuarterly = quarterlySeries(claimsIncurredFacts);
+  const sellingGeneralAdministrativeQuarterly = quarterlySeries(sellingGeneralAdministrativeFacts);
   const cashFlowAnnual = annualSeries(operatingCashFlowFacts);
   const capexAnnual = annualSeries(capexFacts);
 
@@ -324,6 +440,37 @@ function buildCompany(config, companyFacts, alpha) {
   const roe = equity && latestNetIncome ? (latestNetIncome / equity) * 100 : null;
   const score = calculateScore({ revenueGrowth, epsGrowth, netMargin, debtToOperatingIncome });
   const [quality, copy] = qualityLabel(score);
+  const latestQuarterRevenue = revenueQuarterly.at(-1);
+  const priorYearQuarterRevenue = priorYearPeriod(revenueQuarterly, latestQuarterRevenue);
+  const latestQuarterNetIncome = closestPeriod(netIncomeQuarterly, latestQuarterRevenue?.end);
+  const latestQuarterOperatingIncome = closestPeriod(operatingIncomeQuarterly, latestQuarterRevenue?.end);
+  const latestQuarterPremiums = closestPeriod(premiumsEarnedQuarterly, latestQuarterRevenue?.end);
+  const latestQuarterClaims = closestPeriod(claimsIncurredQuarterly, latestQuarterRevenue?.end);
+  const latestQuarterSga = closestPeriod(sellingGeneralAdministrativeQuarterly, latestQuarterRevenue?.end);
+  const latestQuarterEps = closestPeriod(rawEpsAnnual.concat(quarterlySeries(epsFacts)), latestQuarterRevenue?.end)
+    || closestPeriod(epsQuarterly, latestQuarterRevenue?.end);
+  const latestQuarterMargin = latestQuarterRevenue?.val && latestQuarterNetIncome?.val
+    ? (latestQuarterNetIncome.val / latestQuarterRevenue.val) * 100
+    : null;
+  const medicalLossRatio = latestQuarterPremiums?.val && latestQuarterClaims?.val
+    ? (latestQuarterClaims.val / latestQuarterPremiums.val) * 100
+    : null;
+  const quarterDetails = [
+    ["Revenue", formatMoney(latestQuarterRevenue?.val), "SEC reported"],
+    ["Revenue YoY", formatPercent(percentChange(latestQuarterRevenue?.val, priorYearQuarterRevenue?.val)), "Same quarter prior year"],
+    ["Diluted EPS", Number.isFinite(latestQuarterEps?.val) ? `$${latestQuarterEps.val.toFixed(2)}` : "N/A", latestQuarterEps?.dilutedShares ? "Calculated" : "SEC reported"],
+    ["Net income", formatMoney(latestQuarterNetIncome?.val), "SEC reported"],
+    ["Net margin", Number.isFinite(latestQuarterMargin) ? `${latestQuarterMargin.toFixed(1)}%` : "N/A", "Calculated"],
+    ["Operating income", formatMoney(latestQuarterOperatingIncome?.val), "SEC reported"],
+  ];
+  if (Number.isFinite(latestQuarterPremiums?.val)) {
+    quarterDetails.push(
+      ["Premiums earned", formatMoney(latestQuarterPremiums.val), "SEC reported"],
+      ["Claims incurred", formatMoney(latestQuarterClaims?.val), "SEC reported"],
+      ["Medical loss ratio", Number.isFinite(medicalLossRatio) ? `${medicalLossRatio.toFixed(1)}%` : "N/A", "Calculated"],
+      ["SG&A expense", formatMoney(latestQuarterSga?.val), "SEC reported"],
+    );
+  }
 
   return {
     name: companyFacts.entityName,
@@ -350,6 +497,12 @@ function buildCompany(config, companyFacts, alpha) {
     ],
     annual,
     quarterly: quarterly.labels.length >= 2 ? quarterly : annual,
+    quarterDetail: {
+      period: latestQuarterRevenue ? labelQuarter(latestQuarterRevenue) : "Latest quarter",
+      filed: latestQuarterRevenue?.filed || null,
+      items: quarterDetails,
+    },
+    customMetrics,
     operating: {
       title: "Quarterly revenue",
       value: `$${quarterly.revenue.at(-1)?.toFixed(1) ?? annual.revenue.at(-1)?.toFixed(1)}B`,
@@ -395,7 +548,13 @@ async function refreshCompany(config, index) {
       console.warn(`  Quote/profile skipped: ${error.message}`);
     }
   }
-  return buildCompany(config, companyFacts, alpha);
+  let customMetrics = [];
+  try {
+    customMetrics = await fetchCompanySpecificMetrics(config);
+  } catch (error) {
+    console.warn(`  Company metrics skipped: ${error.message}`);
+  }
+  return buildCompany(config, companyFacts, alpha, customMetrics);
 }
 
 const previous = await readFile(outputPath, "utf8").then(JSON.parse).catch(() => null);
