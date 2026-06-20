@@ -65,7 +65,10 @@ const conceptCandidates = {
   claimsIncurred: ["PolicyholderBenefitsAndClaimsIncurredNet"],
   sellingGeneralAdministrative: ["SellingGeneralAndAdministrativeExpense"],
   operatingCashFlow: ["NetCashProvidedByUsedInOperatingActivities"],
-  capex: ["PaymentsToAcquirePropertyPlantAndEquipment"],
+  capex: [
+    "PaymentsToAcquireProductiveAssets",
+    "PaymentsToAcquirePropertyPlantAndEquipment",
+  ],
 };
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -539,6 +542,13 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const freeCashFlow = Number.isFinite(latestOperatingCashFlow) && Number.isFinite(latestCapex)
     ? latestOperatingCashFlow - Math.abs(latestCapex)
     : null;
+  const fcfMargin = latestRevenue && Number.isFinite(freeCashFlow)
+    ? (freeCashFlow / latestRevenue) * 100
+    : null;
+  const operatingMargin = latestRevenue && Number.isFinite(latestOperatingIncome)
+    ? (latestOperatingIncome / latestRevenue) * 100
+    : null;
+  const latestFiscalPeriod = revenueAnnual.at(-1) ? labelAnnual(revenueAnnual.at(-1)) : null;
 
   const overview = alpha?.overview ?? {};
   const quote = alpha?.quote ?? {};
@@ -612,6 +622,16 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
       filed: latestQuarterRevenue?.filed || null,
       items: quarterDetails,
     },
+    financialMetrics: [
+      { title: "Free cash flow", value: formatMoney(freeCashFlow), note: "Calculated", period: latestFiscalPeriod },
+      { title: "Operating cash flow", value: formatMoney(latestOperatingCashFlow), note: "SEC reported", period: latestFiscalPeriod },
+      { title: "Capital expenditures", value: formatMoney(latestCapex), note: "SEC reported", period: latestFiscalPeriod },
+      { title: "FCF margin", value: Number.isFinite(fcfMargin) ? `${fcfMargin.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod },
+      { title: "Operating margin", value: Number.isFinite(operatingMargin) ? `${operatingMargin.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod },
+      { title: "ROE", value: Number.isFinite(roe) ? `${roe.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod },
+      { title: "Debt / op. income", value: formatMultiple(debtToOperatingIncome), note: "Calculated", period: latestFiscalPeriod },
+      { title: "Revenue CAGR", value: Number.isFinite(revenueCagr) ? `${revenueCagr.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod },
+    ],
     customMetrics,
     operating: {
       title: "Quarterly revenue",

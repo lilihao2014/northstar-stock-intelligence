@@ -747,6 +747,38 @@ kbd {
   padding: 20px 23px;
 }
 
+.financial-metrics-card {
+  grid-column: span 12;
+  padding: 20px 23px;
+}
+
+.financial-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.financial-metric {
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.financial-metric span,
+.financial-metric small {
+  display: block;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.financial-metric strong {
+  display: block;
+  margin: 6px 0;
+  font: 600 17px "DM Mono", monospace;
+}
+
 .custom-metrics-card {
   grid-column: span 12;
   padding: 20px 23px;
@@ -1309,6 +1341,10 @@ footer {
   }
 
   .detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .financial-metrics-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 

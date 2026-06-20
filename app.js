@@ -321,6 +321,15 @@ const translations = {
     "Medical loss ratio": "医疗赔付率",
     "SG&A expense": "销售及管理费用",
     "Quarter details unavailable": "季度明细暂不可用",
+    "Common financial metrics": "通用财务指标",
+    "Financial indicators": "财务指标",
+    "SEC filings": "SEC 文件",
+    "Free cash flow": "自由现金流",
+    "Operating cash flow": "经营现金流",
+    "Capital expenditures": "资本支出",
+    "FCF margin": "自由现金流利润率",
+    "Operating margin": "营业利润率",
+    "Latest fiscal year": "最新财年",
     "Company-specific metrics": "公司特定指标",
     "Operating metrics": "经营指标",
     Members: "会员人数",
@@ -387,6 +396,9 @@ function applyLanguage() {
     [".revenue-card h2", "", "Revenue & EPS"],
     [".detail-card .section-label", "", "Quarterly drill-down"],
     [".detail-card h2", "", "Latest reported details"],
+    [".financial-metrics-card .section-label", "", "Common financial metrics"],
+    [".financial-metrics-card h2", "", "Financial indicators"],
+    [".financial-metrics-card .as-of", "", "SEC filings"],
     [".custom-metrics-card .section-label", "", "Company-specific metrics"],
     [".custom-metrics-card h2", "", "Operating metrics"],
     [".peer-card .section-label", "", "Relative view"],
@@ -741,11 +753,23 @@ function renderCompany() {
           <small>${tr(note)}</small>
         </article>`).join("")
     : `<div class="detail-empty">${tr("Quarter details unavailable")}</div>`;
+  renderFinancialMetrics(company.financialMetrics || []);
   renderCustomMetrics(company.customMetrics || []);
 
   renderFundamentals();
   renderOperatingChart();
   renderWatchlist();
+}
+
+function renderFinancialMetrics(metrics) {
+  const card = $("#financial-metrics-card");
+  card.hidden = !metrics.length;
+  $("#financial-metrics-grid").innerHTML = metrics.map((metric) => `
+    <article class="financial-metric">
+      <span>${tr(metric.title)}</span>
+      <strong>${metric.value}</strong>
+      <small>${tr(metric.note)}${metric.period ? ` · ${metric.period}` : ""}</small>
+    </article>`).join("");
 }
 
 function renderCustomMetrics(metrics) {
@@ -1088,6 +1112,7 @@ function mergeCompany(realCompany) {
     color: realCompany.color || fallback.color || "#1f6657",
     operating: realCompany.operating || fallback.operating,
     quarterDetail: realCompany.quarterDetail || null,
+    financialMetrics: realCompany.financialMetrics || [],
     customMetrics: realCompany.customMetrics || [],
   };
 }

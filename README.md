@@ -51,6 +51,8 @@ To change the companies being tracked, edit `config/watchlist.json`.
 
 Ticker-specific operating metrics are controlled by `config/company-metrics.json`. By default, the refresh process discovers useful company-extension concepts from recent SEC inline XBRL filings, ranks recurring operating metrics above accounting details, and keeps up to the configured `maxMetrics`. Explicit ticker entries map important concepts, units, and display formats so metrics such as OSCR quarterly members are always retained. The dashboard renders only metrics actually reported for the selected company; it does not apply OSCR metrics to AAPL or manufacture a common KPI set.
 
+Common financial indicators are calculated consistently for every ticker from standardized SEC facts. These include free cash flow, operating cash flow, capital expenditures, FCF margin, operating margin, return on equity, leverage, and revenue CAGR. A value remains `N/A` when the required facts are not reported rather than being estimated or replaced with mock data.
+
 ## Run locally
 
 ```bash

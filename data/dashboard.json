@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-20T04:18:05.585Z",
+  "generatedAt": "2026-06-20T04:26:33.098Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
@@ -144,6 +144,56 @@
           ]
         ]
       },
+      "financialMetrics": [
+        {
+          "title": "Free cash flow",
+          "value": "$98.8B",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating cash flow",
+          "value": "$111.5B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "Capital expenditures",
+          "value": "$12.7B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "FCF margin",
+          "value": "23.7%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating margin",
+          "value": "32.0%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "ROE",
+          "value": "105.2%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Debt / op. income",
+          "value": "0.1x",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Revenue CAGR",
+          "value": "8.7%",
+          "note": "Calculated",
+          "period": "FY25"
+        }
+      ],
       "customMetrics": [],
       "operating": {
         "title": "Quarterly revenue",
@@ -323,6 +373,56 @@
           ]
         ]
       },
+      "financialMetrics": [
+        {
+          "title": "Free cash flow",
+          "value": "$71.6B",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating cash flow",
+          "value": "$136.2B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "Capital expenditures",
+          "value": "$64.6B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "FCF margin",
+          "value": "25.4%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating margin",
+          "value": "45.6%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "ROE",
+          "value": "24.6%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Debt / op. income",
+          "value": "0.1x",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Revenue CAGR",
+          "value": "14.5%",
+          "note": "Calculated",
+          "period": "FY25"
+        }
+      ],
       "customMetrics": [],
       "operating": {
         "title": "Quarterly revenue",
@@ -502,6 +602,56 @@
           ]
         ]
       },
+      "financialMetrics": [
+        {
+          "title": "Free cash flow",
+          "value": "$96.7B",
+          "note": "Calculated",
+          "period": "FY26"
+        },
+        {
+          "title": "Operating cash flow",
+          "value": "$102.7B",
+          "note": "SEC reported",
+          "period": "FY26"
+        },
+        {
+          "title": "Capital expenditures",
+          "value": "$6.0B",
+          "note": "SEC reported",
+          "period": "FY26"
+        },
+        {
+          "title": "FCF margin",
+          "value": "44.8%",
+          "note": "Calculated",
+          "period": "FY26"
+        },
+        {
+          "title": "Operating margin",
+          "value": "60.4%",
+          "note": "Calculated",
+          "period": "FY26"
+        },
+        {
+          "title": "ROE",
+          "value": "61.4%",
+          "note": "Calculated",
+          "period": "FY26"
+        },
+        {
+          "title": "Debt / op. income",
+          "value": "0.0x",
+          "note": "Calculated",
+          "period": "FY26"
+        },
+        {
+          "title": "Revenue CAGR",
+          "value": "66.9%",
+          "note": "Calculated",
+          "period": "FY26"
+        }
+      ],
       "customMetrics": [
         {
           "id": "ProductWarrantyAndReturnProvisions",
@@ -702,6 +852,56 @@
           ]
         ]
       },
+      "financialMetrics": [
+        {
+          "title": "Free cash flow",
+          "value": "$7.7B",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating cash flow",
+          "value": "$139.5B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "Capital expenditures",
+          "value": "$131.8B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "FCF margin",
+          "value": "1.1%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating margin",
+          "value": "11.2%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "ROE",
+          "value": "17.6%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Debt / op. income",
+          "value": "0.0x",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Revenue CAGR",
+          "value": "13.2%",
+          "note": "Calculated",
+          "period": "FY25"
+        }
+      ],
       "customMetrics": [
         {
           "id": "FulfillmentExpense",
@@ -987,6 +1187,56 @@
           ]
         ]
       },
+      "financialMetrics": [
+        {
+          "title": "Free cash flow",
+          "value": "$73.3B",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating cash flow",
+          "value": "$164.7B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "Capital expenditures",
+          "value": "$91.4B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "FCF margin",
+          "value": "18.2%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating margin",
+          "value": "32.0%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "ROE",
+          "value": "27.6%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Debt / op. income",
+          "value": "0.0x",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Revenue CAGR",
+          "value": "20.0%",
+          "note": "Calculated",
+          "period": "FY25"
+        }
+      ],
       "customMetrics": [],
       "operating": {
         "title": "Quarterly revenue",
@@ -1166,6 +1416,56 @@
           ]
         ]
       },
+      "financialMetrics": [
+        {
+          "title": "Free cash flow",
+          "value": "$46.1B",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating cash flow",
+          "value": "$115.8B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "Capital expenditures",
+          "value": "$69.7B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "FCF margin",
+          "value": "22.9%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating margin",
+          "value": "41.4%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "ROE",
+          "value": "24.8%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Debt / op. income",
+          "value": "0.7x",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Revenue CAGR",
+          "value": "18.5%",
+          "note": "Calculated",
+          "period": "FY25"
+        }
+      ],
       "customMetrics": [],
       "operating": {
         "title": "Quarterly revenue",
@@ -1345,6 +1645,56 @@
           ]
         ]
       },
+      "financialMetrics": [
+        {
+          "title": "Free cash flow",
+          "value": "$1.7B",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating cash flow",
+          "value": "$17.5B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "Capital expenditures",
+          "value": "$15.9B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "FCF margin",
+          "value": "4.5%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating margin",
+          "value": "26.1%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "ROE",
+          "value": "11.8%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Debt / op. income",
+          "value": "0.0x",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Revenue CAGR",
+          "value": "11.8%",
+          "note": "Calculated",
+          "period": "FY25"
+        }
+      ],
       "customMetrics": [
         {
           "id": "LicenseAgreementIncomeExpense",
@@ -1577,6 +1927,56 @@
           ]
         ]
       },
+      "financialMetrics": [
+        {
+          "title": "Free cash flow",
+          "value": "$1.1B",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating cash flow",
+          "value": "$1.1B",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "Capital expenditures",
+          "value": "$36.4M",
+          "note": "SEC reported",
+          "period": "FY25"
+        },
+        {
+          "title": "FCF margin",
+          "value": "9.0%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Operating margin",
+          "value": "-3.4%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "ROE",
+          "value": "-26.6%",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Debt / op. income",
+          "value": "-1.1x",
+          "note": "Calculated",
+          "period": "FY25"
+        },
+        {
+          "title": "Revenue CAGR",
+          "value": "90.8%",
+          "note": "Calculated",
+          "period": "FY25"
+        }
+      ],
       "customMetrics": [
         {
           "id": "members",
