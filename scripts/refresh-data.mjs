@@ -81,6 +81,8 @@ const percentChange = (latest, prior) => {
 const formatPercent = (value, digits = 1) =>
   Number.isFinite(value) ? `${value >= 0 ? "+" : ""}${value.toFixed(digits)}%` : "N/A";
 const formatMultiple = (value) => Number.isFinite(value) ? `${value.toFixed(1)}x` : "N/A";
+const formatPerShareChange = (value) =>
+  Number.isFinite(value) ? `${value >= 0 ? "+" : "-"}$${Math.abs(value).toFixed(2)}` : "N/A";
 const formatMoney = (value) => {
   if (!Number.isFinite(value)) return "N/A";
   if (Math.abs(value) >= 1e12) return `$${(value / 1e12).toFixed(2)}T`;
@@ -100,6 +102,17 @@ const formatCustomMetric = (value, format) => {
   if (format === "number") return value.toLocaleString("en-US", { maximumFractionDigits: 2 });
   return value.toLocaleString("en-US");
 };
+
+function describeEpsChange(latest, prior, defaultDelta, defaultNote) {
+  if (!Number.isFinite(latest) || !Number.isFinite(prior)) return ["N/A", "N/A", defaultNote];
+  const change = formatPerShareChange(latest - prior);
+  if (prior >= 0 && latest < 0) return ["Profit to loss", change, "EPS changed from positive to negative"];
+  if (prior < 0 && latest >= 0) return ["Loss to profit", change, "EPS changed from negative to positive"];
+  if (prior < 0 && latest < 0) {
+    return [latest > prior ? "Loss narrowed" : "Loss widened", change, "EPS remains negative"];
+  }
+  return [formatPercent(percentChange(latest, prior)), defaultDelta, defaultNote];
+}
 
 async function fetchJson(url, headers = {}) {
   const response = await fetch(url, { headers });
@@ -579,7 +592,6 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     ? (priorYearQuarterNetIncome.val / priorYearQuarterRevenue.val) * 100
     : null;
   const quarterlyRevenueGrowth = percentChange(latestQuarterRevenue?.val, priorYearQuarterRevenue?.val);
-  const quarterlyEpsGrowth = percentChange(latestQuarterEps?.val, priorYearQuarterEps?.val);
   const medicalLossRatio = latestQuarterPremiums?.val && latestQuarterClaims?.val
     ? (latestQuarterClaims.val / latestQuarterPremiums.val) * 100
     : null;
@@ -599,15 +611,27 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
       ["SG&A expense", formatMoney(latestQuarterSga?.val), "SEC reported"],
     );
   }
+  const annualEpsDisplay = describeEpsChange(
+    latestEps,
+    priorEps,
+    formatPercent((epsGrowth ?? 0) - (priorEpsGrowth ?? 0), 1).replace("%", " pts"),
+    "Diluted EPS, latest fiscal year",
+  );
+  const quarterlyEpsDisplay = describeEpsChange(
+    latestQuarterEps?.val,
+    priorYearQuarterEps?.val,
+    "Same quarter prior year",
+    "Compared with same quarter last year",
+  );
   const annualSummaryMetrics = [
     ["Revenue growth", formatPercent(revenueGrowth), formatPercent((revenueGrowth ?? 0) - (priorRevenueGrowth ?? 0), 1).replace("%", " pts"), "Latest reported fiscal year"],
-    ["EPS growth", formatPercent(epsGrowth), formatPercent((epsGrowth ?? 0) - (priorEpsGrowth ?? 0), 1).replace("%", " pts"), "Diluted EPS, latest fiscal year"],
+    ["EPS growth", ...annualEpsDisplay],
     ["Net margin", Number.isFinite(netMargin) ? `${netMargin.toFixed(1)}%` : "N/A", formatPercent((netMargin ?? 0) - (priorNetMargin ?? 0), 1).replace("%", " pts"), "Calculated from SEC filings"],
     ["Forward P/E", formatMultiple(pe), "Provider", alpha ? "Alpha Vantage overview" : "Add Alpha Vantage key"],
   ];
   const quarterlySummaryMetrics = [
     ["Revenue growth", formatPercent(quarterlyRevenueGrowth), "Same quarter prior year", "Compared with same quarter last year"],
-    ["EPS growth", formatPercent(quarterlyEpsGrowth), "Same quarter prior year", "Compared with same quarter last year"],
+    ["EPS growth", ...quarterlyEpsDisplay],
     ["Net margin", Number.isFinite(latestQuarterMargin) ? `${latestQuarterMargin.toFixed(1)}%` : "N/A", Number.isFinite(latestQuarterMargin) && Number.isFinite(priorYearQuarterMargin) ? formatPercent(latestQuarterMargin - priorYearQuarterMargin, 1).replace("%", " pts") : "N/A", "Compared with same quarter last year"],
     ["Forward P/E", formatMultiple(pe), "Provider", alpha ? "Alpha Vantage overview" : "Add Alpha Vantage key"],
   ];

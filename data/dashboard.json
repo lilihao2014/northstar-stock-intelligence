@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-20T12:29:06.585Z",
+  "generatedAt": "2026-06-20T14:59:34.406Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
@@ -288,10 +288,10 @@
     "MSFT": {
       "name": "MICROSOFT CORPORATION",
       "ticker": "MSFT",
-      "meta": "TECHNOLOGY · SOFTWARE - INFRASTRUCTURE · NASDAQ",
+      "meta": "Technology · Software Infrastructure · NASDAQ",
       "price": 379.4,
       "change": 0.1293,
-      "cap": "$2.82T",
+      "cap": "Quote key required",
       "score": 86,
       "quality": "Strong compounder",
       "copy": "Healthy growth and durable economics support long-term compounding potential.",
@@ -316,7 +316,7 @@
         ],
         [
           "Forward P/E",
-          "19.5x",
+          "N/A",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -343,7 +343,7 @@
           ],
           [
             "Forward P/E",
-            "19.5x",
+            "N/A",
             "Provider",
             "Alpha Vantage overview"
           ]
@@ -369,7 +369,7 @@
           ],
           [
             "Forward P/E",
-            "19.5x",
+            "N/A",
             "Provider",
             "Alpha Vantage overview"
           ]
@@ -378,7 +378,7 @@
       "signals": [
         [
           "FCF yield",
-          "2.5%"
+          "N/A"
         ],
         [
           "ROE",
@@ -560,7 +560,7 @@
         "revenueGrowth": 14.9,
         "epsGrowth": 15.6,
         "netMargin": 36.1,
-        "pe": 19.5,
+        "pe": null,
         "score": 86
       },
       "sources": {
@@ -1273,10 +1273,10 @@
     "GOOGL": {
       "name": "Alphabet Inc.",
       "ticker": "GOOGL",
-      "meta": "Communication Services · Internet Content · NASDAQ",
+      "meta": "COMMUNICATION SERVICES · INTERNET CONTENT & INFORMATION · NASDAQ",
       "price": 368.03,
       "change": 1.1655,
-      "cap": "Quote key required",
+      "cap": "$4.49T",
       "score": 92,
       "quality": "Exceptional quality",
       "copy": "Strong growth and profitability create an unusually resilient fundamental profile.",
@@ -1301,7 +1301,7 @@
         ],
         [
           "Forward P/E",
-          "N/A",
+          "26.1x",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -1328,7 +1328,7 @@
           ],
           [
             "Forward P/E",
-            "N/A",
+            "26.1x",
             "Provider",
             "Alpha Vantage overview"
           ]
@@ -1354,7 +1354,7 @@
           ],
           [
             "Forward P/E",
-            "N/A",
+            "26.1x",
             "Provider",
             "Alpha Vantage overview"
           ]
@@ -1363,7 +1363,7 @@
       "signals": [
         [
           "FCF yield",
-          "N/A"
+          "1.6%"
         ],
         [
           "ROE",
@@ -1536,7 +1536,7 @@
         "revenueGrowth": 15.1,
         "epsGrowth": 34.4,
         "netMargin": 32.8,
-        "pe": null,
+        "pe": 26.1,
         "score": 92
       },
       "sources": {
@@ -1547,10 +1547,10 @@
     "META": {
       "name": "Meta Platforms, Inc.",
       "ticker": "META",
-      "meta": "Communication Services · Internet Content · NASDAQ",
+      "meta": "COMMUNICATION SERVICES · INTERNET CONTENT & INFORMATION · NASDAQ",
       "price": 577.22,
       "change": 1.6984,
-      "cap": "Quote key required",
+      "cap": "$1.47T",
       "score": 84,
       "quality": "Strong compounder",
       "copy": "Healthy growth and durable economics support long-term compounding potential.",
@@ -1575,7 +1575,7 @@
         ],
         [
           "Forward P/E",
-          "N/A",
+          "18.4x",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -1602,7 +1602,7 @@
           ],
           [
             "Forward P/E",
-            "N/A",
+            "18.4x",
             "Provider",
             "Alpha Vantage overview"
           ]
@@ -1628,7 +1628,7 @@
           ],
           [
             "Forward P/E",
-            "N/A",
+            "18.4x",
             "Provider",
             "Alpha Vantage overview"
           ]
@@ -1637,7 +1637,7 @@
       "signals": [
         [
           "FCF yield",
-          "N/A"
+          "3.1%"
         ],
         [
           "ROE",
@@ -1819,7 +1819,7 @@
         "revenueGrowth": 22.2,
         "epsGrowth": -1.5,
         "netMargin": 30.1,
-        "pe": null,
+        "pe": 18.4,
         "score": 84
       },
       "sources": {
@@ -2162,9 +2162,9 @@
         ],
         [
           "EPS growth",
-          "-1865.5%",
-          "-1973.3 pts",
-          "Diluted EPS, latest fiscal year"
+          "Profit to loss",
+          "-$1.78",
+          "EPS changed from positive to negative"
         ],
         [
           "Net margin",
@@ -2189,9 +2189,9 @@
           ],
           [
             "EPS growth",
-            "-1865.5%",
-            "-1973.3 pts",
-            "Diluted EPS, latest fiscal year"
+            "Profit to loss",
+            "-$1.78",
+            "EPS changed from positive to negative"
           ],
           [
             "Net margin",
@@ -3088,7 +3088,7 @@
       "ticker": "MSFT",
       "growth": 14.9,
       "eps": 15.6,
-      "pe": 19.5,
+      "pe": null,
       "margin": 36.1,
       "score": 86
     },
@@ -3112,7 +3112,7 @@
       "ticker": "GOOGL",
       "growth": 15.1,
       "eps": 34.4,
-      "pe": null,
+      "pe": 26.1,
       "margin": 32.8,
       "score": 92
     },
@@ -3120,7 +3120,7 @@
       "ticker": "META",
       "growth": 22.2,
       "eps": -1.5,
-      "pe": null,
+      "pe": 18.4,
       "margin": 30.1,
       "score": 84
     },

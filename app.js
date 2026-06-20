@@ -349,6 +349,13 @@ const translations = {
     "SEC reported": "SEC 报告值",
     "Same quarter prior year": "上年同期",
     "Compared with same quarter last year": "与去年同期相比",
+    "Profit to loss": "由盈转亏",
+    "Loss to profit": "由亏转盈",
+    "Loss narrowed": "亏损收窄",
+    "Loss widened": "亏损扩大",
+    "EPS changed from positive to negative": "每股收益由正转负",
+    "EPS changed from negative to positive": "每股收益由负转正",
+    "EPS remains negative": "每股收益仍为负值",
     Calculated: "计算值",
     Filed: "申报日期",
     "latest reported quarter": "最近报告季度",
@@ -773,7 +780,7 @@ function renderSummaryMetrics(company) {
             <span>${tr(label)}</span>
             <span class="metric-delta ${neutral ? "" : isNegative ? "negative" : "positive"}">${tr(delta)}</span>
           </div>
-          <strong>${value}</strong>
+          <strong>${tr(value)}</strong>
           <p>${tr(note)}</p>
         </article>`;
     })
