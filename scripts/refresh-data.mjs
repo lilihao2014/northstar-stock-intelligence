@@ -356,6 +356,8 @@ function presentEstimate(estimate) {
     eps: formatEstimateValue(estimate.epsAverage, "eps"),
     epsRange: range(estimate.epsLow, estimate.epsHigh, "eps"),
     analystCount: estimate.analystCount,
+    revenueValue: estimate.revenueAverage,
+    epsValue: estimate.epsAverage,
   };
 }
 

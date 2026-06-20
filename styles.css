@@ -1132,6 +1132,15 @@ kbd {
   gap: 5px;
 }
 
+.legend span[hidden] {
+  display: none;
+}
+
+.legend b {
+  font: inherit;
+  font-weight: 400;
+}
+
 .legend-block {
   width: 7px;
   height: 7px;
@@ -1142,6 +1151,11 @@ kbd {
   width: 11px;
   height: 2px;
   background: var(--coral);
+}
+
+.legend-block.estimate {
+  background: transparent;
+  border: 1px dashed #68a590;
 }
 
 .chart-wrap {

@@ -342,6 +342,8 @@ const translations = {
     "EPS consensus": "每股收益一致预期",
     "EPS range": "每股收益预期范围",
     "Analysts": "分析师人数",
+    "Estimate": "预期",
+    "Estimate unavailable": "预期不可用",
     "Analyst estimates are currently unavailable.": "分析师预期目前不可用。",
     "Alpha Vantage analyst consensus": "Alpha Vantage 分析师一致预期",
     "Analyst consensus, not company-issued guidance.": "分析师一致预期，并非公司发布的指引。",
@@ -436,6 +438,7 @@ function applyLanguage() {
     [".financial-metrics-card .as-of", "", "SEC filings"],
     [".guidance-card .section-label", "", "Forward outlook"],
     [".guidance-card h2", "", "Guidance & estimates"],
+    ["#estimate-legend b", "", "Estimate"],
     [".custom-metrics-card .section-label", "", "Company-specific metrics"],
     [".custom-metrics-card h2", "", "Operating metrics"],
     ["#hidden-metrics-panel strong", "", "Hidden metrics"],
@@ -779,7 +782,7 @@ function renderCompany() {
         </article>`).join("")
     : `<div class="detail-empty">${tr("Quarter details unavailable")}</div>`;
   renderFinancialMetrics(company.financialMetrics || []);
-  renderGuidance(company.guidance || null);
+  renderGuidance(company.guidance || null, company);
   renderCustomMetrics(company.customMetrics || []);
 
   renderFundamentals();
@@ -830,15 +833,44 @@ function renderFinancialMetrics(metrics) {
     </article>`).join("");
 }
 
-function renderGuidance(guidance) {
+function advanceQuarterLabel(label) {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const match = String(label || "").match(/^([A-Z][a-z]{2})\s+'(\d{2})/);
+  if (!match || !months.includes(match[1])) return tr("Next quarter");
+  const date = new Date(Date.UTC(2000 + Number(match[2]), months.indexOf(match[1]) + 3, 1));
+  return `${months[date.getUTCMonth()]} '${String(date.getUTCFullYear()).slice(-2)}`;
+}
+
+function nextFiscalYearLabel(label) {
+  const match = String(label || "").match(/^FY(\d{2,4})/);
+  if (!match) return tr("Full fiscal year");
+  const year = Number(match[1]) + 1;
+  return `FY${String(year).padStart(match[1].length, "0")}`;
+}
+
+function unavailableEstimate(period) {
+  return {
+    period,
+    revenue: "N/A",
+    revenueRange: "N/A",
+    eps: "N/A",
+    epsRange: "N/A",
+    analystCount: null,
+    revenueValue: null,
+    epsValue: null,
+  };
+}
+
+function renderGuidance(guidance, company) {
+  const nextQuarter = guidance?.nextQuarter || unavailableEstimate(advanceQuarterLabel(company.quarterly?.labels?.at(-1)));
+  const fiscalYear = guidance?.fiscalYear || unavailableEstimate(nextFiscalYearLabel(company.annual?.labels?.at(-1)));
   const estimates = [
-    ["Next quarter", guidance?.nextQuarter],
-    ["Full fiscal year", guidance?.fiscalYear],
-  ].filter(([, estimate]) => estimate);
+    ["Next quarter", nextQuarter],
+    ["Full fiscal year", fiscalYear],
+  ];
   $("#guidance-source").textContent = guidance?.source ? tr(guidance.source) : "";
   $("#guidance-disclaimer").textContent = guidance?.disclaimer ? tr(guidance.disclaimer) : "";
-  $("#guidance-grid").innerHTML = estimates.length
-    ? estimates.map(([title, estimate]) => `
+  $("#guidance-grid").innerHTML = estimates.map(([title, estimate]) => `
         <article class="guidance-period">
           <div class="guidance-period-heading">
             <span>${tr(title)}</span>
@@ -851,8 +883,7 @@ function renderGuidance(guidance) {
             <div><dt>${tr("EPS range")}</dt><dd>${estimate.epsRange}</dd></div>
             <div><dt>${tr("Analysts")}</dt><dd>${Number.isFinite(estimate.analystCount) ? estimate.analystCount : "N/A"}</dd></div>
           </dl>
-        </article>`).join("")
-    : `<div class="guidance-empty">${tr("Analyst estimates are currently unavailable.")}</div>`;
+        </article>`).join("");
 }
 
 function renderCustomMetrics(metrics) {
@@ -919,15 +950,29 @@ function setMetricHidden(metricId, hidden) {
 
 function renderFundamentals() {
   const svg = $("#fundamentals-chart");
-  const data = companies[selectedTicker][selectedPeriod];
+  const company = companies[selectedTicker];
+  const baseData = company[selectedPeriod];
+  const lastLabelIsEstimate = /E$/.test(baseData.labels.at(-1) || "");
+  const estimate = company.guidance?.nextQuarter;
+  const data = selectedPeriod === "quarterly" && !lastLabelIsEstimate
+    ? {
+        labels: [...baseData.labels, `${estimate?.period || advanceQuarterLabel(baseData.labels.at(-1))} E`],
+        revenue: [...baseData.revenue, Number.isFinite(estimate?.revenueValue) ? estimate.revenueValue / 1e9 : null],
+        eps: [...baseData.eps, Number.isFinite(estimate?.epsValue) ? estimate.epsValue : null],
+        estimated: [...baseData.labels.map(() => false), true],
+      }
+    : { ...baseData, estimated: baseData.labels.map((_, index) => lastLabelIsEstimate && index === baseData.labels.length - 1) };
+  $("#estimate-legend").hidden = selectedPeriod !== "quarterly";
   const width = 700;
   const height = 245;
   const pad = { top: 18, right: 34, bottom: 30, left: 42 };
   const chartW = width - pad.left - pad.right;
   const chartH = height - pad.top - pad.bottom;
-  const maxRevenue = Math.max(...data.revenue) * 1.18;
-  const minEps = Math.min(0, ...data.eps);
-  const maxEps = Math.max(...data.eps) * 1.25;
+  const revenueValues = data.revenue.filter(Number.isFinite);
+  const epsValues = data.eps.filter(Number.isFinite);
+  const maxRevenue = Math.max(...revenueValues) * 1.18;
+  const minEps = Math.min(0, ...epsValues);
+  const maxEps = Math.max(...epsValues) * 1.25;
   const groupW = chartW / data.labels.length;
   const barW = Math.min(42, groupW * 0.45);
 
@@ -945,22 +990,30 @@ function renderFundamentals() {
   const epsPoints = [];
   data.labels.forEach((labelText, i) => {
     const centerX = pad.left + groupW * i + groupW / 2;
-    const barHeight = (data.revenue[i] / maxRevenue) * chartH;
-    const bar = svgEl("rect", {
-      x: centerX - barW / 2,
-      y: pad.top + chartH - barHeight,
-      width: barW,
-      height: barHeight,
-      rx: 3,
-      fill: i === data.labels.length - 1 ? "#68a590" : "#1f6657",
-      opacity: i === data.labels.length - 1 ? 0.72 : 0.92,
-      "data-index": i,
+    const isEstimate = data.estimated[i];
+    const hasRevenue = Number.isFinite(data.revenue[i]);
+    const barHeight = hasRevenue ? (data.revenue[i] / maxRevenue) * chartH : 18;
+    const bar = svgEl("rect", hasRevenue ? {
+      x: centerX - barW / 2, y: pad.top + chartH - barHeight, width: barW, height: barHeight, rx: 3,
+      fill: isEstimate ? "#68a590" : "#1f6657", opacity: isEstimate ? 0.58 : 0.92, "data-index": i,
+      ...(isEstimate ? { stroke: "#397966", "stroke-width": 1, "stroke-dasharray": "4 3" } : {}),
+    } : {
+      x: centerX - barW / 2, y: pad.top + chartH - barHeight, width: barW, height: barHeight, rx: 3,
+      fill: "transparent", stroke: "#68a590", "stroke-width": 1.2, "stroke-dasharray": "4 3", "data-index": i,
     });
     svg.appendChild(bar);
 
-    const epsRange = maxEps - minEps || 1;
-    const epsY = pad.top + chartH - ((data.eps[i] - minEps) / epsRange) * chartH;
-    epsPoints.push([centerX, epsY]);
+    if (!hasRevenue) {
+      const unavailable = svgEl("text", { x: centerX, y: pad.top + chartH - 23, "text-anchor": "middle", fill: "#758580", "font-size": 7, "font-family": "DM Mono" });
+      unavailable.textContent = "N/A";
+      svg.appendChild(unavailable);
+    }
+
+    if (Number.isFinite(data.eps[i])) {
+      const epsRange = maxEps - minEps || 1;
+      const epsY = pad.top + chartH - ((data.eps[i] - minEps) / epsRange) * chartH;
+      epsPoints.push({ x: centerX, y: epsY, estimated: isEstimate });
+    }
 
     const label = svgEl("text", { x: centerX, y: height - 8, "text-anchor": "middle", fill: "#758580", "font-size": 8, "font-family": "DM Mono" });
     label.textContent = labelText;
@@ -972,17 +1025,26 @@ function renderFundamentals() {
     svg.appendChild(hit);
   });
 
-  const pathData = epsPoints.map(([x, y], i) => `${i === 0 ? "M" : "L"} ${x} ${y}`).join(" ");
-  svg.appendChild(svgEl("path", { d: pathData, fill: "none", stroke: "#e77d61", "stroke-width": 2.2, "stroke-linecap": "round", "stroke-linejoin": "round" }));
-  epsPoints.forEach(([x, y]) => {
-    svg.appendChild(svgEl("circle", { cx: x, cy: y, r: 3.4, fill: "#fffefa", stroke: "#e77d61", "stroke-width": 2 }));
+  const reportedPoints = epsPoints.filter((point) => !point.estimated);
+  const pathData = reportedPoints.map(({ x, y }, i) => `${i === 0 ? "M" : "L"} ${x} ${y}`).join(" ");
+  if (pathData) svg.appendChild(svgEl("path", { d: pathData, fill: "none", stroke: "#e77d61", "stroke-width": 2.2, "stroke-linecap": "round", "stroke-linejoin": "round" }));
+  const forecastPoint = epsPoints.find((point) => point.estimated);
+  const priorPoint = reportedPoints.at(-1);
+  if (forecastPoint && priorPoint) {
+    svg.appendChild(svgEl("path", { d: `M ${priorPoint.x} ${priorPoint.y} L ${forecastPoint.x} ${forecastPoint.y}`, fill: "none", stroke: "#e77d61", "stroke-width": 2.2, "stroke-dasharray": "5 4" }));
+  }
+  epsPoints.forEach(({ x, y, estimated }) => {
+    svg.appendChild(svgEl("circle", { cx: x, cy: y, r: 3.4, fill: "#fffefa", stroke: "#e77d61", "stroke-width": 2, ...(estimated ? { "stroke-dasharray": "3 2" } : {}) }));
   });
 }
 
 function showFundamentalsTooltip(event, index, data) {
   const tooltip = $("#fundamentals-tooltip");
   const rect = event.currentTarget.ownerSVGElement.getBoundingClientRect();
-  tooltip.innerHTML = `<strong>${data.labels[index]}</strong><br>${tr("Revenue")} $${data.revenue[index].toFixed(1)}B<br>EPS $${data.eps[index].toFixed(2)}`;
+  const revenue = Number.isFinite(data.revenue[index]) ? `$${data.revenue[index].toFixed(1)}B` : "N/A";
+  const eps = Number.isFinite(data.eps[index]) ? `$${data.eps[index].toFixed(2)}` : "N/A";
+  const estimateLabel = data.estimated?.[index] ? ` · ${tr("Estimate")}` : "";
+  tooltip.innerHTML = `<strong>${data.labels[index]}${estimateLabel}</strong><br>${tr("Revenue")} ${revenue}<br>EPS ${eps}`;
   tooltip.style.left = `${event.clientX - rect.left}px`;
   tooltip.style.top = `${event.clientY - rect.top}px`;
   tooltip.style.opacity = 1;
