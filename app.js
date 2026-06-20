@@ -333,6 +333,18 @@ const translations = {
     "FCF margin": "自由现金流利润率",
     "Operating margin": "营业利润率",
     "Latest fiscal year": "最新财年",
+    "Forward outlook": "前瞻展望",
+    "Guidance & estimates": "指引与预期",
+    "Next quarter": "下一季度",
+    "Full fiscal year": "完整财年",
+    "Revenue consensus": "营收一致预期",
+    "Revenue range": "营收预期范围",
+    "EPS consensus": "每股收益一致预期",
+    "EPS range": "每股收益预期范围",
+    "Analysts": "分析师人数",
+    "Analyst estimates are currently unavailable.": "分析师预期目前不可用。",
+    "Alpha Vantage analyst consensus": "Alpha Vantage 分析师一致预期",
+    "Analyst consensus, not company-issued guidance.": "分析师一致预期，并非公司发布的指引。",
     "Company-specific metrics": "公司特定指标",
     "Operating metrics": "经营指标",
     "Manage metrics": "管理指标",
@@ -422,6 +434,8 @@ function applyLanguage() {
     [".financial-metrics-card .section-label", "", "Common financial metrics"],
     [".financial-metrics-card h2", "", "Financial indicators"],
     [".financial-metrics-card .as-of", "", "SEC filings"],
+    [".guidance-card .section-label", "", "Forward outlook"],
+    [".guidance-card h2", "", "Guidance & estimates"],
     [".custom-metrics-card .section-label", "", "Company-specific metrics"],
     [".custom-metrics-card h2", "", "Operating metrics"],
     ["#hidden-metrics-panel strong", "", "Hidden metrics"],
@@ -765,6 +779,7 @@ function renderCompany() {
         </article>`).join("")
     : `<div class="detail-empty">${tr("Quarter details unavailable")}</div>`;
   renderFinancialMetrics(company.financialMetrics || []);
+  renderGuidance(company.guidance || null);
   renderCustomMetrics(company.customMetrics || []);
 
   renderFundamentals();
@@ -813,6 +828,31 @@ function renderFinancialMetrics(metrics) {
       <small>${tr(metric.note)}${metric.period ? ` · ${metric.period}` : ""}</small>
       ${renderMetricHistory(metric.history, "financial-metric-history")}
     </article>`).join("");
+}
+
+function renderGuidance(guidance) {
+  const estimates = [
+    ["Next quarter", guidance?.nextQuarter],
+    ["Full fiscal year", guidance?.fiscalYear],
+  ].filter(([, estimate]) => estimate);
+  $("#guidance-source").textContent = guidance?.source ? tr(guidance.source) : "";
+  $("#guidance-disclaimer").textContent = guidance?.disclaimer ? tr(guidance.disclaimer) : "";
+  $("#guidance-grid").innerHTML = estimates.length
+    ? estimates.map(([title, estimate]) => `
+        <article class="guidance-period">
+          <div class="guidance-period-heading">
+            <span>${tr(title)}</span>
+            <strong>${estimate.period}</strong>
+          </div>
+          <dl>
+            <div><dt>${tr("Revenue consensus")}</dt><dd>${estimate.revenue}</dd></div>
+            <div><dt>${tr("Revenue range")}</dt><dd>${estimate.revenueRange}</dd></div>
+            <div><dt>${tr("EPS consensus")}</dt><dd>${estimate.eps}</dd></div>
+            <div><dt>${tr("EPS range")}</dt><dd>${estimate.epsRange}</dd></div>
+            <div><dt>${tr("Analysts")}</dt><dd>${Number.isFinite(estimate.analystCount) ? estimate.analystCount : "N/A"}</dd></div>
+          </dl>
+        </article>`).join("")
+    : `<div class="guidance-empty">${tr("Analyst estimates are currently unavailable.")}</div>`;
 }
 
 function renderCustomMetrics(metrics) {
@@ -1210,6 +1250,7 @@ function mergeCompany(realCompany) {
     operating: realCompany.operating || fallback.operating,
     quarterDetail: realCompany.quarterDetail || null,
     financialMetrics: realCompany.financialMetrics || [],
+    guidance: realCompany.guidance || null,
     customMetrics: realCompany.customMetrics || [],
   };
 }

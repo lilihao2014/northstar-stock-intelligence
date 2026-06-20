@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-20T15:18:04.006Z",
+  "generatedAt": "2026-06-20T18:12:49.445Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
@@ -233,6 +233,12 @@
             "Add Alpha Vantage key"
           ]
         ]
+      },
+      "guidance": {
+        "source": "Alpha Vantage analyst consensus",
+        "disclaimer": "Analyst consensus, not company-issued guidance.",
+        "nextQuarter": null,
+        "fiscalYear": null
       },
       "signals": [
         [
@@ -801,6 +807,12 @@
           ]
         ]
       },
+      "guidance": {
+        "source": "Alpha Vantage analyst consensus",
+        "disclaimer": "Analyst consensus, not company-issued guidance.",
+        "nextQuarter": null,
+        "fiscalYear": null
+      },
       "signals": [
         [
           "FCF yield",
@@ -1367,6 +1379,12 @@
             "Add Alpha Vantage key"
           ]
         ]
+      },
+      "guidance": {
+        "source": "Alpha Vantage analyst consensus",
+        "disclaimer": "Analyst consensus, not company-issued guidance.",
+        "nextQuarter": null,
+        "fiscalYear": null
       },
       "signals": [
         [
@@ -1945,6 +1963,12 @@
             "Add Alpha Vantage key"
           ]
         ]
+      },
+      "guidance": {
+        "source": "Alpha Vantage analyst consensus",
+        "disclaimer": "Analyst consensus, not company-issued guidance.",
+        "nextQuarter": null,
+        "fiscalYear": null
       },
       "signals": [
         [
@@ -2616,6 +2640,12 @@
           ]
         ]
       },
+      "guidance": {
+        "source": "Alpha Vantage analyst consensus",
+        "disclaimer": "Analyst consensus, not company-issued guidance.",
+        "nextQuarter": null,
+        "fiscalYear": null
+      },
       "signals": [
         [
           "FCF yield",
@@ -3157,6 +3187,12 @@
             "Add Alpha Vantage key"
           ]
         ]
+      },
+      "guidance": {
+        "source": "Alpha Vantage analyst consensus",
+        "disclaimer": "Analyst consensus, not company-issued guidance.",
+        "nextQuarter": null,
+        "fiscalYear": null
       },
       "signals": [
         [
@@ -3720,6 +3756,12 @@
             "Add Alpha Vantage key"
           ]
         ]
+      },
+      "guidance": {
+        "source": "Alpha Vantage analyst consensus",
+        "disclaimer": "Analyst consensus, not company-issued guidance.",
+        "nextQuarter": null,
+        "fiscalYear": null
       },
       "signals": [
         [
@@ -4306,6 +4348,12 @@
             "Add Alpha Vantage key"
           ]
         ]
+      },
+      "guidance": {
+        "source": "Alpha Vantage analyst consensus",
+        "disclaimer": "Analyst consensus, not company-issued guidance.",
+        "nextQuarter": null,
+        "fiscalYear": null
       },
       "signals": [
         [

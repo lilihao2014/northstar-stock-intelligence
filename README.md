@@ -14,7 +14,7 @@ A responsive, dependency-free stock analysis dashboard covering:
 Northstar uses a local refresh script instead of a backend server:
 
 - SEC Company Facts supplies reported revenue, EPS, margins, cash flow, debt, and equity.
-- Alpha Vantage supplies company quotes, market capitalization, profile data, P/E, broad-market ETF proxies, and sector ETF quotes.
+- Alpha Vantage supplies company quotes, market capitalization, profile data, P/E, analyst estimates, broad-market ETF proxies, and sector ETF quotes.
 - Northstar calculates a clearly labeled fundamental score from reported growth, profitability, and balance-sheet metrics.
 
 Set your SEC identity. The SEC requires an application name and contact email in the user agent:
@@ -56,6 +56,8 @@ Users can hide discovered company-specific metrics independently for each ticker
 Common financial indicators are calculated consistently for every ticker from standardized SEC facts. These include free cash flow, operating cash flow, capital expenditures, FCF margin, operating margin, return on equity, leverage, and revenue CAGR. A value remains `N/A` when the required facts are not reported rather than being estimated or replaced with mock data.
 
 Historical observations are retained and displayed alongside the latest value for SEC-derived summary, financial, and company-specific metrics. The Annual/Quarterly selector changes both the revenue/EPS chart and the corresponding historical growth and margin series. Provider-only point-in-time metrics such as forward P/E remain current-only when no historical feed is available.
+
+The forward-outlook section shows Alpha Vantage analyst-consensus revenue and EPS estimates for the next quarter and full fiscal year, including ranges and analyst counts when supplied. These are explicitly labeled as analyst estimates rather than company-issued guidance. If the provider has no estimate or the API quota is unavailable, the dashboard shows an unavailable state and does not create placeholder values.
 
 ## Run locally
 

@@ -291,6 +291,7 @@ function qualityLabel(score) {
 
 async function fetchAlphaVantage(ticker) {
   if (!alphaKey) return null;
+  const estimateParams = new URLSearchParams({ function: "EARNINGS_ESTIMATES", symbol: ticker, apikey: alphaKey });
   const params = new URLSearchParams({ function: "OVERVIEW", symbol: ticker, apikey: alphaKey });
   const quoteParams = new URLSearchParams({ function: "GLOBAL_QUOTE", symbol: ticker, apikey: alphaKey });
 
@@ -299,12 +300,63 @@ async function fetchAlphaVantage(ticker) {
     return payload.Note || payload.Information ? null : payload;
   }
 
+  const estimates = await fetchEndpoint(`https://www.alphavantage.co/query?${estimateParams}`);
+  await delay(850);
   const quoteResponse = await fetchEndpoint(`https://www.alphavantage.co/query?${quoteParams}`);
   await delay(850);
   const overview = await fetchEndpoint(`https://www.alphavantage.co/query?${params}`);
   const quote = quoteResponse?.["Global Quote"] ?? {};
-  if (!quoteResponse && !overview) throw new Error("Alpha Vantage rate limit reached");
-  return { overview, quote };
+  if (!quoteResponse && !overview && !estimates) throw new Error("Alpha Vantage rate limit reached");
+  return { overview, quote, estimates };
+}
+
+function normalizeEstimate(item) {
+  if (!item) return null;
+  const numeric = (key) => {
+    const raw = item[key];
+    if (raw === null || raw === undefined || raw === "" || raw === "None" || raw === "-") return null;
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : null;
+  };
+  return {
+    period: item.date || item.fiscalDateEnding || null,
+    horizon: item.horizon || null,
+    epsAverage: numeric("eps_estimate_average"),
+    epsLow: numeric("eps_estimate_low"),
+    epsHigh: numeric("eps_estimate_high"),
+    revenueAverage: numeric("revenue_estimate_average"),
+    revenueLow: numeric("revenue_estimate_low"),
+    revenueHigh: numeric("revenue_estimate_high"),
+    analystCount: numeric("eps_estimate_analyst_count") || numeric("revenue_estimate_analyst_count"),
+  };
+}
+
+function selectFutureEstimate(items, latestReportedEnd) {
+  return (items || [])
+    .map(normalizeEstimate)
+    .filter((item) => item?.period && item.period > latestReportedEnd)
+    .sort((a, b) => a.period.localeCompare(b.period))[0] || null;
+}
+
+function formatEstimateValue(value, format) {
+  if (!Number.isFinite(value)) return "N/A";
+  if (format === "eps") return `${value < 0 ? "-" : ""}$${Math.abs(value).toFixed(2)}`;
+  return formatMoney(value);
+}
+
+function presentEstimate(estimate) {
+  if (!estimate) return null;
+  const range = (low, high, format) => Number.isFinite(low) && Number.isFinite(high)
+    ? `${formatEstimateValue(low, format)} – ${formatEstimateValue(high, format)}`
+    : "N/A";
+  return {
+    period: estimate.period,
+    revenue: formatEstimateValue(estimate.revenueAverage, "money"),
+    revenueRange: range(estimate.revenueLow, estimate.revenueHigh, "money"),
+    eps: formatEstimateValue(estimate.epsAverage, "eps"),
+    epsRange: range(estimate.epsLow, estimate.epsHigh, "eps"),
+    analystCount: estimate.analystCount,
+  };
 }
 
 async function fetchMarketQuote(symbol) {
@@ -724,6 +776,14 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     ["Net margin", Number.isFinite(latestQuarterMargin) ? `${latestQuarterMargin.toFixed(1)}%` : "N/A", Number.isFinite(latestQuarterMargin) && Number.isFinite(priorYearQuarterMargin) ? formatPercent(latestQuarterMargin - priorYearQuarterMargin, 1).replace("%", " pts") : "N/A", "Compared with same quarter last year", quarterlyNetMarginHistory],
     ["Forward P/E", formatMultiple(pe), "Provider", alpha ? "Alpha Vantage overview" : "Add Alpha Vantage key"],
   ];
+  const nextQuarterEstimate = selectFutureEstimate(
+    alpha?.estimates?.quarterlyEarningsEstimates,
+    latestQuarterRevenue?.end || "",
+  );
+  const fiscalYearEstimate = selectFutureEstimate(
+    alpha?.estimates?.annualEarningsEstimates,
+    revenueAnnual.at(-1)?.end || "",
+  );
 
   return {
     name: companyFacts.entityName,
@@ -738,6 +798,12 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     color: config.color,
     metrics: annualSummaryMetrics,
     periodMetrics: { annual: annualSummaryMetrics, quarterly: quarterlySummaryMetrics },
+    guidance: {
+      source: "Alpha Vantage analyst consensus",
+      disclaimer: "Analyst consensus, not company-issued guidance.",
+      nextQuarter: presentEstimate(nextQuarterEstimate),
+      fiscalYear: presentEstimate(fiscalYearEstimate),
+    },
     signals: [
       ["FCF yield", Number.isFinite(fcfYield) ? `${fcfYield.toFixed(1)}%` : "N/A"],
       ["ROE", Number.isFinite(roe) ? `${roe.toFixed(1)}%` : "N/A"],
@@ -833,6 +899,9 @@ for (const [index, config] of watchlist.entries()) {
       refreshed.metrics[3] = cached.metrics?.[3] ?? refreshed.metrics[3];
       refreshed.signals[0] = cached.signals?.[0] ?? refreshed.signals[0];
       refreshed.sources.quote = cached.sources?.quote ?? "Alpha Vantage cached";
+    }
+    if (!refreshed.guidance?.nextQuarter && !refreshed.guidance?.fiscalYear && cached?.guidance) {
+      refreshed.guidance = cached.guidance;
     }
     companies[config.ticker] = refreshed;
     console.log("done");
