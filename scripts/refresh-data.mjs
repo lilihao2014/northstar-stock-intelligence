@@ -205,6 +205,7 @@ function displayHistory(items, valueFor, formatter = (value) => value) {
     .filter((item) => item.value !== null && item.value !== undefined && item.value !== "N/A");
   return {
     labels: entries.map((item) => item.label),
+    values: entries.map((item) => item.value),
     displayValues: entries.map((item) => formatter(item.value)),
   };
 }

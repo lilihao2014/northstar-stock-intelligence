@@ -250,6 +250,7 @@ const translations = {
     "Select a company first": "请先选择公司",
     "is already added": "已在自选股中",
     "Already in watchlist": "已在自选股中",
+    "Search to add a stock": "搜索并添加股票",
     added: "已添加",
     removed: "已移除",
     "No US-listed SEC ticker found.": "未找到在美国上市的 SEC 股票代码。",
@@ -417,7 +418,7 @@ function applyLanguage() {
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
   });
-  $("#add-watchlist").setAttribute("aria-label", currentLanguage === "zh" ? "将当前公司加入自选股" : "Add selected company to watchlist");
+  $("#add-watchlist").setAttribute("aria-label", tr("Search to add a stock"));
   document.querySelector(".main-nav").setAttribute("aria-label", currentLanguage === "zh" ? "主导航" : "Main navigation");
   $("#stock-search").placeholder = tr("Search ticker or company");
   const staticText = [
@@ -538,18 +539,18 @@ function renderWatchlist() {
 
 function syncWatchlistButton() {
   const button = $("#add-watchlist");
-  const alreadyAdded = watchlistTickers.includes(selectedTicker);
-  button.disabled = alreadyAdded;
-  button.textContent = alreadyAdded ? "✓" : "+";
-  button.setAttribute(
-    "aria-label",
-    alreadyAdded
-      ? `${selectedTicker} ${tr("Already in watchlist")}`
-      : currentLanguage === "zh"
-        ? "将当前公司加入自选股"
-        : "Add selected company to watchlist",
-  );
-  button.title = alreadyAdded ? `${selectedTicker} ${tr("Already in watchlist")}` : "";
+  button.disabled = false;
+  button.textContent = "+";
+  button.setAttribute("aria-label", tr("Search to add a stock"));
+  button.title = tr("Search to add a stock");
+}
+
+function openWatchlistSearch() {
+  const search = $("#stock-search");
+  search.focus();
+  search.select();
+  if (search.value.trim()) renderSearchResults(search.value);
+  showWatchlistStatus(tr("Search to add a stock"));
 }
 
 function showWatchlistStatus(message) {
@@ -804,15 +805,78 @@ function renderSummaryMetrics(company) {
           </div>
           <strong>${tr(value)}</strong>
           <p>${tr(note)}</p>
-          ${renderMetricHistory(history, "metric-history")}
+          ${renderMetricHistory(history, "metric-history", label, "line")}
         </article>`;
     })
     .join("");
 }
 
-function renderMetricHistory(history, className) {
+function numericHistoryValue(value) {
+  if (Number.isFinite(value)) return value;
+  if (typeof value !== "string") return null;
+  const normalized = value.replace(/,/g, "").trim();
+  if (!normalized || /N\/A|profit to loss|loss to profit|widened|narrowed/i.test(normalized)) return null;
+  const match = normalized.match(/(-?\d+(?:\.\d+)?)/);
+  if (!match) return null;
+  let number = Number(match[1]);
+  if (normalized.includes("-$")) number = -Math.abs(number);
+  if (/T/i.test(normalized)) number *= 1e12;
+  else if (/B/i.test(normalized)) number *= 1e9;
+  else if (/M/i.test(normalized)) number *= 1e6;
+  else if (/K/i.test(normalized)) number *= 1e3;
+  return Number.isFinite(number) ? number : null;
+}
+
+function miniChart(history, type, title) {
   if (!history?.labels?.length) return "";
-  return `<div class="${className}">
+  const sourceValues = history.values?.length === history.labels.length ? history.values : history.displayValues;
+  const values = sourceValues.map(numericHistoryValue);
+  const validValues = values.filter(Number.isFinite);
+  if (validValues.length < 2) return "";
+  const width = 240;
+  const height = 68;
+  const pad = { top: 7, right: 5, bottom: 7, left: 5 };
+  const chartWidth = width - pad.left - pad.right;
+  const chartHeight = height - pad.top - pad.bottom;
+  const escapedTitle = String(title).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+  if (type === "bar") {
+    const min = Math.min(0, ...validValues);
+    const max = Math.max(0, ...validValues);
+    const range = max - min || 1;
+    const baseline = pad.top + ((max - 0) / range) * chartHeight;
+    const groupWidth = chartWidth / values.length;
+    const barWidth = Math.max(5, Math.min(24, groupWidth * 0.58));
+    const bars = values.map((value, index) => {
+      if (!Number.isFinite(value)) return "";
+      const valueY = pad.top + ((max - value) / range) * chartHeight;
+      const y = Math.min(valueY, baseline);
+      const barHeight = Math.max(1.5, Math.abs(baseline - valueY));
+      const x = pad.left + groupWidth * index + (groupWidth - barWidth) / 2;
+      return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barHeight.toFixed(1)}" rx="2" fill="${value < 0 ? "#e77d61" : "#397966"}" opacity="${index === values.length - 1 ? "0.95" : "0.62"}" />`;
+    }).join("");
+    return `<div class="metric-mini-chart"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapedTitle} history bar chart"><line x1="${pad.left}" y1="${baseline.toFixed(1)}" x2="${width - pad.right}" y2="${baseline.toFixed(1)}" stroke="#dedbd1" stroke-width="1" />${bars}</svg></div>`;
+  }
+
+  let min = Math.min(...validValues);
+  let max = Math.max(...validValues);
+  const spread = max - min || Math.max(Math.abs(max) * 0.1, 1);
+  min -= spread * 0.12;
+  max += spread * 0.12;
+  const points = values.map((value, index) => {
+    if (!Number.isFinite(value)) return null;
+    const x = pad.left + (index / Math.max(values.length - 1, 1)) * chartWidth;
+    const y = pad.top + ((max - value) / (max - min)) * chartHeight;
+    return { x, y, index };
+  }).filter(Boolean);
+  const path = points.map((point, index) => `${index ? "L" : "M"} ${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ");
+  const dots = points.map((point) => `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="${point.index === values.length - 1 ? 3 : 2}" fill="${point.index === values.length - 1 ? "#1f6657" : "#fffefa"}" stroke="#1f6657" stroke-width="1.5" />`).join("");
+  return `<div class="metric-mini-chart"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapedTitle} history line chart"><path d="${path}" fill="none" stroke="#397966" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />${dots}</svg></div>`;
+}
+
+function renderMetricHistory(history, className, title, chartType) {
+  if (!history?.labels?.length) return "";
+  return `${miniChart(history, chartType, title)}<div class="${className}">
     ${history.labels.map((label, index) => `
       <div>
         <span>${label}</span>
@@ -829,7 +893,7 @@ function renderFinancialMetrics(metrics) {
       <span>${tr(metric.title)}</span>
       <strong>${metric.value}</strong>
       <small>${tr(metric.note)}${metric.period ? ` · ${metric.period}` : ""}</small>
-      ${renderMetricHistory(metric.history, "financial-metric-history")}
+      ${renderMetricHistory(metric.history, "financial-metric-history", metric.title, /margin|ROE|CAGR|Debt/i.test(metric.title) ? "line" : "bar")}
     </article>`).join("");
 }
 
@@ -914,6 +978,7 @@ function renderCustomMetrics(metrics) {
           <button data-hide-metric="${metric.id}" aria-label="${tr("Hide")} ${tr(metric.title)}">${tr("Hide")}</button>
         </div>
       </div>
+      ${miniChart(metric, /members|users|rate|ratio|margin|percentage/i.test(metric.title) ? "line" : "bar", metric.title)}
       <div class="custom-metric-series">
         ${metric.labels.map((label, index) => `
           <div>
@@ -1239,7 +1304,7 @@ function setupInteractions() {
   });
 
   $("#add-watchlist").addEventListener("click", () => {
-    addToWatchlist();
+    openWatchlistSearch();
   });
 
   $("#manage-custom-metrics").addEventListener("click", () => {
