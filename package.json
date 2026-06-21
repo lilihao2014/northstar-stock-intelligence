@@ -5,6 +5,6 @@
   "scripts": {
     "refresh": "node --env-file-if-exists=.env scripts/refresh-data.mjs",
     "serve": "node --env-file-if-exists=.env scripts/server.mjs",
-    "check": "node --check app.js && node --check scripts/refresh-data.mjs && node --check scripts/server.mjs"
+    "check": "node --check app.js && node --check scripts/refresh-data.mjs && node --check scripts/server.mjs && node scripts/check-regressions.mjs"
   }
 }
