@@ -191,6 +191,8 @@ let searchRequest = 0;
 let searchTimer = null;
 let watchlistStatusTimer = null;
 let currentLanguage = localStorage.getItem("northstar-language") || "en";
+let tickerContentRequest = 0;
+const tickerContentCache = new Map();
 
 const $ = (selector) => document.querySelector(selector);
 const fmtSign = (value, suffix = "%") => `${value >= 0 ? "+" : ""}${value.toFixed(2)}${suffix}`;
@@ -355,6 +357,16 @@ const translations = {
     "Alpha Vantage + Nasdaq analyst consensus": "Alpha Vantage 与纳斯达克分析师一致预期",
     "Multiple analyst consensus sources": "多个分析师一致预期来源",
     "Analyst consensus unavailable": "暂无分析师一致预期",
+    "Company news": "公司新闻",
+    "Latest headlines": "最新头条",
+    "Social pulse": "社交动态",
+    "X / Twitter": "X / 推特",
+    "Cashtag discussion": "股票标签讨论",
+    "Loading latest content...": "正在加载最新内容...",
+    "No recent company news is available.": "暂无近期公司新闻。",
+    "Recent X posts are unavailable.": "近期 X 帖子暂不可用。",
+    "Connect X API to show recent posts here.": "连接 X API 后可在此显示近期帖子。",
+    "Open live discussion on X ↗": "在 X 上打开实时讨论 ↗",
     "Company-specific metrics": "公司特定指标",
     "Operating metrics": "经营指标",
     "Manage metrics": "管理指标",
@@ -446,6 +458,11 @@ function applyLanguage() {
     [".financial-metrics-card .as-of", "", "SEC filings"],
     [".guidance-card .section-label", "", "Forward outlook"],
     [".guidance-card h2", "", "Guidance & estimates"],
+    [".news-card .section-label", "", "Company news"],
+    [".news-card h2", "", "Latest headlines"],
+    [".x-card .section-label", "", "Social pulse"],
+    [".x-card h2", "", "X / Twitter"],
+    [".x-card .as-of", "", "Cashtag discussion"],
     ["#estimate-legend b", "", "Estimate"],
     [".metric-visibility-card .section-label", "", "Metric visibility"],
     [".metric-visibility-card > div > p", "", "Hidden only for this ticker"],
@@ -795,10 +812,69 @@ function renderCompany() {
   renderGuidance(company.guidance || null, company);
   renderCustomMetrics(company.customMetrics || []);
   renderMetricManager(company);
+  renderTickerContent(company.ticker);
 
   renderFundamentals();
   renderOperatingChart();
   renderWatchlist();
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function renderNewsItems(news) {
+  return news.length ? news.map((item) => `
+    <a class="feed-item" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
+      <span>${escapeHtml(item.publisher)} · ${escapeHtml(item.published)}</span>
+      <strong>${escapeHtml(item.title)}</strong>
+      ${item.description ? `<p>${escapeHtml(item.description)}</p>` : ""}
+    </a>`).join("") : `<div class="feed-empty">${tr("No recent company news is available.")}</div>`;
+}
+
+function renderXItems(x) {
+  if (x.status === "unconfigured") {
+    return `<div class="feed-empty">${tr("Connect X API to show recent posts here.")}</div>`;
+  }
+  if (!x.posts?.length) return `<div class="feed-empty">${tr("Recent X posts are unavailable.")}</div>`;
+  return x.posts.map((post) => `
+    <a class="feed-item social-post" href="${escapeHtml(post.url)}" target="_blank" rel="noopener noreferrer">
+      <span>${escapeHtml(post.authorName)}${post.username ? ` @${escapeHtml(post.username)}` : ""} · ${new Date(post.createdAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US")}</span>
+      <p>${escapeHtml(post.text)}</p>
+      <small>♡ ${post.likes} · ↻ ${post.reposts}</small>
+    </a>`).join("");
+}
+
+async function renderTickerContent(ticker) {
+  const requestId = ++tickerContentRequest;
+  $("#news-feed").innerHTML = `<div class="feed-empty">${tr("Loading latest content...")}</div>`;
+  $("#x-feed").innerHTML = `<div class="feed-empty">${tr("Loading latest content...")}</div>`;
+  $("#x-search-link").href = `https://x.com/search?q=${encodeURIComponent(`$${ticker}`)}&src=typed_query&f=live`;
+  $("#x-search-link").textContent = tr("Open live discussion on X ↗");
+  try {
+    let payload = tickerContentCache.get(ticker);
+    if (!payload) {
+      const response = await fetch(`/api/content/${encodeURIComponent(ticker)}`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      payload = await response.json();
+      tickerContentCache.set(ticker, payload);
+    }
+    if (requestId !== tickerContentRequest || ticker !== selectedTicker) return;
+    $("#news-feed").innerHTML = renderNewsItems(payload.news || []);
+    $("#x-feed").innerHTML = renderXItems(payload.x || { status: "unavailable", posts: [] });
+    $("#x-search-link").href = payload.xSearchUrl;
+    $("#x-search-link").textContent = tr("Open live discussion on X ↗");
+  } catch {
+    if (requestId !== tickerContentRequest) return;
+    $("#news-feed").innerHTML = `<div class="feed-empty">${tr("No recent company news is available.")}</div>`;
+    $("#x-feed").innerHTML = `<div class="feed-empty">${tr("Recent X posts are unavailable.")}</div>`;
+    $("#x-search-link").href = `https://x.com/search?q=${encodeURIComponent(`$${ticker}`)}&src=typed_query&f=live`;
+  }
 }
 
 function renderSummaryMetrics(company) {

@@ -14,3 +14,5 @@ services:
         sync: false
       - key: ALPHA_VANTAGE_API_KEY
         sync: false
+      - key: X_BEARER_TOKEN
+        sync: false

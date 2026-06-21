@@ -48,6 +48,10 @@ requireContract(app.includes("localStorage.setItem(hiddenMetricsStorageKey"), "H
 requireContract(app.includes("data-restore-metric"), "Hidden metrics must provide restore actions");
 requireContract(app.includes('["#metrics-grid", "#financial-metrics-grid", "#custom-metrics-grid"]'), "Every metric section must handle hide actions");
 requireContract(styles.includes(".metric-visibility-card"), "Metric visibility manager styles are missing");
+requireContract(html.includes('id="news-feed"'), "Ticker news section is missing");
+requireContract(html.includes('id="x-feed"'), "Ticker X / Twitter section is missing");
+requireContract(app.includes("renderTickerContent(company.ticker)"), "Ticker selection must refresh news and social content");
+requireContract(app.includes("escapeHtml(item.title)"), "News headlines must be escaped before rendering");
 
 const currentEstimateFixture = {
   symbol: "TEST",

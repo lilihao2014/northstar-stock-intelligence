@@ -84,6 +84,8 @@ The Node server provides:
 Selecting an uncached ticker in search downloads its SEC fundamentals, adds it to `config/watchlist.json`, refreshes the shared cache, and opens it in the dashboard. No API key is exposed to the browser.
 On-demand additions refresh only the requested ticker, preserving existing companies and market data while staying within provider request limits.
 
+Each selected ticker also loads recent Nasdaq company news through the server. The X / Twitter card always links to the ticker's live cashtag search. To render recent X posts inside the dashboard, set `X_BEARER_TOKEN` in `.env` locally and in the Render service environment; the token is used only by the server and is never sent to the browser.
+
 ## Deploy on Render
 
 The included `render.yaml` defines a public Node web service.

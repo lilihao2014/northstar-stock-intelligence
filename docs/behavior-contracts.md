@@ -67,6 +67,13 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 ## Localization
 
 - `EN` renders English labels and `中文` renders Chinese labels.
+
+## Ticker news and social content
+
+- News is fetched for the selected ticker and every headline links to its original Nasdaq-hosted article.
+- The X / Twitter card is ticker-scoped and always provides a live `$TICKER` search link.
+- Recent posts are shown only when the server has `X_BEARER_TOKEN`; an unavailable token must produce an honest configuration message, not mock posts.
+- News and social text is escaped before rendering, and provider credentials must never be returned to the browser.
 - Newly introduced visible controls and status messages require entries in the shared translation map.
 
 ## Automated check

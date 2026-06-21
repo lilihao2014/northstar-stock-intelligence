@@ -8,6 +8,7 @@ const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const port = Number(process.env.PORT || 4173);
 const host = process.env.HOST || "0.0.0.0";
 const secIdentity = process.env.SEC_USER_AGENT;
+const xBearerToken = process.env.X_BEARER_TOKEN;
 const tickerCachePath = join(root, "data", "sec-tickers.json");
 const watchlistPath = join(root, "config", "watchlist.json");
 const dashboardPath = join(root, "data", "dashboard.json");
@@ -24,6 +25,7 @@ const mimeTypes = {
 let tickerDirectory = null;
 let refreshQueue = Promise.resolve();
 const fetchAttempts = new Map();
+const tickerContentCache = new Map();
 const allowedStaticFiles = new Set([
   "index.html",
   "styles.css",
@@ -54,6 +56,73 @@ function allowCompanyFetch(request) {
   recent.push(now);
   fetchAttempts.set(ip, recent);
   return true;
+}
+
+async function fetchNasdaqNews(ticker) {
+  const query = encodeURIComponent(`${ticker}|stocks`);
+  const response = await fetch(
+    `https://api.nasdaq.com/api/news/topic/articlebysymbol?q=${query}&offset=0&limit=8`,
+    { headers: { "User-Agent": "Mozilla/5.0 (compatible; Northstar Stock Intelligence)", Accept: "application/json" } },
+  );
+  if (!response.ok) throw new Error(`Nasdaq news returned HTTP ${response.status}`);
+  const payload = await response.json();
+  return (payload.data?.rows || []).slice(0, 8).map((item) => ({
+    title: item.title,
+    description: item.description || "",
+    publisher: item.publisher || "Nasdaq",
+    published: item.ago || item.created || "",
+    url: item.url?.startsWith("http") ? item.url : `https://www.nasdaq.com${item.url || ""}`,
+  }));
+}
+
+async function fetchXPosts(ticker) {
+  if (!xBearerToken) return { status: "unconfigured", posts: [] };
+  const params = new URLSearchParams({
+    query: `$${ticker} -is:retweet lang:en`,
+    max_results: "10",
+    expansions: "author_id",
+    "tweet.fields": "created_at,public_metrics",
+    "user.fields": "name,username,verified",
+  });
+  const response = await fetch(`https://api.x.com/2/tweets/search/recent?${params}`, {
+    headers: { Authorization: `Bearer ${xBearerToken}` },
+  });
+  if (!response.ok) return { status: "unavailable", posts: [] };
+  const payload = await response.json();
+  const users = new Map((payload.includes?.users || []).map((user) => [user.id, user]));
+  return {
+    status: "available",
+    posts: (payload.data || []).map((post) => {
+      const author = users.get(post.author_id) || {};
+      return {
+        id: post.id,
+        text: post.text,
+        createdAt: post.created_at,
+        authorName: author.name || author.username || "X user",
+        username: author.username || null,
+        verified: Boolean(author.verified),
+        likes: post.public_metrics?.like_count ?? 0,
+        reposts: post.public_metrics?.retweet_count ?? 0,
+        url: author.username ? `https://x.com/${author.username}/status/${post.id}` : `https://x.com/i/web/status/${post.id}`,
+      };
+    }),
+  };
+}
+
+async function tickerContent(ticker) {
+  const cached = tickerContentCache.get(ticker);
+  if (cached && Date.now() - cached.cachedAt < 15 * 60 * 1000) return cached.payload;
+  const [newsResult, xResult] = await Promise.allSettled([fetchNasdaqNews(ticker), fetchXPosts(ticker)]);
+  const payload = {
+    ticker,
+    news: newsResult.status === "fulfilled" ? newsResult.value : [],
+    newsStatus: newsResult.status === "fulfilled" ? "available" : "unavailable",
+    x: xResult.status === "fulfilled" ? xResult.value : { status: "unavailable", posts: [] },
+    xSearchUrl: `https://x.com/search?q=${encodeURIComponent(`$${ticker}`)}&src=typed_query&f=live`,
+    fetchedAt: new Date().toISOString(),
+  };
+  tickerContentCache.set(ticker, { cachedAt: Date.now(), payload });
+  return payload;
 }
 
 async function fetchTickerDirectory() {
@@ -193,6 +262,12 @@ const server = createServer(async (request, response) => {
     if (request.method === "GET" && url.pathname === "/api/tickers") {
       const directory = await fetchTickerDirectory();
       json(response, 200, { results: searchTickers(directory, url.searchParams.get("q") || "") });
+      return;
+    }
+
+    const contentMatch = request.method === "GET" && url.pathname.match(/^\/api\/content\/([A-Z0-9.-]+)$/i);
+    if (contentMatch) {
+      json(response, 200, await tickerContent(contentMatch[1].toUpperCase()));
       return;
     }
 
