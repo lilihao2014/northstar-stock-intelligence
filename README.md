@@ -61,6 +61,8 @@ Metric histories include compact visualizations as well as exact period values: 
 
 User-visible invariants and their acceptance checks are maintained in [`docs/behavior-contracts.md`](docs/behavior-contracts.md). `npm run check` enforces the source-level contracts for the Watchlist add control, historical metric charts, exact-value retention, and forecast styling.
 
+Summary, common financial, and company-specific metrics can be hidden independently for each ticker. The dashboard-wide **Manage metrics** panel lists hidden metrics and restores them later without deleting their source data or history.
+
 The forward-outlook section shows Alpha Vantage analyst-consensus revenue and EPS estimates for the next quarter and full fiscal year, including ranges and analyst counts when supplied. The quarterly chart adds the upcoming fiscal quarter with a dashed estimate style. These values are explicitly labeled as analyst estimates rather than company-issued guidance; when the provider has no estimate or its API quota is unavailable, the expected period remains visible as `N/A` and the dashboard does not create placeholder values.
 
 ## Run locally

@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260620-7" />
+    <link rel="stylesheet" href="styles.css?v=20260620-8" />
   </head>
   <body>
     <div class="app-shell">
@@ -129,6 +129,21 @@
             </div>
           </section>
 
+          <section class="metric-visibility-card" id="metric-visibility-card">
+            <div>
+              <span class="section-label">Metric visibility</span>
+              <p>Hidden only for this ticker</p>
+            </div>
+            <button class="text-button" id="manage-metrics">Manage metrics</button>
+            <div class="hidden-metrics-panel" id="hidden-metrics-panel" hidden>
+              <div>
+                <strong>Hidden metrics</strong>
+                <span>Restore any metric when you need it again</span>
+              </div>
+              <div class="hidden-metrics-list" id="hidden-metrics-list"></div>
+            </div>
+          </section>
+
           <section class="metrics-grid" id="metrics-grid"></section>
 
           <section class="chart-card card revenue-card">
@@ -217,16 +232,8 @@
                 <h2>Operating metrics</h2>
               </div>
               <div class="custom-metrics-actions">
-                <button class="text-button" id="manage-custom-metrics">Manage metrics</button>
                 <span class="as-of">SEC inline XBRL</span>
               </div>
-            </div>
-            <div class="hidden-metrics-panel" id="hidden-metrics-panel" hidden>
-              <div>
-                <strong>Hidden metrics</strong>
-                <span>Hidden only for this ticker</span>
-              </div>
-              <div class="hidden-metrics-list" id="hidden-metrics-list"></div>
             </div>
             <div class="custom-metrics-grid" id="custom-metrics-grid"></div>
           </section>
@@ -290,6 +297,6 @@
         </footer>
       </main>
     </div>
-    <script src="app.js?v=20260620-7"></script>
+    <script src="app.js?v=20260620-8"></script>
   </body>
 </html>

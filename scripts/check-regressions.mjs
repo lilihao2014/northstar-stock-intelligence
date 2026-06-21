@@ -36,6 +36,17 @@ requireContract(app.includes("history.displayValues[index]"), "Exact historical 
 requireContract(refresh.includes("values: entries.map((item) => item.value)"), "Generated histories must retain raw numeric values");
 requireContract(styles.includes(".metric-mini-chart"), "Metric mini-chart styles are missing");
 
+requireContract(html.includes('id="manage-metrics"'), "Dashboard-wide metric manager is missing");
+requireContract(html.includes('id="hidden-metrics-panel"'), "Hidden metric restore panel is missing");
+requireContract(app.includes('metricKey("summary", label)'), "Summary metrics must use namespaced visibility keys");
+requireContract(app.includes('metricKey("financial", metric.title)'), "Financial metrics must use namespaced visibility keys");
+requireContract(app.includes('metricKey("custom", metric.id)'), "Company-specific metrics must use namespaced visibility keys");
+requireContract(app.includes('id.includes(":") ? id : metricKey("custom", id)'), "Legacy hidden metric preferences must be migrated");
+requireContract(app.includes("localStorage.setItem(hiddenMetricsStorageKey"), "Hidden metric preferences must persist in local storage");
+requireContract(app.includes("data-restore-metric"), "Hidden metrics must provide restore actions");
+requireContract(app.includes('["#metrics-grid", "#financial-metrics-grid", "#custom-metrics-grid"]'), "Every metric section must handle hide actions");
+requireContract(styles.includes(".metric-visibility-card"), "Metric visibility manager styles are missing");
+
 requireContract(app.includes('const forecastColor = "#b9823d"'), "Forecast chart color contract is missing");
 requireContract(app.includes("advanceQuarterLabel(baseData.labels.at(-1))"), "Upcoming quarter must remain on the Revenue/EPS chart");
 requireContract(app.includes('revenueValue) ? estimate.revenueValue / 1e9 : null'), "Unavailable forecast revenue must remain null");

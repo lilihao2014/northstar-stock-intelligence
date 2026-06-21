@@ -714,6 +714,59 @@ kbd {
   gap: 16px;
 }
 
+.metric-visibility-card {
+  grid-column: span 12;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.42);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.metric-visibility-card p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.metric-visibility-card .hidden-metrics-panel {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+}
+
+.metric-card-actions,
+.financial-metric-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+}
+
+.metric-hide {
+  padding: 3px 5px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 7px;
+}
+
+.metric-hide:hover {
+  border-color: var(--line);
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.metrics-empty {
+  grid-column: 1 / -1;
+  padding: 18px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
 .metric-card {
   min-width: 0;
   padding: 16px 18px;

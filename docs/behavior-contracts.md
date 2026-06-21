@@ -24,6 +24,18 @@ Acceptance check: select a ticker that is already in the watchlist, confirm `+` 
 
 Acceptance check: confirm summary cards contain line charts, free cash flow contains positive/negative bars, and period/value rows remain visible below each chart.
 
+## Per-ticker metric visibility
+
+- Summary metrics, common financial indicators, and company-specific metrics each provide a `Hide` action.
+- Hidden state is stored independently for each ticker in browser local storage.
+- Stable keys use `summary:`, `financial:`, and `custom:` namespaces so unrelated metrics cannot collide.
+- Existing unnamespaced company-specific preferences are migrated to `custom:` keys when loaded.
+- The dashboard-wide **Manage metrics** control remains visible even when every metric in a section is hidden.
+- Opening **Manage metrics** lists every hidden metric for the selected ticker, and each item has a `Restore` action.
+- Hiding a summary metric applies in both Annual and Quarterly modes when they share the same metric label.
+
+Acceptance check: hide one metric from each of the summary, financial, and company-specific sections; switch tickers and confirm the other ticker is unchanged; return to the original ticker, restore all three from **Manage metrics**, and confirm their historical charts and values return.
+
 ## Forecast periods
 
 - The upcoming quarter is rendered on the same Revenue/EPS axes as reported periods.
