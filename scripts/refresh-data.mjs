@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { estimateSeries } from "./estimate-utils.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputPath = path.join(root, "data", "dashboard.json");
@@ -348,11 +349,27 @@ function normalizeEstimate(item) {
   };
 }
 
-function selectFutureEstimate(items, latestReportedEnd) {
+function selectFutureEstimate(items, latestReportedEnd, minimumSeparationDays = 45) {
+  const latestReportedTime = latestReportedEnd
+    ? new Date(`${latestReportedEnd}T00:00:00Z`).getTime()
+    : 0;
+  const cutoffTime = latestReportedTime + minimumSeparationDays * 86400000;
   return (items || [])
     .map(normalizeEstimate)
-    .filter((item) => item?.period && item.period > latestReportedEnd)
+    .filter((item) => item?.period && new Date(`${item.period}T00:00:00Z`).getTime() > cutoffTime)
     .sort((a, b) => a.period.localeCompare(b.period))[0] || null;
+}
+
+function fiscalQuarterOrdinal(label) {
+  const match = String(label || "").match(/^FY(\d{2,4}) Q([1-4])$/);
+  if (!match) return null;
+  return Number(match[1]) * 4 + Number(match[2]) - 1;
+}
+
+function isFutureFiscalQuarter(candidate, latestReported) {
+  const candidateOrdinal = fiscalQuarterOrdinal(candidate);
+  const latestOrdinal = fiscalQuarterOrdinal(latestReported);
+  return Number.isFinite(candidateOrdinal) && Number.isFinite(latestOrdinal) && candidateOrdinal > latestOrdinal;
 }
 
 function formatEstimateValue(value, format) {
@@ -800,11 +817,11 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     ["Forward P/E", formatMultiple(pe), "Provider", alpha ? "Alpha Vantage overview" : "Add Alpha Vantage key"],
   ];
   const nextQuarterEstimate = selectFutureEstimate(
-    alpha?.estimates?.quarterlyEarningsEstimates,
+    estimateSeries(alpha?.estimates, "fiscal quarter"),
     latestQuarterRevenue?.end || "",
   );
   const fiscalYearEstimate = selectFutureEstimate(
-    alpha?.estimates?.annualEarningsEstimates,
+    estimateSeries(alpha?.estimates, "fiscal year"),
     revenueAnnual.at(-1)?.end || "",
   );
 
@@ -923,8 +940,15 @@ for (const [index, config] of watchlist.entries()) {
       refreshed.signals[0] = cached.signals?.[0] ?? refreshed.signals[0];
       refreshed.sources.quote = cached.sources?.quote ?? "Alpha Vantage cached";
     }
-    if (!refreshed.guidance?.nextQuarter && !refreshed.guidance?.fiscalYear && cached?.guidance) {
-      refreshed.guidance = cached.guidance;
+    const latestQuarterLabel = refreshed.quarterly?.labels?.at(-1);
+    if (!isFutureFiscalQuarter(refreshed.guidance?.nextQuarter?.period, latestQuarterLabel)) {
+      refreshed.guidance.nextQuarter = null;
+    }
+    if (!refreshed.guidance.nextQuarter && isFutureFiscalQuarter(cached?.guidance?.nextQuarter?.period, latestQuarterLabel)) {
+      refreshed.guidance.nextQuarter = cached.guidance.nextQuarter;
+    }
+    if (!refreshed.guidance.fiscalYear && cached?.guidance?.fiscalYear) {
+      refreshed.guidance.fiscalYear = cached.guidance.fiscalYear;
     }
     companies[config.ticker] = refreshed;
     console.log("done");

@@ -44,6 +44,10 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 - The upcoming quarter is rendered on the same Revenue/EPS axes as reported periods.
 - Forecast revenue and EPS use amber styling and an `E` suffix to distinguish estimates from reported results.
 - Unavailable provider estimates remain visible as `N/A`; the UI must not manufacture a bar, EPS point, or placeholder value.
+- Alpha Vantage estimate ingestion supports the current unified `estimates` array filtered by `horizon`, plus the legacy annual/quarterly array schema.
+- A future quarterly estimate must be at least 45 days after the latest reported period end, preventing calendar-date drift from selecting the already-reported fiscal quarter.
+- Cached next-quarter guidance is reused only when its fiscal-quarter ordinal is later than the latest reported quarter; cached full-year guidance is preserved independently.
+- Every committed company cache must contain at least one real guidance horizon; a ticker cannot ship with both next-quarter and full-year guidance empty.
 
 ## Localization
 

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-21T02:27:57.584Z",
+  "generatedAt": "2026-06-21T15:02:04.226Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
@@ -299,8 +299,26 @@
       "guidance": {
         "source": "Alpha Vantage analyst consensus",
         "disclaimer": "Analyst consensus, not company-issued guidance.",
-        "nextQuarter": null,
-        "fiscalYear": null
+        "nextQuarter": {
+          "period": "FY26 Q3",
+          "revenue": "$109.0B",
+          "revenueRange": "$107.5B – $112.2B",
+          "eps": "$1.89",
+          "epsRange": "$1.83 – $1.99",
+          "analystCount": 31,
+          "revenueValue": 108994233640,
+          "epsValue": 1.8943
+        },
+        "fiscalYear": {
+          "period": "FY26",
+          "revenue": "$478.3B",
+          "revenueRange": "$469.8B – $485.3B",
+          "eps": "$8.76",
+          "epsRange": "$8.29 – $9.04",
+          "analystCount": 41,
+          "revenueValue": 478254964790,
+          "epsValue": 8.7596
+        }
       },
       "signals": [
         [
@@ -706,7 +724,7 @@
       "meta": "Technology · Software Infrastructure · NASDAQ",
       "price": 379.4,
       "change": 0.1293,
-      "cap": "$2.82T",
+      "cap": "Quote key required",
       "score": 86,
       "quality": "Strong compounder",
       "copy": "Healthy growth and durable economics support long-term compounding potential.",
@@ -803,7 +821,7 @@
         ],
         [
           "Forward P/E",
-          "19.5x",
+          "N/A",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -902,7 +920,7 @@
           ],
           [
             "Forward P/E",
-            "19.5x",
+            "N/A",
             "Provider",
             "Alpha Vantage overview"
           ]
@@ -997,13 +1015,31 @@
       "guidance": {
         "source": "Alpha Vantage analyst consensus",
         "disclaimer": "Analyst consensus, not company-issued guidance.",
-        "nextQuarter": null,
-        "fiscalYear": null
+        "nextQuarter": {
+          "period": "FY26 Q4",
+          "revenue": "$87.7B",
+          "revenueRange": "$86.9B – $91.2B",
+          "eps": "$4.24",
+          "epsRange": "$4.07 – $4.89",
+          "analystCount": 31,
+          "revenueValue": 87655534780,
+          "epsValue": 4.2375
+        },
+        "fiscalYear": {
+          "period": "FY26",
+          "revenue": "$329.5B",
+          "revenueRange": "$328.7B – $333.1B",
+          "eps": "$16.84",
+          "epsRange": "$16.70 – $17.36",
+          "analystCount": 25,
+          "revenueValue": 329502013070,
+          "epsValue": 16.84
+        }
       },
       "signals": [
         [
           "FCF yield",
-          "2.5%"
+          "N/A"
         ],
         [
           "ROE",
@@ -1390,7 +1426,7 @@
         "revenueGrowth": 14.9,
         "epsGrowth": 15.6,
         "netMargin": 36.1,
-        "pe": 19.5,
+        "pe": null,
         "score": 86
       },
       "sources": {
@@ -1696,7 +1732,16 @@
         "source": "Alpha Vantage analyst consensus",
         "disclaimer": "Analyst consensus, not company-issued guidance.",
         "nextQuarter": null,
-        "fiscalYear": null
+        "fiscalYear": {
+          "period": "FY27",
+          "revenue": "$391.7B",
+          "revenueRange": "$357.2B – $415.5B",
+          "eps": "$8.96",
+          "epsRange": "$8.20 – $9.85",
+          "analystCount": 49,
+          "revenueValue": 391720962530,
+          "epsValue": 8.962
+        }
       },
       "signals": [
         [
@@ -2399,8 +2444,26 @@
       "guidance": {
         "source": "Alpha Vantage analyst consensus",
         "disclaimer": "Analyst consensus, not company-issued guidance.",
-        "nextQuarter": null,
-        "fiscalYear": null
+        "nextQuarter": {
+          "period": "FY26 Q2",
+          "revenue": "$195.8B",
+          "revenueRange": "$186.0B – $199.6B",
+          "eps": "$1.81",
+          "epsRange": "$1.56 – $2.10",
+          "analystCount": 45,
+          "revenueValue": 195815048890,
+          "epsValue": 1.8135
+        },
+        "fiscalYear": {
+          "period": "FY26",
+          "revenue": "$823.4B",
+          "revenueRange": "$785.0B – $839.9B",
+          "eps": "$8.66",
+          "epsRange": "$7.56 – $9.93",
+          "analystCount": 58,
+          "revenueValue": 823424287190,
+          "epsValue": 8.6647
+        }
       },
       "signals": [
         [
@@ -3194,8 +3257,26 @@
       "guidance": {
         "source": "Alpha Vantage analyst consensus",
         "disclaimer": "Analyst consensus, not company-issued guidance.",
-        "nextQuarter": null,
-        "fiscalYear": null
+        "nextQuarter": {
+          "period": "FY26 Q2",
+          "revenue": "$116.7B",
+          "revenueRange": "$113.6B – $120.1B",
+          "eps": "$2.87",
+          "epsRange": "$2.60 – $3.13",
+          "analystCount": 42,
+          "revenueValue": 116678355480,
+          "epsValue": 2.87
+        },
+        "fiscalYear": {
+          "period": "FY26",
+          "revenue": "$487.7B",
+          "revenueRange": "$473.9B – $519.0B",
+          "eps": "$14.22",
+          "epsRange": "$12.79 – $15.13",
+          "analystCount": 53,
+          "revenueValue": 487719900330,
+          "epsValue": 14.2204
+        }
       },
       "signals": [
         [
@@ -3859,8 +3940,26 @@
       "guidance": {
         "source": "Alpha Vantage analyst consensus",
         "disclaimer": "Analyst consensus, not company-issued guidance.",
-        "nextQuarter": null,
-        "fiscalYear": null
+        "nextQuarter": {
+          "period": "FY26 Q2",
+          "revenue": "$60.2B",
+          "revenueRange": "$59.1B – $62.8B",
+          "eps": "$7.20",
+          "epsRange": "$5.76 – $8.55",
+          "analystCount": 46,
+          "revenueValue": 60209152310,
+          "epsValue": 7.2007
+        },
+        "fiscalYear": {
+          "period": "FY26",
+          "revenue": "$252.8B",
+          "revenueRange": "$237.1B – $261.2B",
+          "eps": "$32.83",
+          "epsRange": "$29.20 – $38.62",
+          "analystCount": 56,
+          "revenueValue": 252840344320,
+          "epsValue": 32.8347
+        }
       },
       "signals": [
         [
@@ -4552,7 +4651,16 @@
         "source": "Alpha Vantage analyst consensus",
         "disclaimer": "Analyst consensus, not company-issued guidance.",
         "nextQuarter": null,
-        "fiscalYear": null
+        "fiscalYear": {
+          "period": "FY26",
+          "revenue": "$113.3B",
+          "revenueRange": "$72.2B – $131.8B",
+          "eps": "$61.01",
+          "epsRange": "$28.42 – $75.00",
+          "analystCount": 34,
+          "revenueValue": 113263403800,
+          "epsValue": 61.0095
+        }
       },
       "signals": [
         [
@@ -5261,8 +5369,26 @@
       "guidance": {
         "source": "Alpha Vantage analyst consensus",
         "disclaimer": "Analyst consensus, not company-issued guidance.",
-        "nextQuarter": null,
-        "fiscalYear": null
+        "nextQuarter": {
+          "period": "FY26 Q2",
+          "revenue": "$4.7B",
+          "revenueRange": "$4.1B – $5.1B",
+          "eps": "$0.33",
+          "epsRange": "-$0.18 – $0.69",
+          "analystCount": 10,
+          "revenueValue": 4742270210,
+          "epsValue": 0.333
+        },
+        "fiscalYear": {
+          "period": "FY26",
+          "revenue": "$18.6B",
+          "revenueRange": "$17.2B – $18.9B",
+          "eps": "$1.07",
+          "epsRange": "$0.63 – $1.38",
+          "analystCount": 9,
+          "revenueValue": 18576472100,
+          "epsValue": 1.0726
+        }
       },
       "signals": [
         [
@@ -6321,7 +6447,7 @@
       "ticker": "MSFT",
       "growth": 14.9,
       "eps": 15.6,
-      "pe": 19.5,
+      "pe": null,
       "margin": 36.1,
       "score": 86
     },
