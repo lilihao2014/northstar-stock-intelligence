@@ -63,6 +63,10 @@ requireContract(refresh.includes("minimumSeparationDays = 45"), "Next-quarter es
 requireContract(refresh.includes("candidateOrdinal > latestOrdinal"), "Cached guidance must be later than the latest reported fiscal quarter");
 requireContract(refresh.includes("fetchNasdaqQuote(config.ticker)"), "New ticker refresh must attempt the Nasdaq quote fallback");
 requireContract(refresh.includes('quoteSource: "Nasdaq delayed quote"'), "Nasdaq fallback prices must retain their source label");
+requireContract(refresh.includes("fetchNasdaqForecast(config.ticker)"), "New ticker refresh must attempt the Nasdaq forecast fallback");
+requireContract(refresh.includes('estimateSource: hasAlphaEstimates'), "Mixed estimate sources must retain their provider label");
+requireContract(refresh.includes('"Nasdaq analyst consensus (EPS)"'), "Nasdaq-only guidance must be labeled as EPS consensus");
+requireContract(refresh.includes("estimateCompleteness(cached.guidance.nextQuarter) > estimateCompleteness(refreshed.guidance.nextQuarter)"), "A less complete forecast must not replace richer cached guidance");
 
 requireContract(app.includes('const forecastColor = "#b9823d"'), "Forecast chart color contract is missing");
 requireContract(app.includes("advanceQuarterLabel(baseData.labels.at(-1))"), "Upcoming quarter must remain on the Revenue/EPS chart");

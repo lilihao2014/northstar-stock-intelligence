@@ -352,6 +352,39 @@ async function fetchNasdaqQuote(ticker) {
   };
 }
 
+function nasdaqFiscalEnd(value) {
+  const match = String(value || "").trim().match(/^([A-Za-z]{3})\s+(\d{4})$/);
+  if (!match) return null;
+  const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    .indexOf(match[1]);
+  if (month < 0) return null;
+  return new Date(Date.UTC(Number(match[2]), month + 1, 0)).toISOString().slice(0, 10);
+}
+
+async function fetchNasdaqForecast(ticker) {
+  const payload = await fetchJson(
+    `https://api.nasdaq.com/api/analyst/${encodeURIComponent(ticker)}/earnings-forecast`,
+    {
+      "User-Agent": "Mozilla/5.0 (compatible; Northstar Stock Intelligence)",
+      Accept: "application/json",
+    },
+  );
+  const normalizeRows = (rows, horizon) => (rows || []).map((row) => ({
+    date: nasdaqFiscalEnd(row.fiscalEnd),
+    horizon,
+    eps_estimate_average: row.consensusEPSForecast,
+    eps_estimate_low: row.lowEPSForecast,
+    eps_estimate_high: row.highEPSForecast,
+    eps_estimate_analyst_count: row.noOfEstimates,
+  })).filter((row) => row.date && Number.isFinite(Number(row.eps_estimate_average)));
+  const estimates = [
+    ...normalizeRows(payload.data?.quarterlyForecast?.rows, "fiscal quarter"),
+    ...normalizeRows(payload.data?.yearlyForecast?.rows, "fiscal year"),
+  ];
+  if (!estimates.length) throw new Error("Nasdaq did not return analyst forecasts");
+  return estimates;
+}
+
 function normalizeEstimate(item) {
   if (!item) return null;
   const numeric = (key) => {
@@ -417,6 +450,12 @@ function presentEstimate(estimate, periodLabel = null) {
     revenueValue: estimate.revenueAverage,
     epsValue: estimate.epsAverage,
   };
+}
+
+function estimateCompleteness(estimate) {
+  if (!estimate) return 0;
+  return [estimate.revenueValue, estimate.epsValue, estimate.revenueRange, estimate.epsRange, estimate.analystCount]
+    .filter((value) => value !== null && value !== undefined && value !== "N/A").length;
 }
 
 async function fetchMarketQuote(symbol) {
@@ -863,7 +902,8 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     metrics: annualSummaryMetrics,
     periodMetrics: { annual: annualSummaryMetrics, quarterly: quarterlySummaryMetrics },
     guidance: {
-      source: "Alpha Vantage analyst consensus",
+      source: alpha?.estimateSource
+        || (nextQuarterEstimate || fiscalYearEstimate ? "Alpha Vantage analyst consensus" : "Analyst consensus unavailable"),
       disclaimer: "Analyst consensus, not company-issued guidance.",
       nextQuarter: presentEstimate(nextQuarterEstimate, nextQuarterEstimate ? labelFiscalQuarter(nextQuarterEstimate.period) : null),
       fiscalYear: presentEstimate(fiscalYearEstimate, fiscalYearEstimate ? labelFiscalQuarter(fiscalYearEstimate.period).replace(/ Q4$/, "") : null),
@@ -945,6 +985,30 @@ async function refreshCompany(config, index) {
       console.warn(`  Nasdaq quote fallback skipped: ${error.message}`);
     }
   }
+  const alphaQuarterlyEstimates = estimateSeries(alpha?.estimates, "fiscal quarter");
+  const alphaAnnualEstimates = estimateSeries(alpha?.estimates, "fiscal year");
+  if (!alphaQuarterlyEstimates.length || !alphaAnnualEstimates.length) {
+    try {
+      const nasdaqEstimates = await fetchNasdaqForecast(config.ticker);
+      const estimates = [
+        ...alphaQuarterlyEstimates,
+        ...alphaAnnualEstimates,
+        ...nasdaqEstimates.filter((item) =>
+          item.horizon === "fiscal quarter" ? !alphaQuarterlyEstimates.length : !alphaAnnualEstimates.length,
+        ),
+      ];
+      const hasAlphaEstimates = alphaQuarterlyEstimates.length || alphaAnnualEstimates.length;
+      alpha = {
+        ...(alpha || {}),
+        estimates: { estimates },
+        estimateSource: hasAlphaEstimates
+          ? "Alpha Vantage + Nasdaq analyst consensus"
+          : "Nasdaq analyst consensus (EPS)",
+      };
+    } catch (error) {
+      console.warn(`  Nasdaq forecast fallback skipped: ${error.message}`);
+    }
+  }
   let customMetrics = [];
   try {
     customMetrics = await fetchCompanySpecificMetrics(config, companyFacts);
@@ -976,11 +1040,22 @@ for (const [index, config] of watchlist.entries()) {
     if (!isFutureFiscalQuarter(refreshed.guidance?.nextQuarter?.period, latestQuarterLabel)) {
       refreshed.guidance.nextQuarter = null;
     }
-    if (!refreshed.guidance.nextQuarter && isFutureFiscalQuarter(cached?.guidance?.nextQuarter?.period, latestQuarterLabel)) {
+    const cachedNextQuarterIsValid = isFutureFiscalQuarter(cached?.guidance?.nextQuarter?.period, latestQuarterLabel);
+    const useCachedNextQuarter = cachedNextQuarterIsValid
+      && estimateCompleteness(cached.guidance.nextQuarter) > estimateCompleteness(refreshed.guidance.nextQuarter);
+    const useCachedFiscalYear = cached?.guidance?.fiscalYear
+      && estimateCompleteness(cached.guidance.fiscalYear) > estimateCompleteness(refreshed.guidance.fiscalYear);
+    if (useCachedNextQuarter) {
       refreshed.guidance.nextQuarter = cached.guidance.nextQuarter;
     }
-    if (!refreshed.guidance.fiscalYear && cached?.guidance?.fiscalYear) {
+    if (useCachedFiscalYear) {
       refreshed.guidance.fiscalYear = cached.guidance.fiscalYear;
+    }
+    if (useCachedNextQuarter || useCachedFiscalYear) {
+      const allCached = useCachedNextQuarter && useCachedFiscalYear;
+      refreshed.guidance.source = allCached
+        ? cached.guidance.source
+        : "Multiple analyst consensus sources";
     }
     companies[config.ticker] = refreshed;
     console.log("done");

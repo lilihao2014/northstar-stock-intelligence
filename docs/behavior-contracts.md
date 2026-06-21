@@ -56,6 +56,14 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 - The fallback value must be identified as `Nasdaq delayed quote`; it must never be presented as Alpha Vantage data or as a live exchange price.
 - A failed fallback may remain unavailable, but the application must not manufacture a price.
 
+## New ticker analyst estimates
+
+- Alpha Vantage remains the primary source for revenue and EPS consensus.
+- If Alpha Vantage omits a quarterly or annual estimate horizon, the refresh fills that horizon from Nasdaq analyst EPS forecasts when available.
+- Nasdaq-only forecast fields must leave revenue consensus as `N/A`; the application must not derive or manufacture revenue guidance.
+- Guidance must identify whether it came from Alpha Vantage, Nasdaq, or both.
+- A less complete fallback estimate must not replace a valid cached estimate containing more real fields.
+
 ## Localization
 
 - `EN` renders English labels and `中文` renders Chinese labels.
