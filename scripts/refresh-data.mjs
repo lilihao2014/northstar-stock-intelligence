@@ -328,6 +328,30 @@ async function fetchAlphaVantage(ticker) {
   return { overview, quote, estimates };
 }
 
+function parseMarketNumber(value) {
+  const normalized = String(value ?? "").replace(/[$,%+]/g, "").replace(/,/g, "").trim();
+  if (!normalized) return null;
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+async function fetchNasdaqQuote(ticker) {
+  const payload = await fetchJson(
+    `https://api.nasdaq.com/api/quote/${encodeURIComponent(ticker)}/info?assetclass=stocks`,
+    {
+      "User-Agent": "Mozilla/5.0 (compatible; Northstar Stock Intelligence)",
+      Accept: "application/json",
+    },
+  );
+  const primary = payload.data?.primaryData;
+  const price = parseMarketNumber(primary?.lastSalePrice);
+  if (!Number.isFinite(price)) throw new Error("Nasdaq quote did not include a last sale price");
+  return {
+    "05. price": String(price),
+    "10. change percent": String(parseMarketNumber(primary?.percentageChange) ?? 0),
+  };
+}
+
 function normalizeEstimate(item) {
   if (!item) return null;
   const numeric = (key) => {
@@ -889,7 +913,7 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     },
     sources: {
       fundamentals: `https://data.sec.gov/api/xbrl/companyfacts/CIK${config.cik}.json`,
-      quote: alpha ? "Alpha Vantage" : null,
+      quote: alpha?.quoteSource || (alpha ? "Alpha Vantage" : null),
     },
   };
 }
@@ -911,6 +935,14 @@ async function refreshCompany(config, index) {
       alpha = await fetchAlphaVantage(config.ticker);
     } catch (error) {
       console.warn(`  Quote/profile skipped: ${error.message}`);
+    }
+  }
+  if (!Number.isFinite(Number(alpha?.quote?.["05. price"]))) {
+    try {
+      const quote = await fetchNasdaqQuote(config.ticker);
+      alpha = { ...(alpha || {}), quote, quoteSource: "Nasdaq delayed quote" };
+    } catch (error) {
+      console.warn(`  Nasdaq quote fallback skipped: ${error.message}`);
     }
   }
   let customMetrics = [];

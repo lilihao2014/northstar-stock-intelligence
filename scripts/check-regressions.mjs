@@ -61,6 +61,8 @@ requireContract(estimateSeries(currentEstimateFixture, "fiscal year").length ===
 requireContract(estimateSeries({ quarterlyEarningsEstimates: [{}] }, "fiscal quarter").length === 1, "Legacy Alpha Vantage estimate schema must remain supported");
 requireContract(refresh.includes("minimumSeparationDays = 45"), "Next-quarter estimates must exclude same-quarter calendar-date drift");
 requireContract(refresh.includes("candidateOrdinal > latestOrdinal"), "Cached guidance must be later than the latest reported fiscal quarter");
+requireContract(refresh.includes("fetchNasdaqQuote(config.ticker)"), "New ticker refresh must attempt the Nasdaq quote fallback");
+requireContract(refresh.includes('quoteSource: "Nasdaq delayed quote"'), "Nasdaq fallback prices must retain their source label");
 
 requireContract(app.includes('const forecastColor = "#b9823d"'), "Forecast chart color contract is missing");
 requireContract(app.includes("advanceQuarterLabel(baseData.labels.at(-1))"), "Upcoming quarter must remain on the Revenue/EPS chart");

@@ -49,6 +49,13 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 - Cached next-quarter guidance is reused only when its fiscal-quarter ordinal is later than the latest reported quarter; cached full-year guidance is preserved independently.
 - Every committed company cache must contain at least one real guidance horizon; a ticker cannot ship with both next-quarter and full-year guidance empty.
 
+## New ticker market prices
+
+- Alpha Vantage remains the primary quote source.
+- When Alpha Vantage has no quote, including during free-tier throttling, the refresh attempts Nasdaq's delayed quote feed.
+- The fallback value must be identified as `Nasdaq delayed quote`; it must never be presented as Alpha Vantage data or as a live exchange price.
+- A failed fallback may remain unavailable, but the application must not manufacture a price.
+
 ## Localization
 
 - `EN` renders English labels and `中文` renders Chinese labels.
