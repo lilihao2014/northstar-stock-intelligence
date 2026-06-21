@@ -23,7 +23,7 @@ const demoCompanies = {
       eps: [3.28, 5.61, 6.11, 6.13, 6.08, 6.70],
     },
     quarterly: {
-      labels: ["Q2'24", "Q3'24", "Q4'24", "Q1'25", "Q2'25", "Q3'25E"],
+      labels: ["FY24 Q2", "FY24 Q3", "FY24 Q4", "FY25 Q1", "FY25 Q2", "FY25 Q3 E"],
       revenue: [90.8, 85.8, 94.9, 124.3, 95.4, 91.7],
       eps: [1.53, 1.40, 1.64, 2.40, 1.65, 1.48],
     },
@@ -61,7 +61,7 @@ const demoCompanies = {
       eps: [5.76, 8.05, 9.65, 9.68, 11.80, 13.94],
     },
     quarterly: {
-      labels: ["Q2'24", "Q3'24", "Q4'24", "Q1'25", "Q2'25", "Q3'25E"],
+      labels: ["FY24 Q2", "FY24 Q3", "FY24 Q4", "FY25 Q1", "FY25 Q2", "FY25 Q3 E"],
       revenue: [61.9, 64.7, 65.6, 69.6, 70.1, 73.8],
       eps: [2.94, 2.95, 3.30, 3.23, 3.46, 3.61],
     },
@@ -99,7 +99,7 @@ const demoCompanies = {
       eps: [0.25, 0.44, 0.33, 1.30, 2.94, 4.18],
     },
     quarterly: {
-      labels: ["Q1'25", "Q2'25", "Q3'25", "Q4'25", "Q1'26", "Q2'26E"],
+      labels: ["FY25 Q1", "FY25 Q2", "FY25 Q3", "FY25 Q4", "FY26 Q1", "FY26 Q2 E"],
       revenue: [26.0, 30.0, 35.1, 39.3, 44.1, 46.2],
       eps: [0.61, 0.68, 0.81, 0.89, 0.96, 1.04],
     },
@@ -137,7 +137,7 @@ const demoCompanies = {
       eps: [2.09, 3.24, -0.27, 2.90, 5.53, 7.61],
     },
     quarterly: {
-      labels: ["Q2'24", "Q3'24", "Q4'24", "Q1'25", "Q2'25", "Q3'25E"],
+      labels: ["FY24 Q2", "FY24 Q3", "FY24 Q4", "FY25 Q1", "FY25 Q2", "FY25 Q3 E"],
       revenue: [148.0, 158.9, 187.8, 155.7, 162.4, 176.0],
       eps: [1.26, 1.43, 1.86, 1.59, 1.67, 1.85],
     },
@@ -913,11 +913,11 @@ function renderFinancialMetrics(metrics) {
 }
 
 function advanceQuarterLabel(label) {
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const match = String(label || "").match(/^([A-Z][a-z]{2})\s+'(\d{2})/);
-  if (!match || !months.includes(match[1])) return tr("Next quarter");
-  const date = new Date(Date.UTC(2000 + Number(match[2]), months.indexOf(match[1]) + 3, 1));
-  return `${months[date.getUTCMonth()]} '${String(date.getUTCFullYear()).slice(-2)}`;
+  const match = String(label || "").match(/^FY(\d{2,4}) Q([1-4])$/);
+  if (!match) return tr("Next quarter");
+  const quarter = Number(match[2]);
+  const fiscalYear = Number(match[1]) + (quarter === 4 ? 1 : 0);
+  return `FY${String(fiscalYear).padStart(match[1].length, "0")} Q${quarter === 4 ? 1 : quarter + 1}`;
 }
 
 function nextFiscalYearLabel(label) {

@@ -167,7 +167,10 @@ function annualSeries(facts, limit = 6) {
     .sort((a, b) => String(a.end).localeCompare(String(b.end)));
 
   const byEnd = new Map();
-  for (const fact of candidates) byEnd.set(fact.end, fact);
+  for (const fact of candidates) {
+    const existing = byEnd.get(fact.end);
+    if (!existing || String(fact.filed) < String(existing.filed)) byEnd.set(fact.end, fact);
+  }
   return [...byEnd.values()].slice(-limit);
 }
 
@@ -175,12 +178,17 @@ function quarterlySeries(facts, limit = 6) {
   const candidates = dedupeFacts(facts)
     .filter((fact) => {
       const days = durationDays(fact);
-      return fact.form === "10-Q" && ["Q1", "Q2", "Q3"].includes(fact.fp) && days >= 70 && days <= 110;
+      const interimQuarter = fact.form === "10-Q" && ["Q1", "Q2", "Q3"].includes(fact.fp);
+      const fourthQuarter = fact.form === "10-K" && fact.fp === "FY";
+      return (interimQuarter || fourthQuarter) && days >= 70 && days <= 110;
     })
     .sort((a, b) => String(a.end).localeCompare(String(b.end)));
 
   const byEnd = new Map();
-  for (const fact of candidates) byEnd.set(fact.end, fact);
+  for (const fact of candidates) {
+    const existing = byEnd.get(fact.end);
+    if (!existing || String(fact.filed) < String(existing.filed)) byEnd.set(fact.end, fact);
+  }
   return [...byEnd.values()].slice(-limit);
 }
 
@@ -214,10 +222,18 @@ function labelAnnual(fact) {
   return `FY${fact.end.slice(2, 4)}`;
 }
 
-function labelQuarter(fact) {
-  const month = new Intl.DateTimeFormat("en-US", { month: "short", timeZone: "UTC" })
-    .format(new Date(`${fact.end}T00:00:00Z`));
-  return `${month} '${fact.end.slice(2, 4)}`;
+function createFiscalQuarterLabeler(facts) {
+  const anchor = annualSeries(facts, 1).at(-1);
+  return (end) => {
+    if (!end || !anchor?.end) return "Fiscal quarter";
+    const target = new Date(`${end}T00:00:00Z`);
+    const anchorFiscalYear = Number.isFinite(Number(anchor.fy)) ? Number(anchor.fy) : Number(anchor.end.slice(0, 4));
+    const quarterDelta = Math.round((target - new Date(`${anchor.end}T00:00:00Z`)) / (91.3125 * 86400000));
+    const absoluteQuarter = anchorFiscalYear * 4 + 3 + quarterDelta;
+    const fiscalYear = Math.floor(absoluteQuarter / 4);
+    const quarter = ((absoluteQuarter % 4) + 4) % 4 + 1;
+    return `FY${String(fiscalYear).slice(-2)} Q${quarter}`;
+  };
 }
 
 function closestPeriod(facts, end, toleranceDays = 8) {
@@ -345,13 +361,13 @@ function formatEstimateValue(value, format) {
   return formatMoney(value);
 }
 
-function presentEstimate(estimate) {
+function presentEstimate(estimate, periodLabel = null) {
   if (!estimate) return null;
   const range = (low, high, format) => Number.isFinite(low) && Number.isFinite(high)
     ? `${formatEstimateValue(low, format)} – ${formatEstimateValue(high, format)}`
     : "N/A";
   return {
-    period: estimate.period,
+    period: periodLabel || estimate.period,
     revenue: formatEstimateValue(estimate.revenueAverage, "money"),
     revenueRange: range(estimate.revenueLow, estimate.revenueHigh, "money"),
     eps: formatEstimateValue(estimate.epsAverage, "eps"),
@@ -473,7 +489,7 @@ function scoreDiscoveredMetric(concept, facts) {
   return score;
 }
 
-function buildMetric(metric, facts) {
+function buildMetric(metric, facts, labelForPeriod) {
   const byPeriod = new Map();
   for (const fact of facts) byPeriod.set(fact.period, fact);
   const series = [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period)).slice(-8);
@@ -481,7 +497,7 @@ function buildMetric(metric, facts) {
     id: metric.id,
     title: metric.title,
     description: metric.description,
-    labels: series.map((fact) => labelQuarter({ end: fact.period })),
+    labels: series.map((fact) => labelForPeriod(fact.period)),
     values: series.map((fact) => fact.value),
     displayValues: series.map((fact) => formatCustomMetric(fact.value, metric.format)),
     latest: formatCustomMetric(series.at(-1)?.value, metric.format),
@@ -490,13 +506,16 @@ function buildMetric(metric, facts) {
   };
 }
 
-async function fetchCompanySpecificMetrics(config) {
+async function fetchCompanySpecificMetrics(config, companyFacts) {
   const tickerConfig = companyMetricConfig[config.ticker] || {};
   const defaults = companyMetricConfig._defaults || {};
   const configured = tickerConfig.metrics || [];
   const autoDiscover = tickerConfig.autoDiscover ?? defaults.autoDiscover ?? false;
   const maxMetrics = tickerConfig.maxMetrics ?? defaults.maxMetrics ?? 20;
   if (!configured.length && !autoDiscover) return [];
+  const labelForPeriod = createFiscalQuarterLabeler(
+    getUnitFacts(companyFacts, conceptCandidates.revenue, ["USD"]),
+  );
 
   const submissions = await fetchJson(
     `https://data.sec.gov/submissions/CIK${config.cik}.json`,
@@ -540,7 +559,7 @@ async function fetchCompanySpecificMetrics(config) {
 
   const explicitConcepts = new Set(configured.map((metric) => metric.concept));
   const explicitMetrics = configured
-    .map((metric) => buildMetric(metric, valuesByMetric.get(metric.id)))
+    .map((metric) => buildMetric(metric, valuesByMetric.get(metric.id), labelForPeriod))
     .filter((metric) => metric.values.length);
   const discoveredMetrics = [...discoveredByConcept.entries()]
     .filter(([concept]) => !explicitConcepts.has(concept))
@@ -556,7 +575,7 @@ async function fetchCompanySpecificMetrics(config) {
           title: humanizeConcept(concept),
           description: "Company-specific metric reported in SEC filings.",
           format,
-        }, series),
+        }, series, labelForPeriod),
       };
     })
     .filter(Boolean)
@@ -610,9 +629,10 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const capexAnnual = annualSeries(capexFacts);
   const equityAnnual = instantSeries(equityFacts);
   const debtAnnual = instantSeries(debtFacts);
+  const labelFiscalQuarter = createFiscalQuarterLabeler(revenueFacts);
 
   const annual = alignSeries(revenueAnnual, epsAnnual, labelAnnual, 1e9);
-  const quarterly = alignSeries(revenueQuarterly, epsQuarterly, labelQuarter, 1e9);
+  const quarterly = alignSeries(revenueQuarterly, epsQuarterly, (fact) => labelFiscalQuarter(fact.end), 1e9);
   if (annual.labels.length < 2) throw new Error(`Insufficient annual revenue/EPS history for ${config.ticker}`);
 
   const latestRevenue = revenueAnnual.at(-1)?.val;
@@ -744,12 +764,12 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     (value) => `${value.toFixed(1)}%`,
   );
   const quarterlyRevenueGrowthHistory = displayHistory(
-    revenueQuarterly.map((fact) => ({ ...fact, label: labelQuarter(fact) })),
+    revenueQuarterly.map((fact) => ({ ...fact, label: labelFiscalQuarter(fact.end) })),
     (fact) => percentChange(fact.val, priorYearPeriod(revenueQuarterly, fact)?.val),
     (value) => formatPercent(value),
   );
   const quarterlyEpsGrowthHistory = displayHistory(
-    epsQuarterlyForComparison.map((fact) => ({ ...fact, label: labelQuarter(fact) })),
+    epsQuarterlyForComparison.map((fact) => ({ ...fact, label: labelFiscalQuarter(fact.end) })),
     (fact) => {
       const prior = priorYearPeriod(epsQuarterlyForComparison, fact);
       return prior ? describeEpsChange(fact.val, prior.val, "", "")[0] : null;
@@ -758,7 +778,7 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const quarterlyMarginPeriods = revenueQuarterly.map((revenueFact) => {
     const incomeFact = closestPeriod(netIncomeQuarterly, revenueFact.end);
     return {
-      label: labelQuarter(revenueFact),
+      label: labelFiscalQuarter(revenueFact.end),
       value: incomeFact?.val && revenueFact.val ? (incomeFact.val / revenueFact.val) * 100 : null,
     };
   });
@@ -804,8 +824,8 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     guidance: {
       source: "Alpha Vantage analyst consensus",
       disclaimer: "Analyst consensus, not company-issued guidance.",
-      nextQuarter: presentEstimate(nextQuarterEstimate),
-      fiscalYear: presentEstimate(fiscalYearEstimate),
+      nextQuarter: presentEstimate(nextQuarterEstimate, nextQuarterEstimate ? labelFiscalQuarter(nextQuarterEstimate.period) : null),
+      fiscalYear: presentEstimate(fiscalYearEstimate, fiscalYearEstimate ? labelFiscalQuarter(fiscalYearEstimate.period).replace(/ Q4$/, "") : null),
     },
     signals: [
       ["FCF yield", Number.isFinite(fcfYield) ? `${fcfYield.toFixed(1)}%` : "N/A"],
@@ -816,7 +836,7 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     annual,
     quarterly: quarterly.labels.length >= 2 ? quarterly : annual,
     quarterDetail: {
-      period: latestQuarterRevenue ? labelQuarter(latestQuarterRevenue) : "Latest quarter",
+      period: latestQuarterRevenue ? labelFiscalQuarter(latestQuarterRevenue.end) : "Latest quarter",
       filed: latestQuarterRevenue?.filed || null,
       items: quarterDetails,
     },
@@ -878,7 +898,7 @@ async function refreshCompany(config, index) {
   }
   let customMetrics = [];
   try {
-    customMetrics = await fetchCompanySpecificMetrics(config);
+    customMetrics = await fetchCompanySpecificMetrics(config, companyFacts);
   } catch (error) {
     console.warn(`  Company metrics skipped: ${error.message}`);
   }

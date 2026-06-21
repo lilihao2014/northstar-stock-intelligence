@@ -57,6 +57,8 @@ Common financial indicators are calculated consistently for every ticker from st
 
 Historical observations are retained and displayed alongside the latest value for SEC-derived summary, financial, and company-specific metrics. The Annual/Quarterly selector changes both the revenue/EPS chart and the corresponding historical growth and margin series. Provider-only point-in-time metrics such as forward P/E remain current-only when no historical feed is available.
 
+All quarterly periods use fiscal labels such as `FY26 Q2`, calculated from each company's SEC-reported fiscal-year-end anchor. Calendar month-year labels are not used for quarterly results or forecasts.
+
 Metric histories include compact visualizations as well as exact period values: trend and ratio metrics use line charts, while cash flow, expenditure, and other monetary series use positive/negative bar charts. The Watchlist header keeps a permanent `+` control that focuses ticker search for adding another company.
 
 User-visible invariants and their acceptance checks are maintained in [`docs/behavior-contracts.md`](docs/behavior-contracts.md). `npm run check` enforces the source-level contracts for the Watchlist add control, historical metric charts, exact-value retention, and forecast styling.

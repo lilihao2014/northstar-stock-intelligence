@@ -38,6 +38,9 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 
 ## Forecast periods
 
+- Quarter labels always use fiscal notation such as `FY26 Q2`; calendar month-year labels such as `Feb '26` are not allowed.
+- Fiscal labels are calculated from the company's SEC-reported fiscal-year-end anchor, avoiding misleading `fy` values attached to later comparative facts.
+- True three-month Q4 facts reported in a 10-K remain part of quarterly series.
 - The upcoming quarter is rendered on the same Revenue/EPS axes as reported periods.
 - Forecast revenue and EPS use amber styling and an `E` suffix to distinguish estimates from reported results.
 - Unavailable provider estimates remain visible as `N/A`; the UI must not manufacture a bar, EPS point, or placeholder value.

@@ -1,10 +1,11 @@
 import { readFile } from "node:fs/promises";
 
-const [app, html, styles, refresh] = await Promise.all([
+const [app, html, styles, refresh, dashboard] = await Promise.all([
   readFile(new URL("../app.js", import.meta.url), "utf8"),
   readFile(new URL("../index.html", import.meta.url), "utf8"),
   readFile(new URL("../styles.css", import.meta.url), "utf8"),
   readFile(new URL("./refresh-data.mjs", import.meta.url), "utf8"),
+  readFile(new URL("../data/dashboard.json", import.meta.url), "utf8"),
 ]);
 
 const failures = [];
@@ -50,6 +51,20 @@ requireContract(styles.includes(".metric-visibility-card"), "Metric visibility m
 requireContract(app.includes('const forecastColor = "#b9823d"'), "Forecast chart color contract is missing");
 requireContract(app.includes("advanceQuarterLabel(baseData.labels.at(-1))"), "Upcoming quarter must remain on the Revenue/EPS chart");
 requireContract(app.includes('revenueValue) ? estimate.revenueValue / 1e9 : null'), "Unavailable forecast revenue must remain null");
+requireContract(refresh.includes('return `FY${String(fiscalYear).slice(-2)} Q${quarter}`'), "Quarter labels must use fiscal year and fiscal quarter");
+requireContract(refresh.includes("const anchor = annualSeries(facts, 1).at(-1)"), "Quarter labels must derive from the fiscal-year-end anchor");
+requireContract(refresh.includes('const fourthQuarter = fact.form === "10-K" && fact.fp === "FY"'), "Quarterly series must retain reported fiscal Q4 facts");
+requireContract(app.includes('match(/^FY(\\d{2,4}) Q([1-4])$/)'), "Forecast labels must advance fiscal quarters");
+requireContract(!/labels: \[\"Q[1-4]'/m.test(app), "Fallback dashboard must use fiscal-quarter labels");
+
+const dashboardData = JSON.parse(dashboard);
+for (const [ticker, company] of Object.entries(dashboardData.companies || {})) {
+  const quarterlyLabels = company.quarterly?.labels || [];
+  const customLabels = (company.customMetrics || []).flatMap((metric) => metric.labels || []);
+  const allQuarterLabels = [...quarterlyLabels, ...customLabels, company.quarterDetail?.period].filter(Boolean);
+  requireContract(allQuarterLabels.every((label) => /^FY\d{2} Q[1-4]$/.test(label)), `${ticker} contains a non-fiscal quarter label`);
+  requireContract(new Set(quarterlyLabels).size === quarterlyLabels.length, `${ticker} contains duplicate quarterly labels`);
+}
 
 if (failures.length) {
   console.error("Behavior contract checks failed:");
