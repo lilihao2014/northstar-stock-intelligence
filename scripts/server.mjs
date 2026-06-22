@@ -62,7 +62,10 @@ async function fetchNasdaqNews(ticker) {
   const query = encodeURIComponent(`${ticker}|stocks`);
   const response = await fetch(
     `https://api.nasdaq.com/api/news/topic/articlebysymbol?q=${query}&offset=0&limit=8`,
-    { headers: { "User-Agent": "Mozilla/5.0 (compatible; Northstar Stock Intelligence)", Accept: "application/json" } },
+    {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; Northstar Stock Intelligence)", Accept: "application/json" },
+      signal: AbortSignal.timeout(10000),
+    },
   );
   if (!response.ok) throw new Error(`Nasdaq news returned HTTP ${response.status}`);
   const payload = await response.json();
@@ -86,6 +89,7 @@ async function fetchXPosts(ticker) {
   });
   const response = await fetch(`https://api.x.com/2/tweets/search/recent?${params}`, {
     headers: { Authorization: `Bearer ${xBearerToken}` },
+    signal: AbortSignal.timeout(10000),
   });
   if (!response.ok) return { status: "unavailable", posts: [] };
   const payload = await response.json();
@@ -109,9 +113,10 @@ async function fetchXPosts(ticker) {
   };
 }
 
-async function tickerContent(ticker) {
+async function tickerContent(ticker, force = false) {
   const cached = tickerContentCache.get(ticker);
-  if (cached && Date.now() - cached.cachedAt < 15 * 60 * 1000) return cached.payload;
+  const cacheAge = cached ? Date.now() - cached.cachedAt : Infinity;
+  if (cached && (cacheAge < 30 * 1000 || (!force && cacheAge < 15 * 60 * 1000))) return cached.payload;
   const [newsResult, xResult] = await Promise.allSettled([fetchNasdaqNews(ticker), fetchXPosts(ticker)]);
   const payload = {
     ticker,
@@ -267,7 +272,7 @@ const server = createServer(async (request, response) => {
 
     const contentMatch = request.method === "GET" && url.pathname.match(/^\/api\/content\/([A-Z0-9.-]+)$/i);
     if (contentMatch) {
-      json(response, 200, await tickerContent(contentMatch[1].toUpperCase()));
+      json(response, 200, await tickerContent(contentMatch[1].toUpperCase(), url.searchParams.get("refresh") === "1"));
       return;
     }
 

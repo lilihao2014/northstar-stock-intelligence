@@ -1,11 +1,12 @@
 import { readFile } from "node:fs/promises";
 import { estimateSeries } from "./estimate-utils.mjs";
 
-const [app, html, styles, refresh, dashboard] = await Promise.all([
+const [app, html, styles, refresh, server, dashboard] = await Promise.all([
   readFile(new URL("../app.js", import.meta.url), "utf8"),
   readFile(new URL("../index.html", import.meta.url), "utf8"),
   readFile(new URL("../styles.css", import.meta.url), "utf8"),
   readFile(new URL("./refresh-data.mjs", import.meta.url), "utf8"),
+  readFile(new URL("./server.mjs", import.meta.url), "utf8"),
   readFile(new URL("../data/dashboard.json", import.meta.url), "utf8"),
 ]);
 
@@ -52,6 +53,12 @@ requireContract(html.includes('id="news-feed"'), "Ticker news section is missing
 requireContract(html.includes('id="x-feed"'), "Ticker X / Twitter section is missing");
 requireContract(app.includes("renderTickerContent(company.ticker)"), "Ticker selection must refresh news and social content");
 requireContract(app.includes("escapeHtml(item.title)"), "News headlines must be escaped before rendering");
+requireContract(html.includes('id="copy-ticker-link"'), "Shareable ticker link action is missing");
+requireContract(html.includes('id="export-company-data"'), "Company data export action is missing");
+requireContract(app.includes('url.searchParams.set("ticker", ticker)'), "Ticker selection must update a shareable URL");
+requireContract(app.includes('new Blob([csv], { type: "text/csv;charset=utf-8" })'), "Company CSV export is missing");
+requireContract(app.includes('dataMetadata?.generatedAt || "[MOCK/FAKE]"'), "Fallback exports must retain the mock/fake label");
+requireContract(server.includes("AbortSignal.timeout(10000)"), "Ticker content providers must have a bounded timeout");
 
 const currentEstimateFixture = {
   symbol: "TEST",

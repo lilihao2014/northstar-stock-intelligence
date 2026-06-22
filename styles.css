@@ -128,6 +128,63 @@ button {
   justify-content: space-between;
 }
 
+.research-toolbar {
+  margin-top: 16px;
+  padding-top: 13px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.research-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+.research-action-status {
+  color: var(--green);
+  font-size: 8px;
+}
+
+.source-details {
+  min-width: 210px;
+  color: var(--ink-soft);
+  font-size: 9px;
+}
+
+.source-details summary {
+  cursor: pointer;
+  text-align: right;
+}
+
+#company-source-list {
+  min-width: 270px;
+  margin-top: 9px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+}
+
+#company-source-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 5px 0;
+}
+
+#company-source-list a,
+#company-source-list strong {
+  color: var(--ink);
+  font-weight: 600;
+  text-align: right;
+  text-decoration: none;
+}
+
 .section-label {
   color: #7a8a85;
   font-size: 10px;
@@ -1683,6 +1740,20 @@ footer {
 
   .company-header {
     align-items: flex-start;
+  }
+
+  .research-toolbar {
+    flex-direction: column;
+  }
+
+  .source-details,
+  #company-source-list {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .source-details summary {
+    text-align: left;
   }
 
   .company-price {

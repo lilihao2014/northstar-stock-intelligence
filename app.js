@@ -193,6 +193,7 @@ let watchlistStatusTimer = null;
 let currentLanguage = localStorage.getItem("northstar-language") || "en";
 let tickerContentRequest = 0;
 const tickerContentCache = new Map();
+let researchStatusTimer = null;
 
 const $ = (selector) => document.querySelector(selector);
 const fmtSign = (value, suffix = "%") => `${value >= 0 ? "+" : ""}${value.toFixed(2)}${suffix}`;
@@ -367,6 +368,20 @@ const translations = {
     "Recent X posts are unavailable.": "近期 X 帖子暂不可用。",
     "Connect X API to show recent posts here.": "连接 X API 后可在此显示近期帖子。",
     "Open live discussion on X ↗": "在 X 上打开实时讨论 ↗",
+    "Copy ticker link": "复制股票链接",
+    "Export data": "导出数据",
+    "Refresh news": "刷新新闻",
+    "Data sources & freshness": "数据来源与更新时间",
+    "Link copied": "链接已复制",
+    "Copy failed": "复制失败",
+    "Data exported": "数据已导出",
+    "News refreshed": "新闻已刷新",
+    "Refreshing...": "正在刷新...",
+    "Generated": "生成时间",
+    "Fundamentals": "基本面",
+    "Quote": "行情",
+    "Analyst estimates": "分析师预期",
+    "Company news source": "公司新闻来源",
     "Company-specific metrics": "公司特定指标",
     "Operating metrics": "经营指标",
     "Manage metrics": "管理指标",
@@ -779,6 +794,7 @@ function renderCompany() {
   $("#quality-label").textContent = tr(company.quality);
   $("#quality-copy").textContent = tr(company.copy);
   $("#score-ring").style.setProperty("--score", `${company.score}%`);
+  renderResearchToolbar(company);
 
   $("#signal-list").innerHTML = company.signals
     .map(([label, value]) => `<div class="signal"><span>${tr(label)}</span><strong>${value}</strong></div>`)
@@ -819,6 +835,81 @@ function renderCompany() {
   renderWatchlist();
 }
 
+function renderResearchToolbar(company) {
+  $("#copy-ticker-link").textContent = tr("Copy ticker link");
+  $("#export-company-data").textContent = tr("Export data");
+  $("#refresh-ticker-content").textContent = tr("Refresh news");
+  document.querySelector(".source-details summary").textContent = tr("Data sources & freshness");
+  const generated = dataMetadata?.generatedAt
+    ? new Date(dataMetadata.generatedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US")
+    : `${mockText()} ${tr("Generated")}`;
+  const fundamentalUrl = company.sources?.fundamentals;
+  $("#company-source-list").innerHTML = `
+    <div><span>${tr("Generated")}</span><strong>${escapeHtml(generated)}</strong></div>
+    <div><span>${tr("Fundamentals")}</span>${fundamentalUrl ? `<a href="${escapeHtml(fundamentalUrl)}" target="_blank" rel="noopener noreferrer">SEC EDGAR ↗</a>` : `<strong>N/A</strong>`}</div>
+    <div><span>${tr("Quote")}</span><strong>${escapeHtml(company.sources?.quote || "N/A")}</strong></div>
+    <div><span>${tr("Analyst estimates")}</span><strong>${escapeHtml(company.guidance?.source || tr("Analyst consensus unavailable"))}</strong></div>
+    <div><span>${tr("Company news source")}</span><strong>Nasdaq</strong></div>`;
+}
+
+function showResearchStatus(message) {
+  clearTimeout(researchStatusTimer);
+  $("#research-action-status").textContent = tr(message);
+  researchStatusTimer = setTimeout(() => { $("#research-action-status").textContent = ""; }, 2500);
+}
+
+function tickerUrl(ticker) {
+  const url = new URL(window.location.href);
+  url.searchParams.set("ticker", ticker);
+  return url;
+}
+
+function updateTickerUrl(ticker, replace = false) {
+  const url = tickerUrl(ticker);
+  window.history[replace ? "replaceState" : "pushState"]({ ticker }, "", url);
+}
+
+function csvCell(value) {
+  return `"${String(value ?? "").replace(/"/g, '""')}"`;
+}
+
+function companyExportRows(company) {
+  const rows = [["Ticker", company.ticker], ["Company", company.name], ["Generated", dataMetadata?.generatedAt || "[MOCK/FAKE]"]];
+  for (const period of ["annual", "quarterly"]) {
+    for (const [metric, value, delta, note, history] of company.periodMetrics?.[period] || []) {
+      rows.push([period, metric, "latest", value, delta, note]);
+      history?.labels?.forEach((label, index) => rows.push([period, metric, label, history.displayValues?.[index] ?? history.values?.[index], "", note]));
+    }
+  }
+  for (const metric of company.financialMetrics || []) {
+    rows.push(["financial", metric.title, metric.period || "latest", metric.value, "", metric.note]);
+    metric.history?.labels?.forEach((label, index) => rows.push(["financial", metric.title, label, metric.history.displayValues?.[index] ?? metric.history.values?.[index], "", metric.note]));
+  }
+  for (const metric of company.customMetrics || []) {
+    metric.labels?.forEach((label, index) => rows.push(["company-specific", metric.title, label, metric.displayValues?.[index] ?? metric.values?.[index], "", metric.source]));
+  }
+  for (const [label, value, note] of company.quarterDetail?.items || []) rows.push(["quarter-detail", label, company.quarterDetail.period, value, "", note]);
+  for (const [horizon, estimate] of Object.entries({ "next-quarter": company.guidance?.nextQuarter, "fiscal-year": company.guidance?.fiscalYear })) {
+    if (!estimate) continue;
+    rows.push(["guidance", "Revenue consensus", estimate.period || horizon, estimate.revenue, estimate.revenueRange, company.guidance.source]);
+    rows.push(["guidance", "EPS consensus", estimate.period || horizon, estimate.eps, estimate.epsRange, company.guidance.source]);
+  }
+  return rows;
+}
+
+function exportCompanyData(company) {
+  const csv = companyExportRows(company).map((row) => row.map(csvCell).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `${company.ticker.toLowerCase()}-northstar-data.csv`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(link.href), 0);
+  showResearchStatus("Data exported");
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -850,16 +941,16 @@ function renderXItems(x) {
     </a>`).join("");
 }
 
-async function renderTickerContent(ticker) {
+async function renderTickerContent(ticker, force = false) {
   const requestId = ++tickerContentRequest;
   $("#news-feed").innerHTML = `<div class="feed-empty">${tr("Loading latest content...")}</div>`;
   $("#x-feed").innerHTML = `<div class="feed-empty">${tr("Loading latest content...")}</div>`;
   $("#x-search-link").href = `https://x.com/search?q=${encodeURIComponent(`$${ticker}`)}&src=typed_query&f=live`;
   $("#x-search-link").textContent = tr("Open live discussion on X ↗");
   try {
-    let payload = tickerContentCache.get(ticker);
+    let payload = force ? null : tickerContentCache.get(ticker);
     if (!payload) {
-      const response = await fetch(`/api/content/${encodeURIComponent(ticker)}`);
+      const response = await fetch(`/api/content/${encodeURIComponent(ticker)}${force ? "?refresh=1" : ""}`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       payload = await response.json();
       tickerContentCache.set(ticker, payload);
@@ -869,6 +960,7 @@ async function renderTickerContent(ticker) {
     $("#x-feed").innerHTML = renderXItems(payload.x || { status: "unavailable", posts: [] });
     $("#x-search-link").href = payload.xSearchUrl;
     $("#x-search-link").textContent = tr("Open live discussion on X ↗");
+    if (force) showResearchStatus("News refreshed");
   } catch {
     if (requestId !== tickerContentRequest) return;
     $("#news-feed").innerHTML = `<div class="feed-empty">${tr("No recent company news is available.")}</div>`;
@@ -1395,11 +1487,12 @@ function hideTooltips() {
   });
 }
 
-function selectCompany(ticker) {
+function selectCompany(ticker, updateUrl = true) {
   if (!companies[ticker]) return;
   selectedTicker = ticker;
   metricManagerOpen = false;
   localStorage.setItem(selectedTickerStorageKey, ticker);
+  if (updateUrl) updateTickerUrl(ticker);
   renderCompany();
   renderScatter();
   syncWatchlistButton();
@@ -1425,6 +1518,25 @@ function setupInteractions() {
   $("#sort-peers").addEventListener("click", () => {
     peerDescending = !peerDescending;
     renderPeers();
+  });
+
+  $("#copy-ticker-link").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(tickerUrl(selectedTicker).toString());
+      showResearchStatus("Link copied");
+    } catch {
+      showResearchStatus("Copy failed");
+    }
+  });
+
+  $("#export-company-data").addEventListener("click", () => exportCompanyData(companies[selectedTicker]));
+
+  $("#refresh-ticker-content").addEventListener("click", () => {
+    $("#refresh-ticker-content").textContent = tr("Refreshing...");
+    tickerContentCache.delete(selectedTicker);
+    renderTickerContent(selectedTicker, true).finally(() => {
+      $("#refresh-ticker-content").textContent = tr("Refresh news");
+    });
   });
 
   $("#add-watchlist").addEventListener("click", () => {
@@ -1481,6 +1593,11 @@ function setupInteractions() {
 
   document.addEventListener("click", (event) => {
     if (!event.target.closest(".search-control")) closeSearchResults();
+  });
+
+  window.addEventListener("popstate", () => {
+    const ticker = new URL(window.location.href).searchParams.get("ticker")?.toUpperCase();
+    if (ticker && companies[ticker]) selectCompany(ticker, false);
   });
 
   document.querySelectorAll(".nav-item").forEach((button) => {
@@ -1556,9 +1673,12 @@ function renderDataStatus() {
 
 async function init() {
   await loadGeneratedData();
+  const linkedTicker = new URL(window.location.href).searchParams.get("ticker")?.toUpperCase();
   const savedTicker = localStorage.getItem(selectedTickerStorageKey);
-  if (savedTicker && companies[savedTicker]) selectedTicker = savedTicker;
+  if (linkedTicker && companies[linkedTicker]) selectedTicker = linkedTicker;
+  else if (savedTicker && companies[savedTicker]) selectedTicker = savedTicker;
   if (!companies[selectedTicker]) selectedTicker = Object.keys(companies)[0];
+  updateTickerUrl(selectedTicker, true);
   loadHiddenMetrics();
   loadWatchlist();
   renderMarketStrip();

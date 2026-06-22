@@ -114,6 +114,19 @@
               </div>
             </div>
 
+            <div class="research-toolbar">
+              <div class="research-actions">
+                <button class="text-button" id="copy-ticker-link">Copy ticker link</button>
+                <button class="text-button" id="export-company-data">Export data</button>
+                <button class="text-button" id="refresh-ticker-content">Refresh news</button>
+                <span class="research-action-status" id="research-action-status" aria-live="polite"></span>
+              </div>
+              <details class="source-details">
+                <summary>Data sources & freshness</summary>
+                <div id="company-source-list"></div>
+              </details>
+            </div>
+
             <div class="thesis-grid">
               <div class="thesis-score">
                 <div class="score-ring" id="score-ring">
@@ -322,6 +335,6 @@
         </footer>
       </main>
     </div>
-    <script src="app.js?v=20260621-1"></script>
+    <script src="app.js?v=20260621-2"></script>
   </body>
 </html>
