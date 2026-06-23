@@ -32,12 +32,19 @@ requireContract(openSearch.includes("search.select()"), "Watchlist + must select
 requireContract(/#add-watchlist[\s\S]*?openWatchlistSearch\(\)/.test(app), "Watchlist + click must call openWatchlistSearch");
 
 requireContract(app.includes("function miniChart(history, type, title)"), "Shared metric mini-chart renderer is missing");
-requireContract(app.includes('renderMetricHistory(history, "metric-history", label, "line")'), "Summary histories must render line charts");
+requireContract(app.includes('renderMetricHistory(label === "EPS growth" ? epsChangeChartHistory(company, selectedPeriod, history) : history, "metric-history", label, "line")'), "Summary histories must render line charts");
 requireContract(/renderMetricHistory\(metric\.history, "financial-metric-history"[\s\S]*?\? "line" : "bar"\)/.test(app), "Financial histories must select line or bar charts");
 requireContract(/miniChart\(metric,[\s\S]*?\? "line" : "bar", metric\.title\)/.test(app), "Company-specific histories must select line or bar charts");
 requireContract(app.includes("history.displayValues[index]"), "Exact historical display values must remain visible");
 requireContract(refresh.includes("values: entries.map((item) => item.value)"), "Generated histories must retain raw numeric values");
 requireContract(styles.includes(".metric-mini-chart"), "Metric mini-chart styles are missing");
+requireContract(app.includes('tr("Fiscal period")'), "Metric charts must label the X axis as fiscal period");
+requireContract(app.includes('class="metric-chart-axis"'), "Metric charts must render visible axis tick labels");
+requireContract(app.includes('class="metric-chart-zero"'), "Metric charts must show a zero line for sign-changing histories");
+requireContract(app.includes('formatMetricAxis(change, history, true)'), "Metric charts must summarize first-to-latest change");
+requireContract(styles.includes(".metric-chart-grid"), "Metric chart grid styling is missing");
+requireContract(app.includes('axisFormat: "eps"'), "EPS histories must retain numeric per-share changes for charting");
+requireContract(app.includes('const step = period === "quarterly" ? 4 : 1'), "Quarterly EPS charts must compare against the prior-year quarter");
 
 requireContract(html.includes('id="manage-metrics"'), "Dashboard-wide metric manager is missing");
 requireContract(html.includes('id="hidden-metrics-panel"'), "Hidden metric restore panel is missing");

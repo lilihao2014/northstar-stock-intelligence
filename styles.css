@@ -1056,17 +1056,61 @@ kbd {
 }
 
 .metric-mini-chart {
-  height: 68px;
+  min-height: 145px;
   margin-top: 10px;
   padding-top: 7px;
   border-top: 1px solid var(--line);
 }
 
+.metric-chart-meta {
+  min-height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font: 500 7px "DM Mono", monospace;
+}
+
+.metric-chart-meta strong {
+  margin: 0;
+  font: 600 7px "DM Mono", monospace;
+  white-space: nowrap;
+}
+
 .metric-mini-chart svg {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
   overflow: visible;
+}
+
+.metric-chart-grid {
+  stroke: #e5e1d7;
+  stroke-width: 0.8;
+}
+
+.metric-chart-zero {
+  stroke: #9ba7a2;
+  stroke-width: 1;
+  stroke-dasharray: 3 2;
+}
+
+.metric-chart-tick {
+  stroke: #9ba7a2;
+  stroke-width: 0.8;
+}
+
+.metric-chart-axis,
+.metric-chart-title {
+  fill: #71807b;
+  font-family: "DM Mono", monospace;
+  font-size: 6.5px;
+}
+
+.metric-chart-title {
+  font-size: 7px;
+  font-weight: 600;
 }
 
 .metric-mini-chart + .metric-history,

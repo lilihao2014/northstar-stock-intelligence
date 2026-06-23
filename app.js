@@ -382,6 +382,10 @@ const translations = {
     "Quote": "行情",
     "Analyst estimates": "分析师预期",
     "Company news source": "公司新闻来源",
+    "Value": "数值",
+    "Fiscal period": "财务期间",
+    "Change": "变化",
+    "EPS change": "每股收益变化",
     "Company-specific metrics": "公司特定指标",
     "Operating metrics": "经营指标",
     "Manage metrics": "管理指标",
@@ -988,10 +992,36 @@ function renderSummaryMetrics(company) {
           </div>
           <strong>${tr(value)}</strong>
           <p>${tr(note)}</p>
-          ${renderMetricHistory(history, "metric-history", label, "line")}
+          ${renderMetricHistory(label === "EPS growth" ? epsChangeChartHistory(company, selectedPeriod, history) : history, "metric-history", label, "line")}
         </article>`;
     })
     .join("") : `<div class="metrics-empty card">${tr("All metrics in this section are hidden. Use Manage metrics to restore them.")}</div>`;
+}
+
+function fiscalPeriodOrdinal(label) {
+  const quarter = String(label || "").match(/^FY(\d{2,4}) Q([1-4])$/);
+  if (quarter) return Number(quarter[1]) * 4 + Number(quarter[2]) - 1;
+  const year = String(label || "").match(/^FY(\d{2,4})$/);
+  return year ? Number(year[1]) : null;
+}
+
+function epsChangeChartHistory(company, period, history) {
+  if (!history?.labels?.length) return history;
+  const series = period === "quarterly" ? company.quarterly : company.annual;
+  const epsByPeriod = new Map((series?.labels || []).map((label, index) => [fiscalPeriodOrdinal(label), series.eps?.[index]]));
+  const step = period === "quarterly" ? 4 : 1;
+  const values = history.labels.map((label) => {
+    const ordinal = fiscalPeriodOrdinal(label);
+    const current = epsByPeriod.get(ordinal);
+    const prior = epsByPeriod.get(ordinal - step);
+    return Number.isFinite(current) && Number.isFinite(prior) ? current - prior : null;
+  });
+  return {
+    ...history,
+    values,
+    axisFormat: "eps",
+    axisLabel: "EPS change",
+  };
 }
 
 function numericHistoryValue(value) {
@@ -1010,51 +1040,101 @@ function numericHistoryValue(value) {
   return Number.isFinite(number) ? number : null;
 }
 
+function metricChartValues(history) {
+  const source = history.values?.length === history.labels.length ? history.values : history.displayValues;
+  const values = source.map(numericHistoryValue);
+  const sample = history.displayValues?.find((value) => typeof value === "string" && value !== "N/A") || "";
+  if (!sample.includes("%")) return values;
+  const ratios = values.map((value, index) => {
+    const displayed = numericHistoryValue(history.displayValues?.[index]);
+    return Number.isFinite(value) && value !== 0 && Number.isFinite(displayed) ? Math.abs(displayed / value) : null;
+  }).filter(Number.isFinite);
+  const scale = ratios.some((ratio) => ratio > 50 && ratio < 150) ? 100 : 1;
+  return values.map((value) => Number.isFinite(value) ? value * scale : null);
+}
+
+function formatMetricAxis(value, history, delta = false) {
+  const sample = history.displayValues?.find((item) => typeof item === "string" && item !== "N/A") || "";
+  const prefix = sample.includes("$") || history.axisFormat === "eps" ? "$" : "";
+  const suffix = sample.includes("%") ? (delta ? " pts" : "%") : /x$/i.test(sample.trim()) ? "x" : "";
+  const absolute = Math.abs(value);
+  let scaled = absolute;
+  let unit = "";
+  if (!suffix && absolute >= 1e12) [scaled, unit] = [absolute / 1e12, "T"];
+  else if (!suffix && absolute >= 1e9) [scaled, unit] = [absolute / 1e9, "B"];
+  else if (!suffix && absolute >= 1e6) [scaled, unit] = [absolute / 1e6, "M"];
+  else if (!suffix && absolute >= 1e3) [scaled, unit] = [absolute / 1e3, "K"];
+  const digits = scaled >= 100 ? 0 : scaled >= 10 ? 1 : 2;
+  const sign = value < 0 ? "-" : delta && value > 0 ? "+" : "";
+  return `${sign}${prefix}${scaled.toFixed(digits)}${unit}${suffix}`;
+}
+
+function metricTickIndices(length, maximum = 5) {
+  if (length <= maximum) return Array.from({ length }, (_, index) => index);
+  return [...new Set(Array.from({ length: maximum }, (_, index) => Math.round(index * (length - 1) / (maximum - 1))))];
+}
+
 function miniChart(history, type, title) {
   if (!history?.labels?.length) return "";
-  const sourceValues = history.values?.length === history.labels.length ? history.values : history.displayValues;
-  const values = sourceValues.map(numericHistoryValue);
+  const values = metricChartValues(history);
   const validValues = values.filter(Number.isFinite);
   if (validValues.length < 2) return "";
-  const width = 240;
-  const height = 68;
-  const pad = { top: 7, right: 5, bottom: 7, left: 5 };
+  const width = 340;
+  const height = 132;
+  const pad = { top: 19, right: 9, bottom: 26, left: 47 };
   const chartWidth = width - pad.left - pad.right;
   const chartHeight = height - pad.top - pad.bottom;
-  const escapedTitle = String(title).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
-
+  const escapedTitle = escapeHtml(title);
+  const axisLabel = tr(history.axisLabel || "Value");
+  const rawMin = Math.min(...validValues);
+  const rawMax = Math.max(...validValues);
+  const rawSpread = rawMax - rawMin || Math.max(Math.abs(rawMax) * 0.1, 1);
+  let min = type === "bar" ? Math.min(0, rawMin) : rawMin - rawSpread * 0.12;
+  let max = type === "bar" ? Math.max(0, rawMax) : rawMax + rawSpread * 0.12;
+  if (min === max) max = min + 1;
+  const y = (value) => pad.top + ((max - value) / (max - min)) * chartHeight;
+  const x = (index) => type === "bar"
+    ? pad.left + ((index + 0.5) / values.length) * chartWidth
+    : pad.left + (index / Math.max(values.length - 1, 1)) * chartWidth;
+  const yTicks = [max, (max + min) / 2, min];
+  const grid = yTicks.map((value) => `
+    <line x1="${pad.left}" y1="${y(value).toFixed(1)}" x2="${width - pad.right}" y2="${y(value).toFixed(1)}" class="metric-chart-grid" />
+    <text x="${pad.left - 5}" y="${(y(value) + 2.5).toFixed(1)}" text-anchor="end" class="metric-chart-axis">${formatMetricAxis(value, history)}</text>`).join("");
+  const xTicks = metricTickIndices(values.length).map((index) => `
+    <line x1="${x(index).toFixed(1)}" y1="${height - pad.bottom}" x2="${x(index).toFixed(1)}" y2="${height - pad.bottom + 3}" class="metric-chart-tick" />
+    <text x="${x(index).toFixed(1)}" y="${height - 8}" text-anchor="middle" class="metric-chart-axis">${escapeHtml(history.labels[index])}</text>`).join("");
+  const baseline = y(Math.min(max, Math.max(min, 0)));
+  let marks;
   if (type === "bar") {
-    const min = Math.min(0, ...validValues);
-    const max = Math.max(0, ...validValues);
-    const range = max - min || 1;
-    const baseline = pad.top + ((max - 0) / range) * chartHeight;
     const groupWidth = chartWidth / values.length;
-    const barWidth = Math.max(5, Math.min(24, groupWidth * 0.58));
-    const bars = values.map((value, index) => {
+    const barWidth = Math.max(5, Math.min(28, groupWidth * 0.58));
+    marks = values.map((value, index) => {
       if (!Number.isFinite(value)) return "";
-      const valueY = pad.top + ((max - value) / range) * chartHeight;
-      const y = Math.min(valueY, baseline);
+      const valueY = y(value);
+      const barY = Math.min(valueY, baseline);
       const barHeight = Math.max(1.5, Math.abs(baseline - valueY));
-      const x = pad.left + groupWidth * index + (groupWidth - barWidth) / 2;
-      return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barHeight.toFixed(1)}" rx="2" fill="${value < 0 ? "#e77d61" : "#397966"}" opacity="${index === values.length - 1 ? "0.95" : "0.62"}" />`;
+      const barX = x(index) - barWidth / 2;
+      return `<rect x="${barX.toFixed(1)}" y="${barY.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barHeight.toFixed(1)}" rx="2" fill="${value < 0 ? "#e77d61" : "#397966"}" opacity="${index === values.length - 1 ? "0.95" : "0.64"}"><title>${escapeHtml(history.labels[index])}: ${escapeHtml(history.displayValues?.[index] ?? formatMetricAxis(value, history))}</title></rect>`;
     }).join("");
-    return `<div class="metric-mini-chart"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapedTitle} history bar chart"><line x1="${pad.left}" y1="${baseline.toFixed(1)}" x2="${width - pad.right}" y2="${baseline.toFixed(1)}" stroke="#dedbd1" stroke-width="1" />${bars}</svg></div>`;
+  } else {
+    const points = values.map((value, index) => Number.isFinite(value) ? { x: x(index), y: y(value), index } : null).filter(Boolean);
+    const path = points.map((point, index) => `${index ? "L" : "M"} ${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ");
+    const dots = points.map((point) => `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="${point.index === values.length - 1 ? 3.5 : 2.3}" fill="${point.index === values.length - 1 ? "#1f6657" : "#fffefa"}" stroke="#1f6657" stroke-width="1.5"><title>${escapeHtml(history.labels[point.index])}: ${escapeHtml(history.displayValues?.[point.index] ?? formatMetricAxis(values[point.index], history))}</title></circle>`).join("");
+    marks = `<path d="${path}" fill="none" stroke="#397966" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />${dots}`;
   }
-
-  let min = Math.min(...validValues);
-  let max = Math.max(...validValues);
-  const spread = max - min || Math.max(Math.abs(max) * 0.1, 1);
-  min -= spread * 0.12;
-  max += spread * 0.12;
-  const points = values.map((value, index) => {
-    if (!Number.isFinite(value)) return null;
-    const x = pad.left + (index / Math.max(values.length - 1, 1)) * chartWidth;
-    const y = pad.top + ((max - value) / (max - min)) * chartHeight;
-    return { x, y, index };
-  }).filter(Boolean);
-  const path = points.map((point, index) => `${index ? "L" : "M"} ${point.x.toFixed(1)} ${point.y.toFixed(1)}`).join(" ");
-  const dots = points.map((point) => `<circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="${point.index === values.length - 1 ? 3 : 2}" fill="${point.index === values.length - 1 ? "#1f6657" : "#fffefa"}" stroke="#1f6657" stroke-width="1.5" />`).join("");
-  return `<div class="metric-mini-chart"><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapedTitle} history line chart"><path d="${path}" fill="none" stroke="#397966" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />${dots}</svg></div>`;
+  const first = values.find(Number.isFinite);
+  const latest = values.filter(Number.isFinite).at(-1);
+  const change = latest - first;
+  const changeClass = change > 0 ? "positive" : change < 0 ? "negative" : "";
+  return `<div class="metric-mini-chart">
+    <div class="metric-chart-meta"><span>${axisLabel}: ${formatMetricAxis(min, history)} – ${formatMetricAxis(max, history)}</span><strong class="${changeClass}">${tr("Change")} ${formatMetricAxis(change, history, true)}</strong></div>
+    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapedTitle}: ${axisLabel} ${formatMetricAxis(min, history)} to ${formatMetricAxis(max, history)}; ${tr("Fiscal period")} ${escapeHtml(history.labels[0])} to ${escapeHtml(history.labels.at(-1))}">
+      <text x="${pad.left}" y="10" class="metric-chart-title">${axisLabel}</text>
+      ${grid}${min < 0 && max > 0 ? `<line x1="${pad.left}" y1="${y(0).toFixed(1)}" x2="${width - pad.right}" y2="${y(0).toFixed(1)}" class="metric-chart-zero" />` : ""}
+      ${marks}${xTicks}
+      <text x="${width - pad.right}" y="${height - 1}" text-anchor="end" class="metric-chart-title">${tr("Fiscal period")}</text>
+    </svg>
+  </div>`;
 }
 
 function renderMetricHistory(history, className, title, chartType) {

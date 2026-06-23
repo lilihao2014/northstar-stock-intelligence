@@ -83,6 +83,15 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 - Manual news refresh bypasses the normal client/server cache, while a 30-second minimum server cache prevents repeated upstream requests.
 - News and X provider calls time out after 10 seconds so unavailable upstream services cannot leave the dashboard loading indefinitely.
 - The company source panel identifies data freshness and the providers used for fundamentals, quotes, estimates, and news.
+
+## Metric chart axes
+
+- Every rendered metric history chart shows a labeled value range on the Y axis and fiscal-period labels on the X axis.
+- The chart displays first-to-latest absolute change in the metric's own unit; percentage metrics use percentage-point change.
+- Negative-to-positive series show a visible zero reference line, and bar colors distinguish negative values.
+- Dense histories show evenly spaced fiscal-period ticks while retaining every exact period/value pair below the chart.
+- Ratio values stored as decimals must be scaled to match their displayed percentage before charting.
+- EPS transition labels such as `Loss to profit` remain visible, while the chart uses the underlying per-share change against the prior year or prior-year quarter.
 - Newly introduced visible controls and status messages require entries in the shared translation map.
 
 ## Automated check
