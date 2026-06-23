@@ -775,12 +775,30 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const price = Number(quote["05. price"]) || null;
   const change = Number(String(quote["10. change percent"] ?? "").replace("%", "")) || 0;
   const marketCap = Number(overview.MarketCapitalization) || null;
-  const pe = Number(overview.ForwardPE) || Number(overview.PERatio) || null;
+  const latestQuarterRevenue = revenueQuarterly.at(-1);
+  const nextQuarterEstimate = selectFutureEstimate(
+    estimateSeries(alpha?.estimates, "fiscal quarter"),
+    latestQuarterRevenue?.end || "",
+  );
+  const fiscalYearEstimate = selectFutureEstimate(
+    estimateSeries(alpha?.estimates, "fiscal year"),
+    revenueAnnual.at(-1)?.end || "",
+  );
+  const providerForwardPe = Number(overview.ForwardPE) || null;
+  const consensusForwardPe = price && fiscalYearEstimate?.epsAverage > 0
+    ? price / fiscalYearEstimate.epsAverage
+    : null;
+  const pe = providerForwardPe || consensusForwardPe;
+  const peDelta = providerForwardPe ? "Provider" : Number.isFinite(consensusForwardPe) ? "[CALCULATED]" : "Provider";
+  const peNote = providerForwardPe
+    ? "Alpha Vantage overview"
+    : Number.isFinite(consensusForwardPe)
+      ? "Price / fiscal-year EPS consensus"
+      : alpha ? "Alpha Vantage overview" : "Add Alpha Vantage key";
   const fcfYield = marketCap && freeCashFlow ? (freeCashFlow / marketCap) * 100 : null;
   const roe = equity && latestNetIncome ? (latestNetIncome / equity) * 100 : null;
   const score = calculateScore({ revenueGrowth, epsGrowth, netMargin, debtToOperatingIncome });
   const [quality, copy] = qualityLabel(score);
-  const latestQuarterRevenue = revenueQuarterly.at(-1);
   const priorYearQuarterRevenue = priorYearPeriod(revenueQuarterly, latestQuarterRevenue);
   const latestQuarterNetIncome = closestPeriod(netIncomeQuarterly, latestQuarterRevenue?.end);
   const latestQuarterOperatingIncome = closestPeriod(operatingIncomeQuarterly, latestQuarterRevenue?.end);
@@ -871,22 +889,14 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     ["Revenue growth", formatPercent(revenueGrowth), formatPercent((revenueGrowth ?? 0) - (priorRevenueGrowth ?? 0), 1).replace("%", " pts"), "Latest reported fiscal year", annualRevenueGrowthHistory],
     ["EPS growth", ...annualEpsDisplay, annualEpsGrowthHistory],
     ["Net margin", Number.isFinite(netMargin) ? `${netMargin.toFixed(1)}%` : "N/A", formatPercent((netMargin ?? 0) - (priorNetMargin ?? 0), 1).replace("%", " pts"), "Calculated from SEC filings", annualNetMarginHistory],
-    ["Forward P/E", formatMultiple(pe), "Provider", alpha ? "Alpha Vantage overview" : "Add Alpha Vantage key"],
+    ["Forward P/E", formatMultiple(pe), peDelta, peNote],
   ];
   const quarterlySummaryMetrics = [
     ["Revenue growth", formatPercent(quarterlyRevenueGrowth), "Same quarter prior year", "Compared with same quarter last year", quarterlyRevenueGrowthHistory],
     ["EPS growth", ...quarterlyEpsDisplay, quarterlyEpsGrowthHistory],
     ["Net margin", Number.isFinite(latestQuarterMargin) ? `${latestQuarterMargin.toFixed(1)}%` : "N/A", Number.isFinite(latestQuarterMargin) && Number.isFinite(priorYearQuarterMargin) ? formatPercent(latestQuarterMargin - priorYearQuarterMargin, 1).replace("%", " pts") : "N/A", "Compared with same quarter last year", quarterlyNetMarginHistory],
-    ["Forward P/E", formatMultiple(pe), "Provider", alpha ? "Alpha Vantage overview" : "Add Alpha Vantage key"],
+    ["Forward P/E", formatMultiple(pe), peDelta, peNote],
   ];
-  const nextQuarterEstimate = selectFutureEstimate(
-    estimateSeries(alpha?.estimates, "fiscal quarter"),
-    latestQuarterRevenue?.end || "",
-  );
-  const fiscalYearEstimate = selectFutureEstimate(
-    estimateSeries(alpha?.estimates, "fiscal year"),
-    revenueAnnual.at(-1)?.end || "",
-  );
 
   return {
     name: companyFacts.entityName,

@@ -382,6 +382,7 @@ const translations = {
     "Quote": "行情",
     "Analyst estimates": "分析师预期",
     "Company news source": "公司新闻来源",
+    "Price / fiscal-year EPS consensus": "股价 / 全财年每股收益一致预期",
     "Value": "数值",
     "Fiscal period": "财务期间",
     "Change": "变化",
@@ -1692,6 +1693,15 @@ function setupInteractions() {
 
 function mergeCompany(realCompany) {
   const fallback = demoCompanies[realCompany.ticker] ?? {};
+  const providerPe = realCompany.analytics?.pe;
+  const fiscalYearEps = realCompany.guidance?.fiscalYear?.epsValue;
+  const calculatedPe = !Number.isFinite(providerPe) && Number.isFinite(realCompany.price) && fiscalYearEps > 0
+    ? realCompany.price / fiscalYearEps
+    : null;
+  const forwardPe = Number.isFinite(providerPe) ? providerPe : calculatedPe;
+  const patchForwardPe = (metrics = []) => metrics.map((metric) => metric[0] === "Forward P/E" && Number.isFinite(forwardPe)
+    ? [metric[0], `${forwardPe.toFixed(1)}x`, calculatedPe ? "[CALCULATED]" : metric[2], calculatedPe ? "Price / fiscal-year EPS consensus" : metric[3], metric[4]]
+    : metric);
   return {
     ...fallback,
     ...realCompany,
@@ -1704,6 +1714,12 @@ function mergeCompany(realCompany) {
     financialMetrics: realCompany.financialMetrics || [],
     guidance: realCompany.guidance || null,
     customMetrics: realCompany.customMetrics || [],
+    metrics: patchForwardPe(realCompany.metrics || fallback.metrics || []),
+    periodMetrics: {
+      annual: patchForwardPe(realCompany.periodMetrics?.annual || realCompany.metrics || fallback.metrics || []),
+      quarterly: patchForwardPe(realCompany.periodMetrics?.quarterly || realCompany.metrics || fallback.metrics || []),
+    },
+    analytics: { ...(realCompany.analytics || {}), pe: forwardPe },
   };
 }
 
@@ -1717,7 +1733,10 @@ async function loadGeneratedData() {
     companies = Object.fromEntries(
       Object.entries(payload.companies).map(([ticker, company]) => [ticker, mergeCompany(company)]),
     );
-    peers = payload.peers ?? [];
+    peers = (payload.peers ?? []).map((peer) => ({
+      ...peer,
+      pe: Number.isFinite(companies[peer.ticker]?.analytics?.pe) ? companies[peer.ticker].analytics.pe : peer.pe,
+    }));
     marketData = payload.marketData?.filter((item) => Number.isFinite(item.price)) ?? [];
     sectors = payload.sectors?.filter((item) => Number.isFinite(item.price)) ?? [];
     scatterCompanies = peers

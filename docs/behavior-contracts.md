@@ -92,6 +92,13 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 - Dense histories show evenly spaced fiscal-period ticks while retaining every exact period/value pair below the chart.
 - Ratio values stored as decimals must be scaled to match their displayed percentage before charting.
 - EPS transition labels such as `Loss to profit` remain visible, while the chart uses the underlying per-share change against the prior year or prior-year quarter.
+
+## Forward P/E fallback
+
+- Provider-supplied forward P/E is preferred when available.
+- When it is unavailable, Forward P/E is calculated only when both a real market price and a positive full-fiscal-year analyst EPS consensus are available.
+- The fallback is `price / fiscal-year EPS consensus` and must be labeled `[CALCULATED]`; trailing P/E must not be mislabeled as forward P/E.
+- The same resolved Forward P/E feeds metric cards, peer comparison, and the valuation scatter plot.
 - Newly introduced visible controls and status messages require entries in the shared translation map.
 
 ## Automated check

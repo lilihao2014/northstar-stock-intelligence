@@ -45,6 +45,10 @@ requireContract(app.includes('formatMetricAxis(change, history, true)'), "Metric
 requireContract(styles.includes(".metric-chart-grid"), "Metric chart grid styling is missing");
 requireContract(app.includes('axisFormat: "eps"'), "EPS histories must retain numeric per-share changes for charting");
 requireContract(app.includes('const step = period === "quarterly" ? 4 : 1'), "Quarterly EPS charts must compare against the prior-year quarter");
+requireContract(refresh.includes("price / fiscalYearEstimate.epsAverage"), "Refresh must derive forward P/E from price and fiscal-year EPS consensus");
+requireContract(!refresh.includes("Number(overview.PERatio)"), "Trailing P/E must not be used as forward P/E");
+requireContract(app.includes('calculatedPe ? "[CALCULATED]"'), "Cached companies must label derived forward P/E as calculated");
+requireContract(app.includes("realCompany.price / fiscalYearEps"), "Cached companies must derive forward P/E from real price and fiscal-year EPS consensus");
 
 requireContract(html.includes('id="manage-metrics"'), "Dashboard-wide metric manager is missing");
 requireContract(html.includes('id="hidden-metrics-panel"'), "Hidden metric restore panel is missing");
