@@ -1725,8 +1725,9 @@ function mergeCompany(realCompany) {
 
 async function loadGeneratedData() {
   try {
-    let response = await fetch(`/api/dashboard?ts=${Date.now()}`, { cache: "no-store" });
-    if (!response.ok) {
+    const apiResponse = await fetch(`/api/dashboard?ts=${Date.now()}`, { cache: "no-store" });
+    let response = apiResponse;
+    if (!apiResponse.ok && [404, 405].includes(apiResponse.status)) {
       response = await fetch(`data/dashboard.json?ts=${Date.now()}`, { cache: "no-store" });
     }
     if (!response.ok) throw new Error(`HTTP ${response.status}`);

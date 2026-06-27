@@ -104,10 +104,12 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 ## Production persistence
 
 - The browser loads generated dashboard data from `/api/dashboard`, not directly from the JSON cache as the only source.
-- The server returns the Postgres dashboard snapshot when `DATABASE_URL` is configured and falls back to `data/dashboard.json` when the database is unavailable.
-- `npm run refresh` keeps the committed JSON cache and Postgres dashboard snapshot in sync.
-- Adding a ticker persists the watchlist item and refreshed dashboard snapshot to Postgres when configured.
-- Postgres support must be optional; local JSON fallback mode remains valid when `DATABASE_URL` is absent.
+- Production requires `DATABASE_URL`; it must fail loudly rather than silently serving `data/dashboard.json`.
+- Local JSON fallback is development/bootstrap-only and should be removed after remaining state is migrated.
+- `npm run refresh` writes Postgres in production and writes the committed JSON cache only outside production.
+- Adding a ticker persists the watchlist item and refreshed dashboard snapshot to Postgres in production.
+- Production refresh reads the watchlist from Postgres rather than `config/watchlist.json`.
+- Postgres support remains optional only outside production.
 - Startup database seeding must preserve an existing dashboard snapshot so deploys do not overwrite server-added ticker data with older committed JSON.
 - The Render Blueprint declares `DATABASE_URL` from the managed database instead of exposing database credentials in client code.
 

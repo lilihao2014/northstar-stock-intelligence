@@ -7,6 +7,7 @@ import {
   createRefreshJob,
   finishRefreshJob,
   isDatabaseConfigured,
+  isProductionRuntime,
   loadDashboardSnapshot,
   loadWatchlistItems,
   saveDashboardSnapshot,
@@ -170,18 +171,26 @@ async function fetchTickerDirectory() {
 }
 
 async function readDashboardData() {
+  if (isProductionRuntime() && !isDatabaseConfigured()) {
+    throw new Error("DATABASE_URL is required in production; JSON fallback is development-only.");
+  }
   try {
     const stored = await loadDashboardSnapshot();
     if (stored?.companies && Object.keys(stored.companies).length) {
       return { ...stored, storage: "postgres" };
     }
   } catch (error) {
+    if (isProductionRuntime()) throw error;
     console.warn(`Postgres dashboard load failed; using JSON fallback: ${error.message}`);
+  }
+  if (isProductionRuntime()) {
+    throw new Error("Postgres dashboard snapshot is unavailable in production.");
   }
   return readFile(dashboardPath, "utf8").then(JSON.parse);
 }
 
 async function readWatchlistData() {
+  if (isProductionRuntime()) return loadWatchlistItems();
   const fileWatchlist = await readFile(watchlistPath, "utf8").then(JSON.parse);
   try {
     const storedWatchlist = await loadWatchlistItems();
@@ -195,6 +204,10 @@ async function readWatchlistData() {
 }
 
 async function writeWatchlistData(items) {
+  if (isProductionRuntime()) {
+    await saveWatchlistItems(items);
+    return;
+  }
   await writeFile(watchlistPath, `${JSON.stringify(items, null, 2)}\n`);
   try {
     await saveWatchlistItems(items);
@@ -259,8 +272,9 @@ async function addCompany(ticker) {
     });
   }
 
-  const fileWatchlist = await readFile(watchlistPath, "utf8").then(JSON.parse);
-  const fileHasTicker = fileWatchlist.some((item) => item.ticker === normalized);
+  const fileHasTicker = isProductionRuntime()
+    ? true
+    : (await readFile(watchlistPath, "utf8").then(JSON.parse)).some((item) => item.ticker === normalized);
   if (!alreadyTracked || !fileHasTicker) {
     await writeWatchlistData(watchlist);
   } else {
@@ -279,7 +293,9 @@ async function addCompany(ticker) {
     await finishRefreshJob(refreshJobId, "failed", error.message);
     throw error;
   }
-  const dashboard = JSON.parse(await readFile(dashboardPath, "utf8"));
+  const dashboard = await loadDashboardSnapshot()
+    || (isProductionRuntime() ? null : await readFile(dashboardPath, "utf8").then(JSON.parse));
+  if (!dashboard) throw new Error("Postgres dashboard snapshot is unavailable after refresh");
   try {
     await saveDashboardSnapshot(dashboard);
   } catch (error) {
@@ -366,14 +382,23 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(port, host, () => {
-  console.log(`Northstar running at http://localhost:${port}`);
+async function startServer() {
+  if (isProductionRuntime() && !isDatabaseConfigured()) {
+    throw new Error("DATABASE_URL is required in production; JSON fallback is development-only.");
+  }
   if (isDatabaseConfigured()) {
-    seedDatabaseFromFiles({ dashboardPath, watchlistPath })
-      .then(() => console.log("Postgres persistence is enabled."))
-      .catch((error) => console.warn(`Postgres initialization failed; JSON fallback remains available: ${error.message}`));
+    await seedDatabaseFromFiles({ dashboardPath, watchlistPath });
+    console.log("Postgres persistence is enabled.");
   }
-  if (!secIdentity) {
-    console.warn("SEC_USER_AGENT is not set. Cached data works, but adding new tickers will fail.");
-  }
+  server.listen(port, host, () => {
+    console.log(`Northstar running at http://localhost:${port}`);
+    if (!secIdentity) {
+      console.warn("SEC_USER_AGENT is not set. Cached data works, but adding new tickers will fail.");
+    }
+  });
+}
+
+startServer().catch((error) => {
+  console.error(error.message);
+  process.exit(1);
 });

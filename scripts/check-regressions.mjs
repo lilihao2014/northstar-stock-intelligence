@@ -52,21 +52,26 @@ requireContract(refresh.includes("price / fiscalYearEstimate.epsAverage"), "Refr
 requireContract(!refresh.includes("Number(overview.PERatio)"), "Trailing P/E must not be used as forward P/E");
 requireContract(app.includes('calculatedPe ? "[CALCULATED]"'), "Cached companies must label derived forward P/E as calculated");
 requireContract(app.includes("realCompany.price / fiscalYearEps"), "Cached companies must derive forward P/E from real price and fiscal-year EPS consensus");
-requireContract(app.includes('fetch(`/api/dashboard?ts=${Date.now()}`'), "Dashboard data must load from the backend API before JSON fallback");
-requireContract(app.includes('fetch(`data/dashboard.json?ts=${Date.now()}`'), "Dashboard data must retain JSON fallback loading");
+requireContract(app.includes('fetch(`/api/dashboard?ts=${Date.now()}`'), "Dashboard data must load from the backend API");
+requireContract(app.includes("[404, 405].includes(apiResponse.status)"), "JSON fallback must be limited to missing backend routes");
 requireContract(server.includes('url.pathname === "/api/dashboard"'), "Server must expose /api/dashboard for production data loading");
 requireContract(server.includes("loadDashboardSnapshot()"), "Server must load dashboard snapshots from Postgres when configured");
+requireContract(server.includes("DATABASE_URL is required in production"), "Production must fail when DATABASE_URL is missing");
 requireContract(server.includes("saveDashboardSnapshot(dashboard)"), "Ticker additions must persist refreshed dashboard snapshots");
 requireContract(server.includes("saveWatchlistItem"), "Ticker additions must persist watchlist items");
 requireContract(refresh.includes("loadDashboardSnapshot()"), "Refresh must reuse the Postgres dashboard cache when available");
 requireContract(refresh.includes("saveDashboardSnapshot(payload)"), "Refresh must persist generated dashboard snapshots to Postgres");
+requireContract(refresh.includes("isProductionRuntime()") && refresh.includes("loadWatchlistItems()"), "Production refresh must read the watchlist from Postgres");
+requireContract(refresh.includes("Wrote Postgres dashboard snapshot"), "Production refresh must write the Postgres dashboard snapshot");
 requireContract(db.includes("create table if not exists companies"), "Postgres schema must include durable company snapshots");
 requireContract(db.includes("create table if not exists watchlist_items"), "Postgres schema must include durable watchlist items");
 requireContract(db.includes("create table if not exists refresh_jobs"), "Postgres schema must include refresh job tracking");
 requireContract(db.includes("process.env.DATABASE_URL"), "Postgres support must be gated by DATABASE_URL");
+requireContract(db.includes("process.env.NODE_ENV === \"production\""), "Production runtime detection must be centralized");
 requireContract(db.includes("existing?.companies") && db.includes("!force"), "Database seeding must preserve existing dashboard snapshots unless forced");
 requireContract(packageJson.includes('"db:seed"'), "Package scripts must include a database seed command");
 requireContract(render.includes("fromDatabase:"), "Render Blueprint must inject DATABASE_URL from the managed database");
+requireContract(render.includes("NODE_ENV") && render.includes("production"), "Render must run with production storage rules enabled");
 
 requireContract(html.includes('id="manage-metrics"'), "Dashboard-wide metric manager is missing");
 requireContract(html.includes('id="hidden-metrics-panel"'), "Hidden metric restore panel is missing");

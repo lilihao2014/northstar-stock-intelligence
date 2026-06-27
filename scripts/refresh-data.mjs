@@ -1,12 +1,33 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadDashboardSnapshot, saveDashboardSnapshot } from "./db.mjs";
+import {
+  isDatabaseConfigured,
+  isProductionRuntime,
+  loadDashboardSnapshot,
+  loadWatchlistItems,
+  saveDashboardSnapshot,
+} from "./db.mjs";
 import { estimateSeries } from "./estimate-utils.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const outputPath = path.join(root, "data", "dashboard.json");
-const configuredWatchlist = JSON.parse(await readFile(path.join(root, "config", "watchlist.json"), "utf8"));
+const watchlistPath = path.join(root, "config", "watchlist.json");
+if (isProductionRuntime() && !isDatabaseConfigured()) {
+  console.error("DATABASE_URL is required in production; JSON fallback is development-only.");
+  process.exit(1);
+}
+const fileWatchlist = isProductionRuntime()
+  ? []
+  : await readFile(watchlistPath, "utf8").then(JSON.parse);
+const storedWatchlist = await loadWatchlistItems().catch((error) => {
+  if (isProductionRuntime()) throw error;
+  console.warn(`Postgres watchlist skipped: ${error.message}`);
+  return [];
+});
+const configuredWatchlist = isProductionRuntime()
+  ? storedWatchlist
+  : [...new Map([...fileWatchlist, ...storedWatchlist].map((item) => [item.ticker, item])).values()];
 const companyMetricConfig = JSON.parse(
   await readFile(path.join(root, "config", "company-metrics.json"), "utf8").catch(() => "{}"),
 );
@@ -1139,14 +1160,21 @@ const payload = {
   failures,
 };
 
-await mkdir(path.dirname(outputPath), { recursive: true });
-const tempPath = `${outputPath}.tmp`;
-await writeFile(tempPath, `${JSON.stringify(payload, null, 2)}\n`);
-await rename(tempPath, outputPath);
-await saveDashboardSnapshot(payload).catch((error) => {
+try {
+  await saveDashboardSnapshot(payload);
+} catch (error) {
+  if (isProductionRuntime()) throw error;
   console.warn(`Postgres dashboard save skipped: ${error.message}`);
-});
+}
 
-console.log(`\nWrote ${path.relative(root, outputPath)} with ${Object.keys(companies).length} companies.`);
+if (!isProductionRuntime()) {
+  await mkdir(path.dirname(outputPath), { recursive: true });
+  const tempPath = `${outputPath}.tmp`;
+  await writeFile(tempPath, `${JSON.stringify(payload, null, 2)}\n`);
+  await rename(tempPath, outputPath);
+  console.log(`\nWrote ${path.relative(root, outputPath)} with ${Object.keys(companies).length} companies.`);
+} else {
+  console.log(`\nWrote Postgres dashboard snapshot with ${Object.keys(companies).length} companies.`);
+}
 if (!alphaKey) console.log("No ALPHA_VANTAGE_API_KEY found; market quote panels will remain unavailable.");
 if (failures.length) failures.forEach((failure) => console.warn(`Warning: ${failure}`));

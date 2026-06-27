@@ -88,11 +88,12 @@ Each selected ticker also loads recent Nasdaq company news through the server. T
 
 ## Production persistence
 
-Northstar can run from committed JSON files, but production deployments should set `DATABASE_URL` and use Postgres. When a database is configured:
+Northstar can run from committed JSON files for local development and first-time bootstrap, but production deployments require `DATABASE_URL` and use Postgres as the source of truth. When a database is configured:
 
-- `/api/dashboard` loads the dashboard snapshot from Postgres first, then falls back to `data/dashboard.json`.
-- `npm run refresh` writes both `data/dashboard.json` and the Postgres dashboard snapshot.
+- `/api/dashboard` loads the dashboard snapshot from Postgres in production; JSON fallback is development/bootstrap-only.
+- `npm run refresh` writes the Postgres dashboard snapshot in production and only writes `data/dashboard.json` outside production.
 - Adding a ticker through `/api/companies/:ticker` stores the watchlist item, refreshed company snapshot, refresh job status, and full dashboard snapshot in Postgres.
+- Production ticker refresh reads the watchlist from Postgres instead of `config/watchlist.json`.
 - Browser-only metric visibility preferences remain local for now; the `metric_preferences` table is reserved for moving those preferences server-side with user accounts.
 
 To initialize a local or Render database from the committed cache:
@@ -103,6 +104,8 @@ npm run db:seed
 
 If `DATABASE_URL` is not set, the seed command exits without changing anything and the app continues in JSON fallback mode. If the database already has a dashboard snapshot, seeding preserves it; use `npm run db:seed -- --force` only when you intentionally want to replace the database snapshot with committed JSON.
 
+Set `NODE_ENV=production` for deployed services. In production, missing or unavailable Postgres is a startup/runtime error; the app must not silently serve the local JSON cache.
+
 ## Deploy on Render
 
 The included `render.yaml` defines a public Node web service.
@@ -112,7 +115,7 @@ The included `render.yaml` defines a public Node web service.
 3. Enter `SEC_USER_AGENT`, `ALPHA_VANTAGE_API_KEY`, and optional `X_BEARER_TOKEN` when prompted.
 4. Deploy and use the assigned `onrender.com` URL.
 
-The Blueprint also declares a Postgres database and injects `DATABASE_URL` into the service. Companies committed in `data/dashboard.json` remain available as a fallback, while companies fetched on demand are durable once Postgres is connected.
+The Blueprint also declares a Postgres database and injects `DATABASE_URL` into the service. Companies committed in `data/dashboard.json` are used only to seed a new database; companies fetched on demand are durable in Postgres.
 
 For an always-on public site, use a paid Render web-service instance. Free web services may sleep when idle.
 

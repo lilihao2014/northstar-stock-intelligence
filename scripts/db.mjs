@@ -11,6 +11,10 @@ export function isDatabaseConfigured() {
   return Boolean(databaseUrl());
 }
 
+export function isProductionRuntime() {
+  return process.env.NODE_ENV === "production" || process.env.APP_ENV === "production";
+}
+
 async function getPool() {
   if (!isDatabaseConfigured()) return null;
   if (!poolPromise) {
