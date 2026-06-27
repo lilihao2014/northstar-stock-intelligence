@@ -101,6 +101,16 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 - The same resolved Forward P/E feeds metric cards, peer comparison, and the valuation scatter plot.
 - Newly introduced visible controls and status messages require entries in the shared translation map.
 
+## Production persistence
+
+- The browser loads generated dashboard data from `/api/dashboard`, not directly from the JSON cache as the only source.
+- The server returns the Postgres dashboard snapshot when `DATABASE_URL` is configured and falls back to `data/dashboard.json` when the database is unavailable.
+- `npm run refresh` keeps the committed JSON cache and Postgres dashboard snapshot in sync.
+- Adding a ticker persists the watchlist item and refreshed dashboard snapshot to Postgres when configured.
+- Postgres support must be optional; local JSON fallback mode remains valid when `DATABASE_URL` is absent.
+- Startup database seeding must preserve an existing dashboard snapshot so deploys do not overwrite server-added ticker data with older committed JSON.
+- The Render Blueprint declares `DATABASE_URL` from the managed database instead of exposing database credentials in client code.
+
 ## Automated check
 
 Run `npm run check`. In addition to JavaScript syntax validation, it verifies the source-level invariants above. Browser verification remains required for deliberate layout or interaction changes.

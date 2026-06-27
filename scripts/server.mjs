@@ -3,6 +3,17 @@ import { spawn } from "node:child_process";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readFile, writeFile } from "node:fs/promises";
+import {
+  createRefreshJob,
+  finishRefreshJob,
+  isDatabaseConfigured,
+  loadDashboardSnapshot,
+  loadWatchlistItems,
+  saveDashboardSnapshot,
+  saveWatchlistItem,
+  saveWatchlistItems,
+  seedDatabaseFromFiles,
+} from "./db.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const port = Number(process.env.PORT || 4173);
@@ -158,6 +169,40 @@ async function fetchTickerDirectory() {
   }
 }
 
+async function readDashboardData() {
+  try {
+    const stored = await loadDashboardSnapshot();
+    if (stored?.companies && Object.keys(stored.companies).length) {
+      return { ...stored, storage: "postgres" };
+    }
+  } catch (error) {
+    console.warn(`Postgres dashboard load failed; using JSON fallback: ${error.message}`);
+  }
+  return readFile(dashboardPath, "utf8").then(JSON.parse);
+}
+
+async function readWatchlistData() {
+  const fileWatchlist = await readFile(watchlistPath, "utf8").then(JSON.parse);
+  try {
+    const storedWatchlist = await loadWatchlistItems();
+    const byTicker = new Map(fileWatchlist.map((item) => [item.ticker, item]));
+    for (const item of storedWatchlist) byTicker.set(item.ticker, item);
+    return [...byTicker.values()];
+  } catch (error) {
+    console.warn(`Postgres watchlist load failed; using JSON fallback: ${error.message}`);
+    return fileWatchlist;
+  }
+}
+
+async function writeWatchlistData(items) {
+  await writeFile(watchlistPath, `${JSON.stringify(items, null, 2)}\n`);
+  try {
+    await saveWatchlistItems(items);
+  } catch (error) {
+    console.warn(`Postgres watchlist save failed; JSON file still updated: ${error.message}`);
+  }
+}
+
 function searchTickers(directory, query) {
   const normalized = query.trim().toUpperCase();
   if (!normalized) return [];
@@ -201,8 +246,9 @@ async function addCompany(ticker) {
   const listing = directory.find((item) => item.ticker === normalized);
   if (!listing) throw new Error(`Ticker ${normalized} was not found in the SEC directory`);
 
-  const watchlist = JSON.parse(await readFile(watchlistPath, "utf8"));
+  const watchlist = await readWatchlistData();
   const alreadyTracked = watchlist.some((item) => item.ticker === normalized);
+  let refreshJobId = null;
   if (!alreadyTracked) {
     watchlist.push({
       ticker: listing.ticker,
@@ -211,19 +257,34 @@ async function addCompany(ticker) {
       industry: "SEC registrant",
       exchange: listing.exchange,
     });
-    await writeFile(watchlistPath, `${JSON.stringify(watchlist, null, 2)}\n`);
+  }
+
+  const fileWatchlist = await readFile(watchlistPath, "utf8").then(JSON.parse);
+  const fileHasTicker = fileWatchlist.some((item) => item.ticker === normalized);
+  if (!alreadyTracked || !fileHasTicker) {
+    await writeWatchlistData(watchlist);
+  } else {
+    await saveWatchlistItem(watchlist.find((item) => item.ticker === normalized));
   }
 
   try {
+    refreshJobId = await createRefreshJob(normalized);
     await runRefresh(normalized);
+    await finishRefreshJob(refreshJobId, "succeeded");
   } catch (error) {
     if (!alreadyTracked) {
       const restored = watchlist.filter((item) => item.ticker !== normalized);
-      await writeFile(watchlistPath, `${JSON.stringify(restored, null, 2)}\n`);
+      await writeWatchlistData(restored);
     }
+    await finishRefreshJob(refreshJobId, "failed", error.message);
     throw error;
   }
   const dashboard = JSON.parse(await readFile(dashboardPath, "utf8"));
+  try {
+    await saveDashboardSnapshot(dashboard);
+  } catch (error) {
+    console.warn(`Postgres dashboard save failed; JSON file still updated: ${error.message}`);
+  }
   const company = dashboard.companies?.[normalized];
   if (!company) throw new Error(`SEC financial statements are not available for ${normalized}`);
   return { company, peers: dashboard.peers, generatedAt: dashboard.generatedAt };
@@ -270,6 +331,11 @@ const server = createServer(async (request, response) => {
       return;
     }
 
+    if (request.method === "GET" && url.pathname === "/api/dashboard") {
+      json(response, 200, await readDashboardData());
+      return;
+    }
+
     const contentMatch = request.method === "GET" && url.pathname.match(/^\/api\/content\/([A-Z0-9.-]+)$/i);
     if (contentMatch) {
       json(response, 200, await tickerContent(contentMatch[1].toUpperCase(), url.searchParams.get("refresh") === "1"));
@@ -302,6 +368,11 @@ const server = createServer(async (request, response) => {
 
 server.listen(port, host, () => {
   console.log(`Northstar running at http://localhost:${port}`);
+  if (isDatabaseConfigured()) {
+    seedDatabaseFromFiles({ dashboardPath, watchlistPath })
+      .then(() => console.log("Postgres persistence is enabled."))
+      .catch((error) => console.warn(`Postgres initialization failed; JSON fallback remains available: ${error.message}`));
+  }
   if (!secIdentity) {
     console.warn("SEC_USER_AGENT is not set. Cached data works, but adding new tickers will fail.");
   }

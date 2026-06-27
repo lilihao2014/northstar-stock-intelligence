@@ -1725,7 +1725,10 @@ function mergeCompany(realCompany) {
 
 async function loadGeneratedData() {
   try {
-    const response = await fetch(`data/dashboard.json?ts=${Date.now()}`, { cache: "no-store" });
+    let response = await fetch(`/api/dashboard?ts=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) {
+      response = await fetch(`data/dashboard.json?ts=${Date.now()}`, { cache: "no-store" });
+    }
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const payload = await response.json();
     if (!payload.companies || !Object.keys(payload.companies).length) throw new Error("No companies in generated data");

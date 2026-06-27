@@ -86,15 +86,34 @@ On-demand additions refresh only the requested ticker, preserving existing compa
 
 Each selected ticker also loads recent Nasdaq company news through the server. The X / Twitter card always links to the ticker's live cashtag search. To render recent X posts inside the dashboard, set `X_BEARER_TOKEN` in `.env` locally and in the Render service environment; the token is used only by the server and is never sent to the browser.
 
+## Production persistence
+
+Northstar can run from committed JSON files, but production deployments should set `DATABASE_URL` and use Postgres. When a database is configured:
+
+- `/api/dashboard` loads the dashboard snapshot from Postgres first, then falls back to `data/dashboard.json`.
+- `npm run refresh` writes both `data/dashboard.json` and the Postgres dashboard snapshot.
+- Adding a ticker through `/api/companies/:ticker` stores the watchlist item, refreshed company snapshot, refresh job status, and full dashboard snapshot in Postgres.
+- Browser-only metric visibility preferences remain local for now; the `metric_preferences` table is reserved for moving those preferences server-side with user accounts.
+
+To initialize a local or Render database from the committed cache:
+
+```bash
+npm run db:seed
+```
+
+If `DATABASE_URL` is not set, the seed command exits without changing anything and the app continues in JSON fallback mode. If the database already has a dashboard snapshot, seeding preserves it; use `npm run db:seed -- --force` only when you intentionally want to replace the database snapshot with committed JSON.
+
 ## Deploy on Render
 
 The included `render.yaml` defines a public Node web service.
 
 1. Push this project to a GitHub repository.
 2. In Render, create a new Blueprint from that repository.
-3. Enter `SEC_USER_AGENT` and `ALPHA_VANTAGE_API_KEY` when prompted.
+3. Enter `SEC_USER_AGENT`, `ALPHA_VANTAGE_API_KEY`, and optional `X_BEARER_TOKEN` when prompted.
 4. Deploy and use the assigned `onrender.com` URL.
 
-The free Render filesystem is ephemeral. Companies committed in `data/dashboard.json` remain available after redeploys; companies fetched on demand may need to be fetched again after a restart. A paid persistent disk or database is required for permanent server-side additions.
+The Blueprint also declares a Postgres database and injects `DATABASE_URL` into the service. Companies committed in `data/dashboard.json` remain available as a fallback, while companies fetched on demand are durable once Postgres is connected.
+
+For an always-on public site, use a paid Render web-service instance. Free web services may sleep when idle.
 
 The market strip uses liquid ETF/ETN proxies rather than direct index feeds. Built-in fallback company figures are used only if generated data cannot load, and the entire fallback view is visibly labeled `[MOCK/FAKE]`. Always check the linked filing or investor-relations source before making an investment decision.

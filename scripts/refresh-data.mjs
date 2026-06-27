@@ -1,6 +1,7 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadDashboardSnapshot, saveDashboardSnapshot } from "./db.mjs";
 import { estimateSeries } from "./estimate-utils.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -1028,7 +1029,12 @@ async function refreshCompany(config, index) {
   return buildCompany(config, companyFacts, alpha, customMetrics);
 }
 
-const previous = await readFile(outputPath, "utf8").then(JSON.parse).catch(() => null);
+const previous = await loadDashboardSnapshot()
+  .catch((error) => {
+    console.warn(`Postgres dashboard cache skipped: ${error.message}`);
+    return null;
+  })
+  || await readFile(outputPath, "utf8").then(JSON.parse).catch(() => null);
 const companies = requestedTicker ? { ...(previous?.companies || {}) } : {};
 const failures = [];
 
@@ -1137,6 +1143,9 @@ await mkdir(path.dirname(outputPath), { recursive: true });
 const tempPath = `${outputPath}.tmp`;
 await writeFile(tempPath, `${JSON.stringify(payload, null, 2)}\n`);
 await rename(tempPath, outputPath);
+await saveDashboardSnapshot(payload).catch((error) => {
+  console.warn(`Postgres dashboard save skipped: ${error.message}`);
+});
 
 console.log(`\nWrote ${path.relative(root, outputPath)} with ${Object.keys(companies).length} companies.`);
 if (!alphaKey) console.log("No ALPHA_VANTAGE_API_KEY found; market quote panels will remain unavailable.");
