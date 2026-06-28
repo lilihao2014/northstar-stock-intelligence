@@ -56,9 +56,10 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 
 ## New ticker market prices
 
-- Alpha Vantage remains the primary quote source.
-- When Alpha Vantage has no quote, including during free-tier throttling, the refresh attempts Nasdaq's delayed quote feed.
+- Alpha Vantage remains a profile/estimate provider, but displayed market price should prefer the dated Nasdaq delayed quote when available.
+- Nasdaq delayed quote is attempted for every refresh and may override Alpha Vantage's global quote for displayed price accuracy.
 - The fallback value must be identified as `Nasdaq delayed quote`; it must never be presented as Alpha Vantage data or as a live exchange price.
+- Displayed prices must include a quote date or explicitly say the quote date is unavailable.
 - A failed fallback may remain unavailable, but the application must not manufacture a price.
 
 ## New ticker analyst estimates

@@ -371,6 +371,8 @@ async function fetchNasdaqQuote(ticker) {
   return {
     "05. price": String(price),
     "10. change percent": String(parseMarketNumber(primary?.percentageChange) ?? 0),
+    "07. latest trading day": primary?.lastTradeTimestamp || null,
+    source: "Nasdaq delayed quote",
   };
 }
 
@@ -823,6 +825,7 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const quote = alpha?.quote ?? {};
   const price = Number(quote["05. price"]) || null;
   const change = Number(String(quote["10. change percent"] ?? "").replace("%", "")) || 0;
+  const quoteAsOf = quote["07. latest trading day"] || null;
   const marketCap = Number(overview.MarketCapitalization) || null;
   const latestQuarterRevenue = revenueQuarterly.at(-1);
   const nextQuarterEstimate = selectFutureEstimate(
@@ -963,6 +966,7 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     meta: `${overview.Sector || config.sector} · ${overview.Industry || config.industry} · ${overview.Exchange || config.exchange}`,
     price,
     change,
+    quoteAsOf,
     cap: marketCap ? formatMoney(marketCap) : "Quote key required",
     score,
     quality,
@@ -1015,6 +1019,7 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     sources: {
       fundamentals: `https://data.sec.gov/api/xbrl/companyfacts/CIK${config.cik}.json`,
       quote: alpha?.quoteSource || (alpha ? "Alpha Vantage" : null),
+      quoteAsOf,
     },
   };
 }
@@ -1038,12 +1043,14 @@ async function refreshCompany(config, index) {
       console.warn(`  Quote/profile skipped: ${error.message}`);
     }
   }
-  if (!Number.isFinite(Number(alpha?.quote?.["05. price"]))) {
-    try {
-      const quote = await fetchNasdaqQuote(config.ticker);
-      alpha = { ...(alpha || {}), quote, quoteSource: "Nasdaq delayed quote" };
-    } catch (error) {
+  try {
+    const quote = await fetchNasdaqQuote(config.ticker);
+    alpha = { ...(alpha || {}), quote, quoteSource: quote.source || "Nasdaq delayed quote" };
+  } catch (error) {
+    if (!Number.isFinite(Number(alpha?.quote?.["05. price"]))) {
       console.warn(`  Nasdaq quote fallback skipped: ${error.message}`);
+    } else {
+      console.warn(`  Nasdaq quote correction skipped: ${error.message}`);
     }
   }
   const alphaQuarterlyEstimates = estimateSeries(alpha?.estimates, "fiscal quarter");

@@ -1,13 +1,14 @@
 {
-  "generatedAt": "2026-06-21T15:02:04.226Z",
+  "generatedAt": "2026-06-28T21:00:14.834Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
       "name": "Apple Inc.",
       "ticker": "AAPL",
       "meta": "Technology · Consumer Electronics · NASDAQ",
-      "price": 298.01,
-      "change": 0.6961,
+      "price": 283.78,
+      "change": 3.14,
+      "quoteAsOf": "Jun 25, 2026",
       "cap": "Quote key required",
       "score": 79,
       "quality": "Solid fundamentals",
@@ -105,9 +106,9 @@
         ],
         [
           "Forward P/E",
-          "N/A",
-          "Provider",
-          "Alpha Vantage overview"
+          "32.4x",
+          "[CALCULATED]",
+          "Price / fiscal-year EPS consensus"
         ]
       ],
       "periodMetrics": {
@@ -204,9 +205,9 @@
           ],
           [
             "Forward P/E",
-            "N/A",
-            "Provider",
-            "Alpha Vantage overview"
+            "32.4x",
+            "[CALCULATED]",
+            "Price / fiscal-year EPS consensus"
           ]
         ],
         "quarterly": [
@@ -290,9 +291,9 @@
           ],
           [
             "Forward P/E",
-            "N/A",
-            "Provider",
-            "Add Alpha Vantage key"
+            "32.4x",
+            "[CALCULATED]",
+            "Price / fiscal-year EPS consensus"
           ]
         ]
       },
@@ -301,12 +302,12 @@
         "disclaimer": "Analyst consensus, not company-issued guidance.",
         "nextQuarter": {
           "period": "FY26 Q3",
-          "revenue": "$109.0B",
+          "revenue": "$108.9B",
           "revenueRange": "$107.5B – $112.2B",
           "eps": "$1.89",
           "epsRange": "$1.83 – $1.99",
           "analystCount": 31,
-          "revenueValue": 108994233640,
+          "revenueValue": 108900233640,
           "epsValue": 1.8943
         },
         "fiscalYear": {
@@ -316,7 +317,7 @@
           "eps": "$8.76",
           "epsRange": "$8.29 – $9.04",
           "analystCount": 41,
-          "revenueValue": 478254964790,
+          "revenueValue": 478291748570,
           "epsValue": 8.7596
         }
       },
@@ -682,6 +683,12 @@
         }
       ],
       "customMetrics": [],
+      "metricProfile": {
+        "summaryCount": 4,
+        "financialCount": 8,
+        "customCount": 0,
+        "customGroups": {}
+      },
       "operating": {
         "title": "Quarterly revenue",
         "value": "$111.2B",
@@ -710,12 +717,13 @@
         "revenueGrowth": 6.4,
         "epsGrowth": 22.7,
         "netMargin": 26.9,
-        "pe": null,
+        "pe": 32.4,
         "score": 79
       },
       "sources": {
         "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
-        "quote": "Alpha Vantage"
+        "quote": "Nasdaq delayed quote",
+        "quoteAsOf": "Jun 25, 2026"
       }
     },
     "MSFT": {
@@ -6439,7 +6447,7 @@
       "ticker": "AAPL",
       "growth": 6.4,
       "eps": 22.7,
-      "pe": null,
+      "pe": 32.4,
       "margin": 26.9,
       "score": 79
     },

@@ -250,6 +250,8 @@ const translations = {
     "Price unavailable": "价格不可用",
     "Market cap unavailable": "市值不可用",
     "Market cap": "市值",
+    "Quote date unavailable": "行情日期不可用",
+    "Quote as of": "行情截至",
     "No companies yet. Select a company and press +.": "暂无自选股。请选择公司并点击 +。",
     "Select a company first": "请先选择公司",
     "is already added": "已在自选股中",
@@ -401,6 +403,7 @@ const translations = {
     "Generated": "生成时间",
     "Fundamentals": "基本面",
     "Quote": "行情",
+    "Quote date": "行情日期",
     "Analyst estimates": "分析师预期",
     "Company news source": "公司新闻来源",
     "Price / fiscal-year EPS consensus": "股价 / 全财年每股收益一致预期",
@@ -845,6 +848,7 @@ async function chooseSearchResult(ticker) {
 
 function renderCompany() {
   const company = companies[selectedTicker];
+  const quoteAsOf = company.sources?.quoteAsOf || company.quoteAsOf;
   $("#company-logo").textContent = company.ticker[0];
   $("#company-logo").style.background = company.color;
   $("#company-name").textContent = company.name;
@@ -857,6 +861,9 @@ function renderCompany() {
   $("#company-cap").textContent = company.cap === "Quote key required"
     ? tr("Market cap unavailable")
     : `${tr("Market cap")} ${company.cap}`;
+  if (Number.isFinite(company.price)) {
+    $("#company-cap").textContent += ` · ${quoteAsOf ? `${tr("Quote as of")} ${quoteAsOf}` : tr("Quote date unavailable")}`;
+  }
   $("#quality-score").textContent = company.score;
   $("#quality-label").textContent = tr(company.quality);
   $("#quality-copy").textContent = tr(company.copy);
@@ -913,6 +920,7 @@ function renderResearchToolbar(company) {
     ? new Date(dataMetadata.generatedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US")
     : `${mockText()} ${tr("Generated")}`;
   const fundamentalUrl = company.sources?.fundamentals;
+  const quoteAsOf = company.sources?.quoteAsOf || company.quoteAsOf;
   const latestJob = refreshJobs.find((job) => job.ticker === company.ticker);
   const refreshStatus = latestJob
     ? `${tr(latestJob.status)} · ${new Date(latestJob.finishedAt || latestJob.startedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US")}`
@@ -922,6 +930,7 @@ function renderResearchToolbar(company) {
     <div><span>${tr("Last backend refresh")}</span><strong>${escapeHtml(refreshStatus)}</strong></div>
     <div><span>${tr("Fundamentals")}</span>${fundamentalUrl ? `<a href="${escapeHtml(fundamentalUrl)}" target="_blank" rel="noopener noreferrer">SEC EDGAR ↗</a>` : `<strong>N/A</strong>`}</div>
     <div><span>${tr("Quote")}</span><strong>${escapeHtml(company.sources?.quote || "N/A")}</strong></div>
+    <div><span>${tr("Quote date")}</span><strong>${escapeHtml(quoteAsOf || tr("Quote date unavailable"))}</strong></div>
     <div><span>${tr("Analyst estimates")}</span><strong>${escapeHtml(company.guidance?.source || tr("Analyst consensus unavailable"))}</strong></div>
     <div><span>${tr("Company news source")}</span><strong>Nasdaq</strong></div>`;
 }
@@ -1889,6 +1898,7 @@ function mergeCompany(realCompany) {
     ...realCompany,
     price: Number.isFinite(realCompany.price) ? realCompany.price : null,
     change: Number.isFinite(realCompany.price) ? realCompany.change : 0,
+    quoteAsOf: realCompany.quoteAsOf || realCompany.sources?.quoteAsOf || fallback.quoteAsOf || null,
     cap: realCompany.cap,
     color: realCompany.color || fallback.color || "#1f6657",
     operating: realCompany.operating || fallback.operating,
