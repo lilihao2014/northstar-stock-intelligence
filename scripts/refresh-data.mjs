@@ -376,6 +376,49 @@ async function fetchNasdaqQuote(ticker) {
   };
 }
 
+async function fetchLatestSecFiling(cik) {
+  const submissions = await fetchJson(
+    `https://data.sec.gov/submissions/CIK${cik}.json`,
+    { "User-Agent": secIdentity },
+  );
+  const recent = submissions.filings?.recent || {};
+  const filings = (recent.form || []).map((form, index) => ({
+    form,
+    filed: recent.filingDate?.[index] || null,
+    reportDate: recent.reportDate?.[index] || null,
+    accessionNumber: recent.accessionNumber?.[index] || null,
+    primaryDocument: recent.primaryDocument?.[index] || null,
+  })).filter((filing) =>
+    ["10-Q", "10-K"].includes(filing.form)
+    && filing.filed
+    && filing.reportDate,
+  );
+  return filings.sort((a, b) =>
+    String(b.filed).localeCompare(String(a.filed))
+    || String(b.reportDate).localeCompare(String(a.reportDate)),
+  )[0] || null;
+}
+
+function fundamentalsLatestStatus(fundamentalsAsOf, latestSecFiling) {
+  if (!latestSecFiling) {
+    return {
+      status: "unknown",
+      label: "Unable to verify latest filing",
+      latestFiling: null,
+    };
+  }
+  const displayedEnd = latestSecFiling.form === "10-K"
+    ? fundamentalsAsOf.annualEnd
+    : fundamentalsAsOf.quarterEnd;
+  const latestReportDate = latestSecFiling.reportDate;
+  const isLatest = displayedEnd && latestReportDate && displayedEnd >= latestReportDate;
+  return {
+    status: isLatest ? "latest" : "stale",
+    label: isLatest ? "Latest confirmed" : "Stale - refresh needed",
+    latestFiling: latestSecFiling,
+  };
+}
+
 function nasdaqFiscalEnd(value) {
   const match = String(value || "").trim().match(/^([A-Za-z]{3})\s+(\d{4})$/);
   if (!match) return null;
@@ -716,7 +759,7 @@ async function fetchCompanySpecificMetrics(config, companyFacts) {
   return [...explicitMetrics, ...discoveredMetrics];
 }
 
-function buildCompany(config, companyFacts, alpha, customMetrics = []) {
+function buildCompany(config, companyFacts, alpha, customMetrics = [], latestSecFiling = null) {
   const revenueFacts = getUnitFacts(companyFacts, conceptCandidates.revenue, ["USD"]);
   const epsFacts = getUnitFacts(companyFacts, conceptCandidates.eps, ["USD/shares", "USD / shares"]);
   const dilutedShareFacts = getUnitFacts(companyFacts, conceptCandidates.dilutedShares, ["shares"]);
@@ -791,6 +834,7 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     quarterFiled: latestQuarterRevenue?.filed || null,
     refreshedAt: new Date().toISOString(),
   };
+  fundamentalsAsOf.latestCheck = fundamentalsLatestStatus(fundamentalsAsOf, latestSecFiling);
   const debt = closestPeriod(debtAnnual, latestFiscalEnd)?.val ?? latestInstant(debtFacts);
   const equity = closestPeriod(equityAnnual, latestFiscalEnd)?.val ?? latestInstant(equityFacts);
   const debtToOperatingIncome = latestOperatingIncome ? debt / latestOperatingIncome : null;
@@ -1094,7 +1138,13 @@ async function refreshCompany(config, index) {
   } catch (error) {
     console.warn(`  Company metrics skipped: ${error.message}`);
   }
-  return buildCompany(config, companyFacts, alpha, customMetrics);
+  let latestSecFiling = null;
+  try {
+    latestSecFiling = await fetchLatestSecFiling(config.cik);
+  } catch (error) {
+    console.warn(`  SEC latest filing check skipped: ${error.message}`);
+  }
+  return buildCompany(config, companyFacts, alpha, customMetrics, latestSecFiling);
 }
 
 const previous = await loadDashboardSnapshot()

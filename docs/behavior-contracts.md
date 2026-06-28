@@ -105,7 +105,9 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 ## Fundamentals freshness
 
 - Each company stores latest annual period, annual filed date, latest quarterly period, quarterly filed date, and refresh timestamp for SEC-derived fundamentals.
+- Each refresh checks SEC submissions for the latest 10-Q/10-K and marks the displayed fundamentals as latest, stale, or unknown.
 - The source/freshness panel displays the latest annual filing and latest quarterly filing separately.
+- The source/freshness panel displays the latest SEC filing used for freshness validation.
 - Exported company data includes fundamentals freshness rows.
 - Missing filing dates must be labeled unavailable rather than inferred.
 

@@ -137,9 +137,12 @@ requireContract(refresh.includes('quoteSource: quote.source || "Nasdaq delayed q
 requireContract(refresh.includes("const quoteAsOf = quote[\"07. latest trading day\"]"), "Company quote date must be retained from the quote provider");
 requireContract(refresh.includes("alpha = { ...(alpha || {}), quote, quoteSource"), "Nasdaq delayed quote must be able to correct provider quote prices");
 requireContract(refresh.includes("fundamentalsAsOf") && refresh.includes("annualFiled") && refresh.includes("quarterFiled"), "Generated companies must retain fundamentals filing freshness");
+requireContract(refresh.includes("fetchLatestSecFiling") && refresh.includes("fundamentalsLatestStatus"), "Refresh must verify fundamentals against latest SEC 10-Q/10-K submissions");
+requireContract(refresh.includes('status: isLatest ? "latest" : "stale"'), "Fundamentals freshness must explicitly mark stale data");
 requireContract(app.includes("Quote as of") && app.includes("Quote date unavailable"), "UI must display quote freshness beside prices");
 requireContract(app.includes("company.sources?.quoteAsOf || company.quoteAsOf"), "UI must read quote date from company source metadata");
 requireContract(app.includes("Latest annual filing") && app.includes("Latest quarterly filing"), "UI must display annual and quarterly filing freshness");
+requireContract(app.includes("SEC latest check") && app.includes("Latest SEC filing"), "UI must display latest SEC filing validation");
 requireContract(app.includes("Fundamentals refresh"), "UI must display fundamentals refresh timestamp");
 requireContract(refresh.includes("fetchNasdaqForecast(config.ticker)"), "New ticker refresh must attempt the Nasdaq forecast fallback");
 requireContract(refresh.includes('estimateSource: hasAlphaEstimates'), "Mixed estimate sources must retain their provider label");
