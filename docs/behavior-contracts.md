@@ -80,6 +80,9 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 - Selecting a ticker updates the shareable `?ticker=` URL, and browser back/forward navigation restores the matching cached company.
 - CSV export includes annual and quarterly summary history, common financial history, company-specific metrics, quarterly details, and available analyst estimates.
 - Built-in fallback exports must identify their generated source as `[MOCK/FAKE]`.
+- The selected ticker can refresh fundamentals from the research toolbar through `/api/refresh/:ticker`.
+- A successful fundamentals refresh updates the selected company, peer comparison, market map, data freshness, and backend refresh status without a page reload.
+- Recent backend refresh jobs are available through `/api/refresh/status` and appear in the source/freshness panel.
 - Manual news refresh bypasses the normal client/server cache, while a 30-second minimum server cache prevents repeated upstream requests.
 - News and X provider calls time out after 10 seconds so unavailable upstream services cannot leave the dashboard loading indefinitely.
 - The company source panel identifies data freshness and the providers used for fundamentals, quotes, estimates, and news.

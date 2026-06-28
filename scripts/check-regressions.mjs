@@ -93,9 +93,18 @@ requireContract(app.includes("renderTickerContent(company.ticker)"), "Ticker sel
 requireContract(app.includes("escapeHtml(item.title)"), "News headlines must be escaped before rendering");
 requireContract(html.includes('id="copy-ticker-link"'), "Shareable ticker link action is missing");
 requireContract(html.includes('id="export-company-data"'), "Company data export action is missing");
+requireContract(html.includes('id="refresh-company-data"'), "Fundamentals refresh action is missing");
 requireContract(app.includes('url.searchParams.set("ticker", ticker)'), "Ticker selection must update a shareable URL");
 requireContract(app.includes('new Blob([csv], { type: "text/csv;charset=utf-8" })'), "Company CSV export is missing");
 requireContract(app.includes('dataMetadata?.generatedAt || "[MOCK/FAKE]"'), "Fallback exports must retain the mock/fake label");
+requireContract(app.includes("refreshCompanyData(selectedTicker)"), "Fundamentals refresh action must call the backend refresh workflow");
+requireContract(app.includes("/api/refresh/status"), "Refresh status must be loaded from the backend");
+requireContract(app.includes("/api/refresh/${encodeURIComponent(ticker)}"), "Ticker fundamentals refresh must call the backend endpoint");
+requireContract(app.includes("Last backend refresh"), "Source panel must show backend refresh status");
+requireContract(server.includes('url.pathname === "/api/refresh/status"'), "Server must expose refresh job status");
+requireContract(server.includes("/^\\/api\\/refresh\\/([A-Z0-9.-]+)$/i"), "Server must expose ticker refresh endpoint");
+requireContract(server.includes("refreshExistingCompany(ticker)"), "Ticker refresh endpoint must refresh existing companies");
+requireContract(db.includes("listRefreshJobs"), "Database module must expose refresh job history");
 requireContract(server.includes("AbortSignal.timeout(10000)"), "Ticker content providers must have a bounded timeout");
 
 const currentEstimateFixture = {

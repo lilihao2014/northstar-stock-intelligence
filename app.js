@@ -194,6 +194,7 @@ let currentLanguage = localStorage.getItem("northstar-language") || "en";
 let tickerContentRequest = 0;
 const tickerContentCache = new Map();
 let researchStatusTimer = null;
+let refreshJobs = [];
 
 const $ = (selector) => document.querySelector(selector);
 const fmtSign = (value, suffix = "%") => `${value >= 0 ? "+" : ""}${value.toFixed(2)}${suffix}`;
@@ -370,11 +371,19 @@ const translations = {
     "Open live discussion on X ↗": "在 X 上打开实时讨论 ↗",
     "Copy ticker link": "复制股票链接",
     "Export data": "导出数据",
+    "Refresh fundamentals": "刷新基本面",
     "Refresh news": "刷新新闻",
     "Data sources & freshness": "数据来源与更新时间",
     "Link copied": "链接已复制",
     "Copy failed": "复制失败",
     "Data exported": "数据已导出",
+    "Fundamentals refreshed": "基本面已刷新",
+    "Refresh failed": "刷新失败",
+    "Last backend refresh": "最近后端刷新",
+    "No refresh jobs yet": "暂无刷新任务",
+    "succeeded": "成功",
+    "failed": "失败",
+    "running": "运行中",
     "News refreshed": "新闻已刷新",
     "Refreshing...": "正在刷新...",
     "Generated": "生成时间",
@@ -751,6 +760,47 @@ function refreshPeerData(updatedPeers) {
   renderPeers();
 }
 
+async function loadRefreshStatus() {
+  try {
+    const response = await fetch(`/api/refresh/status?ts=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) return;
+    const payload = await response.json();
+    refreshJobs = payload.jobs || [];
+  } catch {
+    refreshJobs = [];
+  }
+}
+
+async function refreshCompanyData(ticker) {
+  const button = $("#refresh-company-data");
+  const previousLabel = button.textContent;
+  button.disabled = true;
+  button.textContent = tr("Refreshing...");
+  try {
+    const response = await fetch(`/api/refresh/${encodeURIComponent(ticker)}`, { method: "POST" });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
+    companies[ticker] = mergeCompany(payload.company);
+    dataMetadata = {
+      ...(dataMetadata || {}),
+      generatedAt: payload.generatedAt,
+      peers: payload.peers || dataMetadata?.peers,
+    };
+    if (payload.job) refreshJobs = [payload.job, ...refreshJobs.filter((job) => job.id !== payload.job.id)].slice(0, 12);
+    refreshPeerData(payload.peers);
+    selectCompany(ticker, false);
+    renderMarketStrip();
+    renderScatter();
+    renderDataStatus();
+    showResearchStatus("Fundamentals refreshed");
+  } catch (error) {
+    showResearchStatus(`${tr("Refresh failed")}: ${error.message}`);
+  } finally {
+    button.disabled = false;
+    button.textContent = previousLabel;
+  }
+}
+
 async function chooseSearchResult(ticker) {
   const match = searchMatches.find((item) => item.ticker === ticker);
   if (!match) return;
@@ -843,14 +893,20 @@ function renderCompany() {
 function renderResearchToolbar(company) {
   $("#copy-ticker-link").textContent = tr("Copy ticker link");
   $("#export-company-data").textContent = tr("Export data");
+  $("#refresh-company-data").textContent = tr("Refresh fundamentals");
   $("#refresh-ticker-content").textContent = tr("Refresh news");
   document.querySelector(".source-details summary").textContent = tr("Data sources & freshness");
   const generated = dataMetadata?.generatedAt
     ? new Date(dataMetadata.generatedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US")
     : `${mockText()} ${tr("Generated")}`;
   const fundamentalUrl = company.sources?.fundamentals;
+  const latestJob = refreshJobs.find((job) => job.ticker === company.ticker);
+  const refreshStatus = latestJob
+    ? `${tr(latestJob.status)} · ${new Date(latestJob.finishedAt || latestJob.startedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US")}`
+    : tr("No refresh jobs yet");
   $("#company-source-list").innerHTML = `
     <div><span>${tr("Generated")}</span><strong>${escapeHtml(generated)}</strong></div>
+    <div><span>${tr("Last backend refresh")}</span><strong>${escapeHtml(refreshStatus)}</strong></div>
     <div><span>${tr("Fundamentals")}</span>${fundamentalUrl ? `<a href="${escapeHtml(fundamentalUrl)}" target="_blank" rel="noopener noreferrer">SEC EDGAR ↗</a>` : `<strong>N/A</strong>`}</div>
     <div><span>${tr("Quote")}</span><strong>${escapeHtml(company.sources?.quote || "N/A")}</strong></div>
     <div><span>${tr("Analyst estimates")}</span><strong>${escapeHtml(company.guidance?.source || tr("Analyst consensus unavailable"))}</strong></div>
@@ -1612,6 +1668,10 @@ function setupInteractions() {
 
   $("#export-company-data").addEventListener("click", () => exportCompanyData(companies[selectedTicker]));
 
+  $("#refresh-company-data").addEventListener("click", () => {
+    refreshCompanyData(selectedTicker);
+  });
+
   $("#refresh-ticker-content").addEventListener("click", () => {
     $("#refresh-ticker-content").textContent = tr("Refreshing...");
     tickerContentCache.delete(selectedTicker);
@@ -1776,6 +1836,7 @@ function renderDataStatus() {
 
 async function init() {
   await loadGeneratedData();
+  await loadRefreshStatus();
   const linkedTicker = new URL(window.location.href).searchParams.get("ticker")?.toUpperCase();
   const savedTicker = localStorage.getItem(selectedTickerStorageKey);
   if (linkedTicker && companies[linkedTicker]) selectedTicker = linkedTicker;

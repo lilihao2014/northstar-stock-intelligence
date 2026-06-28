@@ -207,6 +207,26 @@ export async function finishRefreshJob(id, status, message = null) {
   return true;
 }
 
+export async function listRefreshJobs(limit = 10) {
+  if (!isDatabaseConfigured()) return [];
+  await ensureDatabase();
+  const result = await query(
+    `select id, ticker, status, message, started_at, finished_at
+     from refresh_jobs
+     order by started_at desc
+     limit $1`,
+    [limit],
+  );
+  return result.rows.map((row) => ({
+    id: row.id,
+    ticker: row.ticker,
+    status: row.status,
+    message: row.message,
+    startedAt: row.started_at,
+    finishedAt: row.finished_at,
+  }));
+}
+
 export async function seedDatabaseFromFiles({ dashboardPath, watchlistPath, force = false }) {
   if (!isDatabaseConfigured()) return false;
   await ensureDatabase();

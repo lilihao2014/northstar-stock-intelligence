@@ -8,6 +8,7 @@ import {
   finishRefreshJob,
   isDatabaseConfigured,
   isProductionRuntime,
+  listRefreshJobs,
   loadDashboardSnapshot,
   loadWatchlistItems,
   saveDashboardSnapshot,
@@ -306,6 +307,36 @@ async function addCompany(ticker) {
   return { company, peers: dashboard.peers, generatedAt: dashboard.generatedAt };
 }
 
+async function refreshExistingCompany(ticker) {
+  const normalized = ticker.toUpperCase();
+  const dashboardBefore = await readDashboardData();
+  if (!dashboardBefore.companies?.[normalized]) {
+    throw new Error(`Ticker ${normalized} is not currently tracked`);
+  }
+
+  const refreshJobId = await createRefreshJob(normalized);
+  try {
+    await runRefresh(normalized);
+    const dashboard = await loadDashboardSnapshot()
+      || (isProductionRuntime() ? null : await readFile(dashboardPath, "utf8").then(JSON.parse));
+    if (!dashboard?.companies?.[normalized]) {
+      throw new Error(`Refresh finished, but ${normalized} is missing from the dashboard snapshot`);
+    }
+    await saveDashboardSnapshot(dashboard);
+    await finishRefreshJob(refreshJobId, "succeeded");
+    const finishedAt = new Date().toISOString();
+    return {
+      company: dashboard.companies[normalized],
+      peers: dashboard.peers,
+      generatedAt: dashboard.generatedAt,
+      job: { id: refreshJobId, ticker: normalized, status: "succeeded", finishedAt },
+    };
+  } catch (error) {
+    await finishRefreshJob(refreshJobId, "failed", error.message);
+    throw error;
+  }
+}
+
 async function serveStatic(pathname, response) {
   const requested = pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
   if (!allowedStaticFiles.has(requested)) {
@@ -352,6 +383,11 @@ const server = createServer(async (request, response) => {
       return;
     }
 
+    if (request.method === "GET" && url.pathname === "/api/refresh/status") {
+      json(response, 200, { jobs: await listRefreshJobs(12) });
+      return;
+    }
+
     const contentMatch = request.method === "GET" && url.pathname.match(/^\/api\/content\/([A-Z0-9.-]+)$/i);
     if (contentMatch) {
       json(response, 200, await tickerContent(contentMatch[1].toUpperCase(), url.searchParams.get("refresh") === "1"));
@@ -366,6 +402,19 @@ const server = createServer(async (request, response) => {
       }
       const ticker = addMatch[1].toUpperCase();
       const task = refreshQueue.then(() => addCompany(ticker));
+      refreshQueue = task.catch(() => {});
+      json(response, 200, await task);
+      return;
+    }
+
+    const refreshMatch = request.method === "POST" && url.pathname.match(/^\/api\/refresh\/([A-Z0-9.-]+)$/i);
+    if (refreshMatch) {
+      if (!allowCompanyFetch(request)) {
+        json(response, 429, { error: "Too many refresh requests. Try again in 10 minutes." });
+        return;
+      }
+      const ticker = refreshMatch[1].toUpperCase();
+      const task = refreshQueue.then(() => refreshExistingCompany(ticker));
       refreshQueue = task.catch(() => {});
       json(response, 200, await task);
       return;
