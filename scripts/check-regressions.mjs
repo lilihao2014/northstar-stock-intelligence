@@ -1,13 +1,14 @@
 import { readFile } from "node:fs/promises";
 import { estimateSeries } from "./estimate-utils.mjs";
 
-const [app, html, styles, refresh, server, db, render, packageJson, dashboard] = await Promise.all([
+const [app, html, styles, refresh, server, db, ensureDeps, render, packageJson, dashboard] = await Promise.all([
   readFile(new URL("../app.js", import.meta.url), "utf8"),
   readFile(new URL("../index.html", import.meta.url), "utf8"),
   readFile(new URL("../styles.css", import.meta.url), "utf8"),
   readFile(new URL("./refresh-data.mjs", import.meta.url), "utf8"),
   readFile(new URL("./server.mjs", import.meta.url), "utf8"),
   readFile(new URL("./db.mjs", import.meta.url), "utf8"),
+  readFile(new URL("./ensure-deps.mjs", import.meta.url), "utf8"),
   readFile(new URL("../render.yaml", import.meta.url), "utf8"),
   readFile(new URL("../package.json", import.meta.url), "utf8"),
   readFile(new URL("../data/dashboard.json", import.meta.url), "utf8"),
@@ -70,6 +71,8 @@ requireContract(db.includes("process.env.DATABASE_URL"), "Postgres support must 
 requireContract(db.includes("process.env.NODE_ENV === \"production\""), "Production runtime detection must be centralized");
 requireContract(db.includes("existing?.companies") && db.includes("!force"), "Database seeding must preserve existing dashboard snapshots unless forced");
 requireContract(packageJson.includes('"db:seed"'), "Package scripts must include a database seed command");
+requireContract(packageJson.includes("scripts/ensure-deps.mjs"), "Check script must bootstrap runtime dependencies for Render");
+requireContract(ensureDeps.includes('await import("pg")') && ensureDeps.includes("npm"), "Dependency bootstrap must install pg when missing");
 requireContract(render.includes("fromDatabase:"), "Render Blueprint must inject DATABASE_URL from the managed database");
 requireContract(render.includes("NODE_ENV") && render.includes("production"), "Render must run with production storage rules enabled");
 requireContract(render.includes("npm install && npm run check"), "Render build must install runtime dependencies before checking");
