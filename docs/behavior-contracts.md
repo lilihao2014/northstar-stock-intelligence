@@ -77,6 +77,8 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 ## Ticker news and social content
 
 - News is fetched for the selected ticker and every headline links to its original Nasdaq-hosted article.
+- News responses include provider, fetch timestamp, headline count, latest headline timestamp when available, and freshness status.
+- The source/freshness panel displays news freshness and must label unavailable or stale news honestly.
 - The X / Twitter card is ticker-scoped and always provides a live `$TICKER` search link.
 - Recent posts are shown only when the server has `X_BEARER_TOKEN`; an unavailable token must produce an honest configuration message, not mock posts.
 - News and social text is escaped before rendering, and provider credentials must never be returned to the browser.

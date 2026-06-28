@@ -193,6 +193,7 @@ let watchlistStatusTimer = null;
 let currentLanguage = localStorage.getItem("northstar-language") || "en";
 let tickerContentRequest = 0;
 const tickerContentCache = new Map();
+const contentMetadataByTicker = new Map();
 let researchStatusTimer = null;
 let refreshJobs = [];
 
@@ -415,6 +416,12 @@ const translations = {
     "Quote date": "行情日期",
     "Analyst estimates": "分析师预期",
     "Company news source": "公司新闻来源",
+    "News latest check": "新闻最新检查",
+    "Latest headline": "最新头条",
+    "News fetched": "新闻获取时间",
+    "Latest fetched": "已获取最新",
+    "News may be stale": "新闻可能已过期",
+    "News unavailable": "新闻不可用",
     "Price / fiscal-year EPS consensus": "股价 / 全财年每股收益一致预期",
     "Value": "数值",
     "Fiscal period": "财务期间",
@@ -932,6 +939,8 @@ function renderResearchToolbar(company) {
   const fundamentalsAsOf = company.sources?.fundamentalsAsOf || {};
   const latestCheck = fundamentalsAsOf.latestCheck || {};
   const latestFiling = latestCheck.latestFiling;
+  const contentMetadata = contentMetadataByTicker.get(company.ticker) || {};
+  const newsFreshness = contentMetadata.newsFreshness || {};
   const quoteAsOf = company.sources?.quoteAsOf || company.quoteAsOf;
   const latestJob = refreshJobs.find((job) => job.ticker === company.ticker);
   const refreshStatus = latestJob
@@ -949,7 +958,10 @@ function renderResearchToolbar(company) {
     <div><span>${tr("Quote")}</span><strong>${escapeHtml(company.sources?.quote || "N/A")}</strong></div>
     <div><span>${tr("Quote date")}</span><strong>${escapeHtml(quoteAsOf || tr("Quote date unavailable"))}</strong></div>
     <div><span>${tr("Analyst estimates")}</span><strong>${escapeHtml(company.guidance?.source || tr("Analyst consensus unavailable"))}</strong></div>
-    <div><span>${tr("Company news source")}</span><strong>Nasdaq</strong></div>`;
+    <div><span>${tr("Company news source")}</span><strong>${escapeHtml(newsFreshness.provider || "Nasdaq")}</strong></div>
+    <div><span>${tr("News latest check")}</span><strong>${escapeHtml(tr(newsFreshness.label || "News unavailable"))}</strong></div>
+    <div><span>${tr("Latest headline")}</span><strong>${escapeHtml(newsFreshness.latestPublishedAt ? new Date(newsFreshness.latestPublishedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US") : "N/A")}</strong></div>
+    <div><span>${tr("News fetched")}</span><strong>${escapeHtml(newsFreshness.fetchedAt ? new Date(newsFreshness.fetchedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US") : "N/A")}</strong></div>`;
 }
 
 function showResearchStatus(message) {
@@ -995,6 +1007,12 @@ function companyExportRows(company) {
     rows.push(["source", "Latest quarterly filing", company.sources.fundamentalsAsOf.quarterPeriod || "", company.sources.fundamentalsAsOf.quarterFiled || "", "", "SEC filing"]);
     rows.push(["source", "SEC latest check", latestCheck.status || "", latestCheck.label || "", "", latestCheck.latestFiling ? JSON.stringify(latestCheck.latestFiling) : ""]);
     rows.push(["source", "Fundamentals refresh", "generated", company.sources.fundamentalsAsOf.refreshedAt || "", "", "Northstar refresh"]);
+  }
+  const newsFreshness = contentMetadataByTicker.get(company.ticker)?.newsFreshness;
+  if (newsFreshness) {
+    rows.push(["source", "News latest check", newsFreshness.status || "", newsFreshness.label || "", "", newsFreshness.provider || "Nasdaq"]);
+    rows.push(["source", "Latest headline", "published", newsFreshness.latestPublishedAt || "", "", `${newsFreshness.headlineCount || 0} headlines`]);
+    rows.push(["source", "News fetched", "fetched", newsFreshness.fetchedAt || "", "", "Northstar content refresh"]);
   }
   for (const [horizon, estimate] of Object.entries({ "next-quarter": company.guidance?.nextQuarter, "fiscal-year": company.guidance?.fiscalYear })) {
     if (!estimate) continue;
@@ -1063,16 +1081,38 @@ async function renderTickerContent(ticker, force = false) {
       tickerContentCache.set(ticker, payload);
     }
     if (requestId !== tickerContentRequest || ticker !== selectedTicker) return;
+    contentMetadataByTicker.set(ticker, {
+      newsFreshness: payload.newsFreshness || {
+        provider: "Nasdaq",
+        status: payload.newsStatus || "unavailable",
+        label: payload.newsStatus === "available" ? "Latest fetched" : "News unavailable",
+        fetchedAt: payload.fetchedAt,
+        latestPublishedAt: null,
+        headlineCount: payload.news?.length || 0,
+      },
+    });
     $("#news-feed").innerHTML = renderNewsItems(payload.news || []);
     $("#x-feed").innerHTML = renderXItems(payload.x || { status: "unavailable", posts: [] });
     $("#x-search-link").href = payload.xSearchUrl;
     $("#x-search-link").textContent = tr("Open live discussion on X ↗");
+    renderResearchToolbar(companies[selectedTicker]);
     if (force) showResearchStatus("News refreshed");
   } catch {
     if (requestId !== tickerContentRequest) return;
+    contentMetadataByTicker.set(ticker, {
+      newsFreshness: {
+        provider: "Nasdaq",
+        status: "unavailable",
+        label: "News unavailable",
+        fetchedAt: new Date().toISOString(),
+        latestPublishedAt: null,
+        headlineCount: 0,
+      },
+    });
     $("#news-feed").innerHTML = `<div class="feed-empty">${tr("No recent company news is available.")}</div>`;
     $("#x-feed").innerHTML = `<div class="feed-empty">${tr("Recent X posts are unavailable.")}</div>`;
     $("#x-search-link").href = `https://x.com/search?q=${encodeURIComponent(`$${ticker}`)}&src=typed_query&f=live`;
+    renderResearchToolbar(companies[selectedTicker]);
   }
 }
 

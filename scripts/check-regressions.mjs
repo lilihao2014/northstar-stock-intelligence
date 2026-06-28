@@ -104,6 +104,10 @@ requireContract(html.includes('id="news-feed"'), "Ticker news section is missing
 requireContract(html.includes('id="x-feed"'), "Ticker X / Twitter section is missing");
 requireContract(app.includes("renderTickerContent(company.ticker)"), "Ticker selection must refresh news and social content");
 requireContract(app.includes("escapeHtml(item.title)"), "News headlines must be escaped before rendering");
+requireContract(server.includes("function newsFreshness("), "Ticker news API must include freshness metadata");
+requireContract(server.includes("latestPublishedAt") && server.includes("headlineCount"), "Ticker news freshness must include latest headline and count");
+requireContract(app.includes("contentMetadataByTicker"), "Client must retain ticker content freshness metadata");
+requireContract(app.includes("News latest check") && app.includes("News fetched"), "Source panel must show news freshness");
 requireContract(html.includes('id="copy-ticker-link"'), "Shareable ticker link action is missing");
 requireContract(html.includes('id="export-company-data"'), "Company data export action is missing");
 requireContract(html.includes('id="refresh-company-data"'), "Fundamentals refresh action is missing");

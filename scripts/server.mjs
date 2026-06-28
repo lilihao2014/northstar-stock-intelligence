@@ -87,8 +87,36 @@ async function fetchNasdaqNews(ticker) {
     description: item.description || "",
     publisher: item.publisher || "Nasdaq",
     published: item.ago || item.created || "",
+    publishedAt: item.created || item.date || null,
     url: item.url?.startsWith("http") ? item.url : `https://www.nasdaq.com${item.url || ""}`,
   }));
+}
+
+function parseNewsTime(value) {
+  if (!value) return null;
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime()) ? parsed.toISOString() : null;
+}
+
+function newsFreshness(news, newsStatus, fetchedAt) {
+  const latestPublishedAt = news
+    .map((item) => parseNewsTime(item.publishedAt))
+    .filter(Boolean)
+    .sort()
+    .at(-1) || null;
+  const ageHours = latestPublishedAt
+    ? (Date.now() - new Date(latestPublishedAt).getTime()) / 3600000
+    : null;
+  return {
+    provider: "Nasdaq",
+    status: newsStatus,
+    label: newsStatus === "available"
+      ? latestPublishedAt && ageHours > 72 ? "News may be stale" : "Latest fetched"
+      : "News unavailable",
+    fetchedAt,
+    latestPublishedAt,
+    headlineCount: news.length,
+  };
 }
 
 async function fetchXPosts(ticker) {
@@ -131,13 +159,17 @@ async function tickerContent(ticker, force = false) {
   const cacheAge = cached ? Date.now() - cached.cachedAt : Infinity;
   if (cached && (cacheAge < 30 * 1000 || (!force && cacheAge < 15 * 60 * 1000))) return cached.payload;
   const [newsResult, xResult] = await Promise.allSettled([fetchNasdaqNews(ticker), fetchXPosts(ticker)]);
+  const fetchedAt = new Date().toISOString();
+  const news = newsResult.status === "fulfilled" ? newsResult.value : [];
+  const newsStatus = newsResult.status === "fulfilled" ? "available" : "unavailable";
   const payload = {
     ticker,
-    news: newsResult.status === "fulfilled" ? newsResult.value : [],
-    newsStatus: newsResult.status === "fulfilled" ? "available" : "unavailable",
+    news,
+    newsStatus,
+    newsFreshness: newsFreshness(news, newsStatus, fetchedAt),
     x: xResult.status === "fulfilled" ? xResult.value : { status: "unavailable", posts: [] },
     xSearchUrl: `https://x.com/search?q=${encodeURIComponent(`$${ticker}`)}&src=typed_query&f=live`,
-    fetchedAt: new Date().toISOString(),
+    fetchedAt,
   };
   tickerContentCache.set(ticker, { cachedAt: Date.now(), payload });
   return payload;
