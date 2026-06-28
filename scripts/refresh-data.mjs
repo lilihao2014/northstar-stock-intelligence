@@ -780,6 +780,17 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const netMargin = latestRevenue ? (latestNetIncome / latestRevenue) * 100 : null;
   const priorNetMargin = priorRevenue ? (priorNetIncome / priorRevenue) * 100 : null;
   const latestFiscalEnd = revenueAnnual.at(-1)?.end;
+  const latestAnnualRevenue = revenueAnnual.at(-1);
+  const latestQuarterRevenue = revenueQuarterly.at(-1);
+  const fundamentalsAsOf = {
+    annualPeriod: latestAnnualRevenue ? labelAnnual(latestAnnualRevenue) : null,
+    annualEnd: latestAnnualRevenue?.end || null,
+    annualFiled: latestAnnualRevenue?.filed || null,
+    quarterPeriod: latestQuarterRevenue ? labelFiscalQuarter(latestQuarterRevenue.end) : null,
+    quarterEnd: latestQuarterRevenue?.end || null,
+    quarterFiled: latestQuarterRevenue?.filed || null,
+    refreshedAt: new Date().toISOString(),
+  };
   const debt = closestPeriod(debtAnnual, latestFiscalEnd)?.val ?? latestInstant(debtFacts);
   const equity = closestPeriod(equityAnnual, latestFiscalEnd)?.val ?? latestInstant(equityFacts);
   const debtToOperatingIncome = latestOperatingIncome ? debt / latestOperatingIncome : null;
@@ -827,7 +838,6 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
   const change = Number(String(quote["10. change percent"] ?? "").replace("%", "")) || 0;
   const quoteAsOf = quote["07. latest trading day"] || null;
   const marketCap = Number(overview.MarketCapitalization) || null;
-  const latestQuarterRevenue = revenueQuarterly.at(-1);
   const nextQuarterEstimate = selectFutureEstimate(
     estimateSeries(alpha?.estimates, "fiscal quarter"),
     latestQuarterRevenue?.end || "",
@@ -990,7 +1000,7 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     annual,
     quarterly: quarterly.labels.length >= 2 ? quarterly : annual,
     quarterDetail: {
-      period: latestQuarterRevenue ? labelFiscalQuarter(latestQuarterRevenue.end) : "Latest quarter",
+      period: fundamentalsAsOf.quarterPeriod || "Latest quarter",
       filed: latestQuarterRevenue?.filed || null,
       items: quarterDetails,
     },
@@ -1018,6 +1028,7 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     },
     sources: {
       fundamentals: `https://data.sec.gov/api/xbrl/companyfacts/CIK${config.cik}.json`,
+      fundamentalsAsOf,
       quote: alpha?.quoteSource || (alpha ? "Alpha Vantage" : null),
       quoteAsOf,
     },

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-28T21:00:14.834Z",
+  "generatedAt": "2026-06-28T21:04:06.601Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
@@ -722,6 +722,15 @@
       },
       "sources": {
         "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+        "fundamentalsAsOf": {
+          "annualPeriod": "FY25",
+          "annualEnd": "2025-09-27",
+          "annualFiled": "2025-10-31",
+          "quarterPeriod": "FY26 Q2",
+          "quarterEnd": "2026-03-28",
+          "quarterFiled": "2026-05-01",
+          "refreshedAt": "2026-06-28T21:04:06.598Z"
+        },
         "quote": "Nasdaq delayed quote",
         "quoteAsOf": "Jun 25, 2026"
       }

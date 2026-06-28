@@ -102,6 +102,13 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 - Ratio values stored as decimals must be scaled to match their displayed percentage before charting.
 - EPS transition labels such as `Loss to profit` remain visible, while the chart uses the underlying per-share change against the prior year or prior-year quarter.
 
+## Fundamentals freshness
+
+- Each company stores latest annual period, annual filed date, latest quarterly period, quarterly filed date, and refresh timestamp for SEC-derived fundamentals.
+- The source/freshness panel displays the latest annual filing and latest quarterly filing separately.
+- Exported company data includes fundamentals freshness rows.
+- Missing filing dates must be labeled unavailable rather than inferred.
+
 ## Forward P/E fallback
 
 - Provider-supplied forward P/E is preferred when available.

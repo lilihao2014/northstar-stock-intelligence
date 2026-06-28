@@ -136,8 +136,11 @@ requireContract(refresh.includes("fetchNasdaqQuote(config.ticker)"), "New ticker
 requireContract(refresh.includes('quoteSource: quote.source || "Nasdaq delayed quote"'), "Nasdaq fallback prices must retain their source label");
 requireContract(refresh.includes("const quoteAsOf = quote[\"07. latest trading day\"]"), "Company quote date must be retained from the quote provider");
 requireContract(refresh.includes("alpha = { ...(alpha || {}), quote, quoteSource"), "Nasdaq delayed quote must be able to correct provider quote prices");
+requireContract(refresh.includes("fundamentalsAsOf") && refresh.includes("annualFiled") && refresh.includes("quarterFiled"), "Generated companies must retain fundamentals filing freshness");
 requireContract(app.includes("Quote as of") && app.includes("Quote date unavailable"), "UI must display quote freshness beside prices");
 requireContract(app.includes("company.sources?.quoteAsOf || company.quoteAsOf"), "UI must read quote date from company source metadata");
+requireContract(app.includes("Latest annual filing") && app.includes("Latest quarterly filing"), "UI must display annual and quarterly filing freshness");
+requireContract(app.includes("Fundamentals refresh"), "UI must display fundamentals refresh timestamp");
 requireContract(refresh.includes("fetchNasdaqForecast(config.ticker)"), "New ticker refresh must attempt the Nasdaq forecast fallback");
 requireContract(refresh.includes('estimateSource: hasAlphaEstimates'), "Mixed estimate sources must retain their provider label");
 requireContract(refresh.includes('"Nasdaq analyst consensus (EPS)"'), "Nasdaq-only guidance must be labeled as EPS consensus");

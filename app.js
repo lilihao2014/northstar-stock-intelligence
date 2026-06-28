@@ -402,6 +402,10 @@ const translations = {
     "Refreshing...": "正在刷新...",
     "Generated": "生成时间",
     "Fundamentals": "基本面",
+    "Latest annual filing": "最新年度文件",
+    "Latest quarterly filing": "最新季度文件",
+    "Fundamentals refresh": "基本面刷新",
+    "Filing date unavailable": "文件日期不可用",
     "Quote": "行情",
     "Quote date": "行情日期",
     "Analyst estimates": "分析师预期",
@@ -920,6 +924,7 @@ function renderResearchToolbar(company) {
     ? new Date(dataMetadata.generatedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US")
     : `${mockText()} ${tr("Generated")}`;
   const fundamentalUrl = company.sources?.fundamentals;
+  const fundamentalsAsOf = company.sources?.fundamentalsAsOf || {};
   const quoteAsOf = company.sources?.quoteAsOf || company.quoteAsOf;
   const latestJob = refreshJobs.find((job) => job.ticker === company.ticker);
   const refreshStatus = latestJob
@@ -929,6 +934,9 @@ function renderResearchToolbar(company) {
     <div><span>${tr("Generated")}</span><strong>${escapeHtml(generated)}</strong></div>
     <div><span>${tr("Last backend refresh")}</span><strong>${escapeHtml(refreshStatus)}</strong></div>
     <div><span>${tr("Fundamentals")}</span>${fundamentalUrl ? `<a href="${escapeHtml(fundamentalUrl)}" target="_blank" rel="noopener noreferrer">SEC EDGAR ↗</a>` : `<strong>N/A</strong>`}</div>
+    <div><span>${tr("Latest annual filing")}</span><strong>${escapeHtml(fundamentalsAsOf.annualPeriod ? `${fundamentalsAsOf.annualPeriod} · ${fundamentalsAsOf.annualFiled || tr("Filing date unavailable")}` : "N/A")}</strong></div>
+    <div><span>${tr("Latest quarterly filing")}</span><strong>${escapeHtml(fundamentalsAsOf.quarterPeriod ? `${fundamentalsAsOf.quarterPeriod} · ${fundamentalsAsOf.quarterFiled || tr("Filing date unavailable")}` : "N/A")}</strong></div>
+    <div><span>${tr("Fundamentals refresh")}</span><strong>${escapeHtml(fundamentalsAsOf.refreshedAt ? new Date(fundamentalsAsOf.refreshedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US") : generated)}</strong></div>
     <div><span>${tr("Quote")}</span><strong>${escapeHtml(company.sources?.quote || "N/A")}</strong></div>
     <div><span>${tr("Quote date")}</span><strong>${escapeHtml(quoteAsOf || tr("Quote date unavailable"))}</strong></div>
     <div><span>${tr("Analyst estimates")}</span><strong>${escapeHtml(company.guidance?.source || tr("Analyst consensus unavailable"))}</strong></div>
@@ -972,6 +980,11 @@ function companyExportRows(company) {
     metric.labels?.forEach((label, index) => rows.push(["company-specific", metric.title, label, metric.displayValues?.[index] ?? metric.values?.[index], "", metric.source]));
   }
   for (const [label, value, note] of company.quarterDetail?.items || []) rows.push(["quarter-detail", label, company.quarterDetail.period, value, "", note]);
+  if (company.sources?.fundamentalsAsOf) {
+    rows.push(["source", "Latest annual filing", company.sources.fundamentalsAsOf.annualPeriod || "", company.sources.fundamentalsAsOf.annualFiled || "", "", "SEC filing"]);
+    rows.push(["source", "Latest quarterly filing", company.sources.fundamentalsAsOf.quarterPeriod || "", company.sources.fundamentalsAsOf.quarterFiled || "", "", "SEC filing"]);
+    rows.push(["source", "Fundamentals refresh", "generated", company.sources.fundamentalsAsOf.refreshedAt || "", "", "Northstar refresh"]);
+  }
   for (const [horizon, estimate] of Object.entries({ "next-quarter": company.guidance?.nextQuarter, "fiscal-year": company.guidance?.fiscalYear })) {
     if (!estimate) continue;
     rows.push(["guidance", "Revenue consensus", estimate.period || horizon, estimate.revenue, estimate.revenueRange, company.guidance.source]);
