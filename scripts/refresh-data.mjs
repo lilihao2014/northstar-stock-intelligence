@@ -608,6 +608,33 @@ function buildMetric(metric, facts, labelForPeriod) {
   };
 }
 
+function metricGroup(title) {
+  if (/member|user|subscriber|customer|account|active|enrollment|covered|policy|lives/i.test(title)) {
+    return "Users & scale";
+  }
+  if (/margin|ratio|rate|yield|retention|churn|loss/i.test(title)) {
+    return "Margins & ratios";
+  }
+  if (/cash|flow|capex|debt|income|expense|revenue|premium|claim|cost/i.test(title)) {
+    return "Financial operations";
+  }
+  return "Other operating metrics";
+}
+
+function metricProfile(summaryMetrics, financialMetrics, customMetrics) {
+  const customGroups = customMetrics.reduce((groups, metric) => {
+    const group = metricGroup(`${metric.title} ${metric.description || ""}`);
+    groups[group] = (groups[group] || 0) + 1;
+    return groups;
+  }, {});
+  return {
+    summaryCount: summaryMetrics.length,
+    financialCount: financialMetrics.length,
+    customCount: customMetrics.length,
+    customGroups,
+  };
+}
+
 async function fetchCompanySpecificMetrics(config, companyFacts) {
   const tickerConfig = companyMetricConfig[config.ticker] || {};
   const defaults = companyMetricConfig._defaults || {};
@@ -919,6 +946,16 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
     ["Net margin", Number.isFinite(latestQuarterMargin) ? `${latestQuarterMargin.toFixed(1)}%` : "N/A", Number.isFinite(latestQuarterMargin) && Number.isFinite(priorYearQuarterMargin) ? formatPercent(latestQuarterMargin - priorYearQuarterMargin, 1).replace("%", " pts") : "N/A", "Compared with same quarter last year", quarterlyNetMarginHistory],
     ["Forward P/E", formatMultiple(pe), peDelta, peNote],
   ];
+  const financialMetrics = [
+    { title: "Free cash flow", value: formatMoney(freeCashFlow), note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.freeCashFlow, formatMoney) },
+    { title: "Operating cash flow", value: formatMoney(latestOperatingCashFlow), note: "SEC reported", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.operatingCashFlow, formatMoney) },
+    { title: "Capital expenditures", value: formatMoney(latestCapex), note: "SEC reported", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.capex, formatMoney) },
+    { title: "FCF margin", value: Number.isFinite(fcfMargin) ? `${fcfMargin.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.fcfMargin, (value) => `${value.toFixed(1)}%`) },
+    { title: "Operating margin", value: Number.isFinite(operatingMargin) ? `${operatingMargin.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.operatingMargin, (value) => `${value.toFixed(1)}%`) },
+    { title: "ROE", value: Number.isFinite(roe) ? `${roe.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.roe, (value) => `${value.toFixed(1)}%`) },
+    { title: "Debt / op. income", value: formatMultiple(debtToOperatingIncome), note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.debtToOperatingIncome, formatMultiple) },
+    { title: "Revenue CAGR", value: Number.isFinite(revenueCagr) ? `${revenueCagr.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.revenueCagr, (value) => `${value.toFixed(1)}%`) },
+  ];
 
   return {
     name: companyFacts.entityName,
@@ -953,17 +990,9 @@ function buildCompany(config, companyFacts, alpha, customMetrics = []) {
       filed: latestQuarterRevenue?.filed || null,
       items: quarterDetails,
     },
-    financialMetrics: [
-      { title: "Free cash flow", value: formatMoney(freeCashFlow), note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.freeCashFlow, formatMoney) },
-      { title: "Operating cash flow", value: formatMoney(latestOperatingCashFlow), note: "SEC reported", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.operatingCashFlow, formatMoney) },
-      { title: "Capital expenditures", value: formatMoney(latestCapex), note: "SEC reported", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.capex, formatMoney) },
-      { title: "FCF margin", value: Number.isFinite(fcfMargin) ? `${fcfMargin.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.fcfMargin, (value) => `${value.toFixed(1)}%`) },
-      { title: "Operating margin", value: Number.isFinite(operatingMargin) ? `${operatingMargin.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.operatingMargin, (value) => `${value.toFixed(1)}%`) },
-      { title: "ROE", value: Number.isFinite(roe) ? `${roe.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.roe, (value) => `${value.toFixed(1)}%`) },
-      { title: "Debt / op. income", value: formatMultiple(debtToOperatingIncome), note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.debtToOperatingIncome, formatMultiple) },
-      { title: "Revenue CAGR", value: Number.isFinite(revenueCagr) ? `${revenueCagr.toFixed(1)}%` : "N/A", note: "Calculated", period: latestFiscalPeriod, history: displayHistory(annualFinancialPeriods, (period) => period.revenueCagr, (value) => `${value.toFixed(1)}%`) },
-    ],
+    financialMetrics,
     customMetrics,
+    metricProfile: metricProfile(annualSummaryMetrics, financialMetrics, customMetrics),
     operating: {
       title: "Quarterly revenue",
       value: `$${quarterly.revenue.at(-1)?.toFixed(1) ?? annual.revenue.at(-1)?.toFixed(1)}B`,

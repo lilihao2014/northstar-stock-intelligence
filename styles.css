@@ -794,6 +794,40 @@ kbd {
   margin-top: 2px;
 }
 
+.metric-profile {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.metric-profile-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.metric-profile-chip strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.metric-profile-chip em {
+  min-width: 16px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: var(--green-soft);
+  color: var(--green);
+  font-style: normal;
+  text-align: center;
+}
+
 .metric-card-actions,
 .financial-metric-heading {
   display: flex;
@@ -1156,6 +1190,32 @@ kbd {
   display: grid;
   gap: 12px;
   margin-top: 16px;
+}
+
+.custom-metric-group {
+  display: grid;
+  gap: 10px;
+}
+
+.custom-metric-group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px;
+  border-bottom: 1px solid var(--line);
+}
+
+.custom-metric-group-heading strong {
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.custom-metric-group-heading span {
+  color: var(--green);
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
 }
 
 .custom-metrics-actions,

@@ -256,6 +256,16 @@ const translations = {
     "Already in watchlist": "已在自选股中",
     "Search to add a stock": "搜索并添加股票",
     "Metric visibility": "指标显示管理",
+    "Metric split": "指标拆分",
+    "Per-stock metric split": "单股指标拆分",
+    "Summary": "摘要",
+    "Common": "通用",
+    "Stock-specific": "股票特定",
+    "Hidden": "已隐藏",
+    "Users & scale": "用户与规模",
+    "Margins & ratios": "利润率与比率",
+    "Financial operations": "财务运营",
+    "Other operating metrics": "其他运营指标",
     "Restore any metric when you need it again": "需要时可恢复任何指标",
     "All metrics in this section are hidden. Use Manage metrics to restore them.": "本区域所有指标均已隐藏。请使用“管理指标”恢复。",
     added: "已添加",
@@ -882,6 +892,7 @@ function renderCompany() {
   renderFinancialMetrics(company.financialMetrics || []);
   renderGuidance(company.guidance || null, company);
   renderCustomMetrics(company.customMetrics || []);
+  renderMetricProfile(company);
   renderMetricManager(company);
   renderTickerContent(company.ticker);
 
@@ -1274,6 +1285,47 @@ function renderGuidance(guidance, company) {
         </article>`).join("");
 }
 
+function customMetricGroup(metric) {
+  const text = `${metric.title || ""} ${metric.description || ""}`;
+  if (/member|user|subscriber|customer|account|active|enrollment|covered|policy|lives/i.test(text)) return "Users & scale";
+  if (/margin|ratio|rate|yield|retention|churn|loss/i.test(text)) return "Margins & ratios";
+  if (/cash|flow|capex|debt|income|expense|revenue|premium|claim|cost/i.test(text)) return "Financial operations";
+  return "Other operating metrics";
+}
+
+function metricProfileFor(company) {
+  const profile = company.metricProfile || {};
+  const customMetrics = company.customMetrics || [];
+  const customGroups = profile.customGroups || customMetrics.reduce((groups, metric) => {
+    const group = customMetricGroup(metric);
+    groups[group] = (groups[group] || 0) + 1;
+    return groups;
+  }, {});
+  return {
+    summaryCount: profile.summaryCount ?? (company.metrics || []).length,
+    financialCount: profile.financialCount ?? (company.financialMetrics || []).length,
+    customCount: profile.customCount ?? customMetrics.length,
+    customGroups,
+  };
+}
+
+function renderMetricProfile(company) {
+  const profile = metricProfileFor(company);
+  const hiddenCount = (hiddenMetricsByTicker[selectedTicker] || []).length;
+  const chips = [
+    ["Summary", profile.summaryCount],
+    ["Common", profile.financialCount],
+    ["Stock-specific", profile.customCount],
+    ["Hidden", hiddenCount],
+    ...Object.entries(profile.customGroups).filter(([, count]) => count > 0),
+  ];
+  $("#metric-profile").innerHTML = chips.map(([label, count]) => `
+    <span class="metric-profile-chip">
+      <strong>${tr(label)}</strong>
+      <em>${count}</em>
+    </span>`).join("");
+}
+
 function renderCustomMetrics(metrics) {
   const card = $("#custom-metrics-card");
   card.hidden = !metrics.length;
@@ -1282,7 +1334,19 @@ function renderCustomMetrics(metrics) {
     return;
   }
   const visibleMetrics = metrics.filter((metric) => !isMetricHidden(metricKey("custom", metric.id)));
-  $("#custom-metrics-grid").innerHTML = visibleMetrics.length ? visibleMetrics.map((metric) => `
+  const groups = visibleMetrics.reduce((items, metric) => {
+    const group = customMetricGroup(metric);
+    if (!items.has(group)) items.set(group, []);
+    items.get(group).push(metric);
+    return items;
+  }, new Map());
+  $("#custom-metrics-grid").innerHTML = visibleMetrics.length ? [...groups].map(([group, groupMetrics]) => `
+    <div class="custom-metric-group">
+      <div class="custom-metric-group-heading">
+        <strong>${tr(group)}</strong>
+        <span>${groupMetrics.length}</span>
+      </div>
+      ${groupMetrics.map((metric) => `
     <article class="custom-metric">
       <div class="custom-metric-heading">
         <div>
@@ -1303,7 +1367,8 @@ function renderCustomMetrics(metrics) {
           </div>`).join("")}
       </div>
       <p>${tr(metric.description)}</p>
-    </article>`).join("")
+    </article>`).join("")}
+    </div>`).join("")
     : `<div class="custom-metrics-empty">${tr("All company-specific metrics are hidden. Use Manage metrics to restore them.")}</div>`;
 }
 
@@ -1774,6 +1839,7 @@ function mergeCompany(realCompany) {
     financialMetrics: realCompany.financialMetrics || [],
     guidance: realCompany.guidance || null,
     customMetrics: realCompany.customMetrics || [],
+    metricProfile: realCompany.metricProfile || fallback.metricProfile || null,
     metrics: patchForwardPe(realCompany.metrics || fallback.metrics || []),
     periodMetrics: {
       annual: patchForwardPe(realCompany.periodMetrics?.annual || realCompany.metrics || fallback.metrics || []),
