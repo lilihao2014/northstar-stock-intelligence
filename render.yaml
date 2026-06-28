@@ -3,7 +3,7 @@ services:
     name: northstar-stock-intelligence
     runtime: node
     plan: free
-    buildCommand: npm run check
+    buildCommand: npm install && npm run check
     startCommand: npm run serve
     healthCheckPath: /health
     autoDeploy: true

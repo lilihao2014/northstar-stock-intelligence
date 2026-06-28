@@ -72,6 +72,7 @@ requireContract(db.includes("existing?.companies") && db.includes("!force"), "Da
 requireContract(packageJson.includes('"db:seed"'), "Package scripts must include a database seed command");
 requireContract(render.includes("fromDatabase:"), "Render Blueprint must inject DATABASE_URL from the managed database");
 requireContract(render.includes("NODE_ENV") && render.includes("production"), "Render must run with production storage rules enabled");
+requireContract(render.includes("npm install && npm run check"), "Render build must install runtime dependencies before checking");
 
 requireContract(html.includes('id="manage-metrics"'), "Dashboard-wide metric manager is missing");
 requireContract(html.includes('id="hidden-metrics-panel"'), "Hidden metric restore panel is missing");
