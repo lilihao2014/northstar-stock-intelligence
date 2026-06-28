@@ -266,6 +266,8 @@ const translations = {
     "Margins & ratios": "利润率与比率",
     "Financial operations": "财务运营",
     "Other operating metrics": "其他运营指标",
+    "Stock-specific dashboard": "股票特定看板",
+    "No stock-specific SEC metrics are available for this ticker yet.": "该股票目前暂无 SEC 披露的股票特定指标。",
     "Restore any metric when you need it again": "需要时可恢复任何指标",
     "All metrics in this section are hidden. Use Manage metrics to restore them.": "本区域所有指标均已隐藏。请使用“管理指标”恢复。",
     added: "已添加",
@@ -1326,21 +1328,77 @@ function renderMetricProfile(company) {
     </span>`).join("");
 }
 
+function latestMetricNumber(metric) {
+  const value = metric.values?.at(-1);
+  if (Number.isFinite(value)) return value;
+  const display = String(metric.latest || metric.displayValues?.at(-1) || "");
+  const multiplier = display.includes("T") ? 1e12 : display.includes("B") ? 1e9 : display.includes("M") ? 1e6 : display.includes("K") ? 1e3 : 1;
+  const parsed = Number(display.replace(/[^0-9.-]/g, ""));
+  return Number.isFinite(parsed) ? parsed * multiplier : null;
+}
+
+function renderStockMetricBoard(metrics) {
+  const board = $("#stock-metric-board");
+  if (!metrics.length) {
+    board.innerHTML = `<div class="stock-metric-board-empty">${tr("No stock-specific SEC metrics are available for this ticker yet.")}</div>`;
+    return;
+  }
+  const groups = metrics.reduce((items, metric) => {
+    const group = customMetricGroup(metric);
+    if (!items.has(group)) items.set(group, []);
+    items.get(group).push(metric);
+    return items;
+  }, new Map());
+  board.innerHTML = [...groups].map(([group, groupMetrics]) => {
+    const rows = groupMetrics
+      .map((metric) => ({ metric, numeric: latestMetricNumber(metric) }))
+      .sort((a, b) => Math.abs(b.numeric || 0) - Math.abs(a.numeric || 0))
+      .slice(0, 5);
+    const max = Math.max(...rows.map((row) => Math.abs(row.numeric || 0)), 1);
+    return `
+      <article class="stock-metric-panel">
+        <div class="stock-metric-panel-heading">
+          <span>${tr(group)}</span>
+          <strong>${rows.length}</strong>
+        </div>
+        <div class="stock-metric-bars">
+          ${rows.map(({ metric, numeric }) => {
+            const width = Number.isFinite(numeric) ? Math.max(5, Math.min(100, Math.abs(numeric) / max * 100)) : 0;
+            return `
+              <div class="stock-metric-bar-row">
+                <div>
+                  <span>${tr(metric.title)}</span>
+                  <strong>${metric.latest}</strong>
+                </div>
+                <i style="width:${width}%"></i>
+              </div>`;
+          }).join("")}
+        </div>
+      </article>`;
+  }).join("");
+}
+
 function renderCustomMetrics(metrics) {
   const card = $("#custom-metrics-card");
   card.hidden = !metrics.length;
   if (!metrics.length) {
+    $("#stock-metric-board").innerHTML = "";
     $("#custom-metrics-grid").innerHTML = "";
     return;
   }
   const visibleMetrics = metrics.filter((metric) => !isMetricHidden(metricKey("custom", metric.id)));
+  renderStockMetricBoard(visibleMetrics);
+  if (!visibleMetrics.length) {
+    $("#custom-metrics-grid").innerHTML = `<div class="custom-metrics-empty">${tr("All company-specific metrics are hidden. Use Manage metrics to restore them.")}</div>`;
+    return;
+  }
   const groups = visibleMetrics.reduce((items, metric) => {
     const group = customMetricGroup(metric);
     if (!items.has(group)) items.set(group, []);
     items.get(group).push(metric);
     return items;
   }, new Map());
-  $("#custom-metrics-grid").innerHTML = visibleMetrics.length ? [...groups].map(([group, groupMetrics]) => `
+  $("#custom-metrics-grid").innerHTML = [...groups].map(([group, groupMetrics]) => `
     <div class="custom-metric-group">
       <div class="custom-metric-group-heading">
         <strong>${tr(group)}</strong>
@@ -1368,8 +1426,7 @@ function renderCustomMetrics(metrics) {
       </div>
       <p>${tr(metric.description)}</p>
     </article>`).join("")}
-    </div>`).join("")
-    : `<div class="custom-metrics-empty">${tr("All company-specific metrics are hidden. Use Manage metrics to restore them.")}</div>`;
+    </div>`).join("");
 }
 
 function loadHiddenMetrics() {

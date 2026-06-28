@@ -79,12 +79,16 @@ requireContract(render.includes("npm install && npm run check"), "Render build m
 
 requireContract(html.includes('id="manage-metrics"'), "Dashboard-wide metric manager is missing");
 requireContract(html.includes('id="metric-profile"'), "Per-stock metric split profile is missing");
+requireContract(html.includes('id="stock-metric-board"'), "Stock-specific visual metric dashboard is missing");
 requireContract(html.includes('id="hidden-metrics-panel"'), "Hidden metric restore panel is missing");
 requireContract(app.includes("function customMetricGroup(metric)"), "Metric grouping must be generic and client-side visible");
 requireContract(app.includes("function metricProfileFor(company)"), "Metric profile derivation is missing");
 requireContract(app.includes("renderMetricProfile(company)"), "Selected ticker must render its metric split profile");
+requireContract(app.includes("function renderStockMetricBoard(metrics)"), "Stock-specific visual dashboard renderer is missing");
+requireContract(app.includes("No stock-specific SEC metrics are available for this ticker yet."), "Missing stock-specific metrics must be shown honestly");
 requireContract(app.includes("custom-metric-group"), "Company-specific metrics must render split groups");
 requireContract(styles.includes(".metric-profile-chip"), "Metric profile chip styles are missing");
+requireContract(styles.includes(".stock-metric-panel"), "Stock-specific visual dashboard styles are missing");
 requireContract(styles.includes(".custom-metric-group-heading"), "Grouped custom metric styles are missing");
 requireContract(refresh.includes("function metricProfile("), "Generated company data must include metric profile support");
 requireContract(refresh.includes("metricProfile: metricProfile("), "Refresh output must store each company's metric profile");

@@ -28,6 +28,8 @@ Acceptance check: confirm summary cards contain line charts, free cash flow cont
 
 - Summary metrics, common financial indicators, and company-specific metrics each provide a `Hide` action.
 - Every selected ticker shows a metric split profile with summary, common, stock-specific, hidden, and company-specific group counts.
+- Every selected ticker with company-specific metrics shows a visual stock-specific dashboard using that ticker's own reported metrics.
+- Stock-specific visual panels must use reported/custom metric values only; missing segment or geography data must remain unavailable rather than mocked.
 - Company-specific metrics are grouped generically by metric semantics, such as users/scale, margins/ratios, financial operations, and other operating metrics.
 - Metric grouping must be derived from metric names/descriptions and must not hardcode a solution for one ticker.
 - Hidden state is stored independently for each ticker in browser local storage.
