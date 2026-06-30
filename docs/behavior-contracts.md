@@ -119,6 +119,14 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 - Ratio values stored as decimals must be scaled to match their displayed percentage before charting.
 - EPS transition labels such as `Loss to profit` remain visible, while the chart uses the underlying per-share change against the prior year or prior-year quarter.
 
+## Industry research design
+
+- The dashboard uses a neutral institutional palette with white cards, slate text, subtle borders, and minimal shadow.
+- Decorative serif typography must not be used in the product shell; finance UI text uses Manrope and data values use DM Mono.
+- Primary cards use compact radius and border treatments so dense metric grids remain readable.
+- Controls use standard button/segmented-control styling with explicit active states and clear contrast.
+- Design changes must bump the stylesheet cache key in `index.html` so Render deployments are visible immediately.
+
 ## Fundamentals freshness
 
 - Each company stores latest annual period, annual filed date, latest quarterly period, quarterly filed date, and refresh timestamp for SEC-derived fundamentals.

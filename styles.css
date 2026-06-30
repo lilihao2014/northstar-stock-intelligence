@@ -1,18 +1,21 @@
 :root {
-  --ink: #142b27;
-  --ink-soft: #4f625e;
-  --cream: #f3f0e7;
-  --paper: #fbfaf6;
-  --card: #fffefa;
-  --line: #dedbd0;
-  --green: #1f6657;
-  --green-2: #68a590;
-  --forecast: #b9823d;
-  --lime: #cadd80;
-  --coral: #e77d61;
-  --gold: #d7a84b;
-  --blue: #7196ab;
-  --shadow: 0 12px 40px rgba(25, 53, 47, 0.07);
+  --ink: #17212b;
+  --ink-soft: #52606d;
+  --cream: #f5f7fa;
+  --paper: #f8fafc;
+  --card: #ffffff;
+  --line: #d8dee6;
+  --muted: #64748b;
+  --green: #0f766e;
+  --green-soft: #ccfbf1;
+  --green-2: #14b8a6;
+  --forecast: #b45309;
+  --lime: #22c55e;
+  --coral: #dc2626;
+  --gold: #ca8a04;
+  --blue: #2563eb;
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --radius: 8px;
 }
 
 * {
@@ -27,7 +30,7 @@ body {
   margin: 0;
   color: var(--ink);
   background: var(--cream);
-  font-family: "Manrope", sans-serif;
+  font-family: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -51,8 +54,8 @@ button {
   top: 0;
   height: 100vh;
   padding: 32px 20px 24px;
-  background: var(--ink);
-  color: #f8f5ea;
+  background: #0f172a;
+  color: #f8fafc;
   display: flex;
   flex-direction: column;
 }
@@ -74,9 +77,9 @@ button {
   display: grid;
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 50%;
-  font-family: "Playfair Display", serif;
-  font-style: italic;
+  border-radius: 7px;
+  font-family: "DM Mono", monospace;
+  font-style: normal;
 }
 
 .main-nav {
@@ -88,7 +91,7 @@ button {
   border: 0;
   background: transparent;
   color: #b8c5c1;
-  border-radius: 8px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -340,13 +343,14 @@ p {
 
 h1 {
   margin-bottom: 0;
-  font-size: clamp(25px, 3vw, 35px);
-  letter-spacing: -0.04em;
+  font-size: clamp(24px, 2.7vw, 32px);
+  letter-spacing: -0.035em;
 }
 
 h1 em {
-  font-family: "Playfair Display", serif;
-  font-weight: 600;
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 700;
 }
 
 .topbar-actions {
@@ -360,7 +364,7 @@ h1 em {
   padding: 2px;
   border: 1px solid var(--line);
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.55);
+  background: #eef2f7;
 }
 
 .language-selector button {
@@ -379,7 +383,7 @@ h1 em {
 .language-selector button.active {
   background: white;
   color: var(--ink);
-  box-shadow: 0 1px 3px rgba(26, 47, 42, 0.1);
+  box-shadow: var(--shadow);
 }
 
 .search-box {
@@ -387,7 +391,7 @@ h1 em {
   padding: 9px 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.55);
+  background: white;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -408,7 +412,7 @@ h1 em {
   border: 1px solid var(--line);
   border-radius: 9px;
   background: var(--card);
-  box-shadow: 0 18px 45px rgba(20, 43, 39, 0.16);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.14);
   display: none;
 }
 
@@ -419,7 +423,7 @@ h1 em {
 .search-result {
   width: 100%;
   border: 0;
-  border-bottom: 1px solid #ebe8df;
+  border-bottom: 1px solid var(--line);
   padding: 11px 12px;
   background: transparent;
   display: grid;
@@ -436,7 +440,7 @@ h1 em {
 
 .search-result:hover,
 .search-result.active {
-  background: #f1f2eb;
+  background: #f1f5f9;
 }
 
 .search-result-logo {
@@ -446,7 +450,8 @@ h1 em {
   display: grid;
   place-items: center;
   color: white;
-  font-family: "Playfair Display", serif;
+  font-family: "DM Mono", monospace;
+  font-weight: 700;
 }
 
 .search-result-copy {
@@ -610,15 +615,15 @@ kbd {
 }
 
 .card {
-  border: 1px solid rgba(215, 211, 199, 0.82);
-  border-radius: 11px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   background: var(--card);
   box-shadow: var(--shadow);
 }
 
 .hero-card {
   grid-column: span 12;
-  padding: 24px 27px;
+  padding: 20px 22px;
 }
 
 .company-identity {
@@ -628,15 +633,15 @@ kbd {
 }
 
 .company-logo {
-  width: 43px;
-  height: 43px;
+  width: 40px;
+  height: 40px;
   display: grid;
   place-items: center;
-  border-radius: 10px;
-  background: var(--ink);
+  border-radius: 8px;
+  background: #0f172a;
   color: white;
-  font-family: "Playfair Display", serif;
-  font-size: 21px;
+  font-family: "DM Mono", monospace;
+  font-size: 18px;
 }
 
 .company-title-row {
@@ -646,22 +651,22 @@ kbd {
 
 .company-title-row h2 {
   margin: 0;
-  font-size: 19px;
-  letter-spacing: -0.025em;
+  font-size: 18px;
+  letter-spacing: -0.02em;
 }
 
 .ticker-tag {
-  padding: 3px 6px;
+  padding: 3px 7px;
   border-radius: 4px;
-  background: #edf0e9;
-  color: #71817c;
-  font: 500 9px "DM Mono", monospace;
+  background: #eef2f7;
+  color: #475569;
+  font: 600 9px "DM Mono", monospace;
 }
 
 .company-identity p,
 .company-price p {
   margin: 4px 0 0;
-  color: #87938f;
+  color: #64748b;
   font-size: 10px;
 }
 
@@ -670,7 +675,7 @@ kbd {
 }
 
 .company-price strong {
-  font: 500 21px "DM Mono", monospace;
+  font: 600 22px "DM Mono", monospace;
 }
 
 .company-price span {
@@ -681,10 +686,10 @@ kbd {
 .thesis-grid {
   display: grid;
   grid-template-columns: 1.25fr 1fr;
-  gap: 30px;
-  margin-top: 24px;
-  padding-top: 21px;
-  border-top: 1px solid #ebe8df;
+  gap: 24px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
 }
 
 .thesis-score {
@@ -696,19 +701,19 @@ kbd {
 .score-ring {
   --score: 84%;
   position: relative;
-  width: 90px;
-  height: 90px;
+  width: 78px;
+  height: 78px;
   flex: 0 0 auto;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: conic-gradient(var(--green) var(--score), #e8e7de 0);
+  background: conic-gradient(var(--green) var(--score), #e2e8f0 0);
 }
 
 .score-ring::before {
   content: "";
   position: absolute;
-  inset: 8px;
+  inset: 7px;
   border-radius: inherit;
   background: var(--card);
 }
@@ -718,7 +723,7 @@ kbd {
 }
 
 .score-ring strong {
-  font: 500 27px "DM Mono", monospace;
+  font: 600 24px "DM Mono", monospace;
 }
 
 .score-ring span {
@@ -728,7 +733,7 @@ kbd {
 
 .thesis-score h3 {
   margin: 5px 0 5px;
-  font: 600 20px "Playfair Display", serif;
+  font: 700 18px "Manrope", sans-serif;
 }
 
 .thesis-score p {
@@ -747,7 +752,7 @@ kbd {
 
 .signal {
   padding-bottom: 8px;
-  border-bottom: 1px solid #eeeae1;
+  border-bottom: 1px solid var(--line);
 }
 
 .signal span {
@@ -776,7 +781,7 @@ kbd {
   padding: 10px 14px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.42);
+  background: white;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
@@ -840,7 +845,7 @@ kbd {
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 6px 8px;
-  background: rgba(255, 255, 255, 0.62);
+  background: white;
   color: var(--ink);
   font: 600 9px "DM Mono", monospace;
 }
@@ -858,8 +863,8 @@ kbd {
   gap: 7px;
   padding: 7px 9px;
   border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.55);
+  border-radius: 6px;
+  background: #f8fafc;
   color: var(--muted);
   font-size: 8px;
 }
@@ -899,7 +904,7 @@ kbd {
 .metric-hide:hover {
   border-color: var(--line);
   color: var(--ink);
-  background: rgba(255, 255, 255, 0.55);
+  background: #f8fafc;
 }
 
 .metrics-empty {
@@ -980,7 +985,7 @@ kbd {
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.34);
+  background: #f8fafc;
 }
 
 .guidance-period-heading {
@@ -1051,7 +1056,7 @@ kbd {
   border: 1px solid var(--line);
   border-radius: 7px;
   color: inherit;
-  background: rgba(255, 255, 255, 0.34);
+  background: #f8fafc;
   text-decoration: none;
   transition: 150ms ease;
 }
@@ -1114,7 +1119,7 @@ kbd {
   padding: 13px;
   border: 1px solid var(--line);
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.34);
+  background: #f8fafc;
 }
 
 .financial-metric span,
@@ -1267,8 +1272,8 @@ kbd {
 .stock-metric-panel {
   padding: 13px;
   border: 1px solid var(--line);
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.54);
+  border-radius: 7px;
+  background: #f8fafc;
 }
 
 .stock-metric-panel-heading {
@@ -1287,7 +1292,7 @@ kbd {
 .stock-metric-panel-heading strong {
   width: 22px;
   height: 22px;
-  border-radius: 999px;
+  border-radius: 5px;
   display: grid;
   place-items: center;
   background: var(--green);
@@ -1386,7 +1391,7 @@ kbd {
   border: 1px solid var(--line);
   border-radius: 5px;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.45);
+  background: white;
   font-size: 8px;
 }
 
@@ -1482,7 +1487,7 @@ kbd {
   min-width: 70px;
   padding: 8px;
   border-left: 2px solid var(--green-soft);
-  background: rgba(255, 255, 255, 0.32);
+  background: #f8fafc;
 }
 
 .custom-metric-series strong,
@@ -1514,7 +1519,7 @@ kbd {
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.34);
+  background: #f8fafc;
 }
 
 .detail-item span,
@@ -1578,7 +1583,7 @@ kbd {
 .segmented-control {
   padding: 3px;
   border-radius: 6px;
-  background: #eeece4;
+  background: #eef2f7;
 }
 
 .segmented-control button {
@@ -1594,7 +1599,7 @@ kbd {
 .segmented-control button.active {
   background: white;
   color: var(--ink);
-  box-shadow: 0 1px 4px rgba(20, 43, 39, 0.1);
+  box-shadow: var(--shadow);
 }
 
 .legend {
@@ -1660,7 +1665,7 @@ kbd {
   border-radius: 6px;
   background: var(--ink);
   color: white;
-  box-shadow: 0 6px 18px rgba(20, 43, 39, 0.2);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.22);
   font: 500 9px/1.6 "DM Mono", monospace;
   transition: opacity 100ms ease;
   white-space: nowrap;
@@ -1701,7 +1706,7 @@ kbd {
 .insight {
   margin: 10px 0 0;
   padding-top: 13px;
-  border-top: 1px solid #ebe8df;
+  border-top: 1px solid var(--line);
   color: #697a75;
   font-size: 9px;
   line-height: 1.6;
@@ -1745,7 +1750,7 @@ td:first-child {
 
 td {
   padding: 11px 7px;
-  border-bottom: 1px solid #efede6;
+  border-bottom: 1px solid var(--line);
   text-align: right;
   font: 500 9px "DM Mono", monospace;
 }
@@ -1819,7 +1824,7 @@ tr:last-child td {
 
 .donut-center strong {
   margin: 2px 0;
-  font-family: "Playfair Display", serif;
+  font-family: "DM Mono", monospace;
   font-size: 17px;
 }
 

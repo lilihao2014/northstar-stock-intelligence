@@ -52,6 +52,12 @@ requireContract(styles.includes(".metric-chart-grid"), "Metric chart grid stylin
 requireContract(styles.includes(".metric-axis-explainer"), "Metric axis explanation styling is missing");
 requireContract(app.includes('axisFormat: "eps"'), "EPS histories must retain numeric per-share changes for charting");
 requireContract(app.includes('const step = period === "quarterly" ? 4 : 1'), "Quarterly EPS charts must compare against the prior-year quarter");
+requireContract(!html.includes("Playfair") && !styles.includes("Playfair"), "Product shell must not use decorative serif typography");
+requireContract(html.includes("styles.css?v=20260630-design-1"), "Stylesheet cache key must be bumped for the industry design refresh");
+requireContract(styles.includes("--cream: #f5f7fa") && styles.includes("--card: #ffffff") && styles.includes("--line: #d8dee6"), "Industry design palette tokens are missing");
+requireContract(styles.includes("--shadow: 0 1px 2px rgba(15, 23, 42, 0.06)"), "Card shadow must remain subtle for the research-dashboard design");
+requireContract(styles.includes("border-radius: var(--radius)") && styles.includes("--radius: 8px"), "Cards must use compact industry-dashboard radius");
+requireContract(styles.includes(".company-price strong") && styles.includes('font: 600 22px "DM Mono"'), "Market price typography must remain compact and data-oriented");
 requireContract(refresh.includes("price / fiscalYearEstimate.epsAverage"), "Refresh must derive forward P/E from price and fiscal-year EPS consensus");
 requireContract(!refresh.includes("Number(overview.PERatio)"), "Trailing P/E must not be used as forward P/E");
 requireContract(app.includes('calculatedPe ? "[CALCULATED]"'), "Cached companies must label derived forward P/E as calculated");
