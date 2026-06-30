@@ -111,6 +111,7 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 ## Metric chart axes
 
 - Every rendered metric history chart shows a labeled value range on the Y axis and fiscal-period labels on the X axis.
+- Every rendered metric history chart includes plain-language captions explaining `X axis = fiscal period` and `Y axis = metric value/range`.
 - The chart displays first-to-latest absolute change in the metric's own unit; percentage metrics use percentage-point change.
 - Negative-to-positive series show a visible zero reference line, and bar colors distinguish negative values.
 - Dense histories show evenly spaced fiscal-period ticks while retaining every exact period/value pair below the chart.

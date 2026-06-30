@@ -1185,6 +1185,20 @@ kbd {
   font-weight: 600;
 }
 
+.metric-axis-explainer {
+  display: grid;
+  gap: 3px;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 7.5px;
+  line-height: 1.35;
+}
+
+.metric-axis-explainer b {
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
 .metric-mini-chart + .metric-history,
 .metric-mini-chart + .financial-metric-history {
   margin-top: 3px;

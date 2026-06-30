@@ -44,9 +44,11 @@ requireContract(refresh.includes("values: entries.map((item) => item.value)"), "
 requireContract(styles.includes(".metric-mini-chart"), "Metric mini-chart styles are missing");
 requireContract(app.includes('tr("Fiscal period")'), "Metric charts must label the X axis as fiscal period");
 requireContract(app.includes('class="metric-chart-axis"'), "Metric charts must render visible axis tick labels");
+requireContract(app.includes('class="metric-axis-explainer"') && app.includes('tr("X axis")') && app.includes('tr("Y axis")'), "Metric charts must explain X and Y axes in plain language");
 requireContract(app.includes('class="metric-chart-zero"'), "Metric charts must show a zero line for sign-changing histories");
 requireContract(app.includes('formatMetricAxis(change, history, true)'), "Metric charts must summarize first-to-latest change");
 requireContract(styles.includes(".metric-chart-grid"), "Metric chart grid styling is missing");
+requireContract(styles.includes(".metric-axis-explainer"), "Metric axis explanation styling is missing");
 requireContract(app.includes('axisFormat: "eps"'), "EPS histories must retain numeric per-share changes for charting");
 requireContract(app.includes('const step = period === "quarterly" ? 4 : 1'), "Quarterly EPS charts must compare against the prior-year quarter");
 requireContract(refresh.includes("price / fiscalYearEstimate.epsAverage"), "Refresh must derive forward P/E from price and fiscal-year EPS consensus");

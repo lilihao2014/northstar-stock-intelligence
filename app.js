@@ -454,6 +454,11 @@ const translations = {
     "Price / fiscal-year EPS consensus": "股价 / 全财年每股收益一致预期",
     "Value": "数值",
     "Fiscal period": "财务期间",
+    "X axis": "X 轴",
+    "Y axis": "Y 轴",
+    "Shows": "显示",
+    across: "跨越",
+    "each fiscal period": "每个财务期间",
     "Change": "变化",
     "EPS change": "每股收益变化",
     "Company-specific metrics": "公司特定指标",
@@ -1335,6 +1340,11 @@ function miniChart(history, type, title) {
       ${marks}${xTicks}
       <text x="${width - pad.right}" y="${height - 1}" text-anchor="end" class="metric-chart-title">${tr("Fiscal period")}</text>
     </svg>
+    <div class="metric-axis-explainer">
+      <span><b>${tr("X axis")}:</b> ${tr("Fiscal period")} (${escapeHtml(history.labels[0])} → ${escapeHtml(history.labels.at(-1))})</span>
+      <span><b>${tr("Y axis")}:</b> ${escapeHtml(axisLabel)} (${formatMetricAxis(min, history)} → ${formatMetricAxis(max, history)})</span>
+      <span><b>${tr("Shows")}:</b> ${escapeHtml(title)} ${tr("across")} ${tr("each fiscal period")}</span>
+    </div>
   </div>`;
 }
 
