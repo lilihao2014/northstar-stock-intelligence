@@ -202,7 +202,9 @@ const fmtSign = (value, suffix = "%") => `${value >= 0 ? "+" : ""}${value.toFixe
 const svgNS = "http://www.w3.org/2000/svg";
 const watchlistStorageKey = "northstar-watchlist";
 const hiddenMetricsStorageKey = "northstar-hidden-metrics-v1";
+const metricDisplayStorageKey = "northstar-metric-display-v1";
 let hiddenMetricsByTicker = {};
+let metricDisplayByTicker = {};
 let metricManagerOpen = false;
 const selectedTickerStorageKey = "northstar-selected-ticker";
 const translations = {
@@ -259,6 +261,18 @@ const translations = {
     "Already in watchlist": "已在自选股中",
     "Search to add a stock": "搜索并添加股票",
     "Metric visibility": "指标显示管理",
+    Group: "分组",
+    Sort: "排序",
+    Chart: "图表",
+    Category: "类别",
+    Tier: "层级",
+    None: "不分组",
+    Importance: "重要性",
+    "Latest value": "最新值",
+    Name: "名称",
+    Auto: "自动",
+    Line: "折线",
+    Bar: "柱状",
     "Metric split": "指标拆分",
     "Per-stock metric split": "单股指标拆分",
     "Summary": "摘要",
@@ -587,6 +601,24 @@ function applyLanguage() {
   renderDataStatus();
   renderSearchResults($("#stock-search").value);
   syncWatchlistButton();
+}
+
+function translateSelectOptions(selector) {
+  document.querySelectorAll(`${selector} option`).forEach((option) => {
+    if (!option.dataset.label) option.dataset.label = option.textContent;
+    option.textContent = tr(option.dataset.label);
+  });
+}
+
+function updateMetricDisplayLabels() {
+  [
+    ["metric-group-mode", "Group"],
+    ["metric-sort-mode", "Sort"],
+    ["metric-chart-mode", "Chart"],
+  ].forEach(([id, label]) => {
+    const node = document.querySelector(`label[for='${id}']`)?.firstChild;
+    if (node) node.textContent = `${tr(label)} `;
+  });
 }
 
 function svgEl(tag, attrs = {}) {
@@ -946,6 +978,10 @@ function renderResearchToolbar(company) {
   $("#export-company-data").textContent = tr("Export data");
   $("#refresh-company-data").textContent = tr("Refresh fundamentals");
   $("#refresh-ticker-content").textContent = tr("Refresh news");
+  updateMetricDisplayLabels();
+  translateSelectOptions("#metric-group-mode");
+  translateSelectOptions("#metric-sort-mode");
+  translateSelectOptions("#metric-chart-mode");
   document.querySelector(".source-details summary").textContent = tr("Data sources & freshness");
   const generated = dataMetadata?.generatedAt
     ? new Date(dataMetadata.generatedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US")
@@ -1434,22 +1470,83 @@ function latestMetricNumber(metric) {
   return Number.isFinite(parsed) ? parsed * multiplier : null;
 }
 
+function defaultMetricDisplay() {
+  return { groupMode: "category", sortMode: "importance", chartMode: "auto" };
+}
+
+function metricDisplaySettings(ticker = selectedTicker) {
+  return { ...defaultMetricDisplay(), ...(metricDisplayByTicker[ticker] || {}) };
+}
+
+function saveMetricDisplaySettings() {
+  localStorage.setItem(metricDisplayStorageKey, JSON.stringify(metricDisplayByTicker));
+}
+
+function setMetricDisplaySetting(key, value) {
+  metricDisplayByTicker[selectedTicker] = { ...metricDisplaySettings(), [key]: value };
+  saveMetricDisplaySettings();
+  syncMetricDisplayControls();
+  renderCustomMetrics(companies[selectedTicker]?.customMetrics || []);
+}
+
+function loadMetricDisplaySettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(metricDisplayStorageKey) || "{}");
+    metricDisplayByTicker = saved && typeof saved === "object" && !Array.isArray(saved) ? saved : {};
+  } catch {
+    metricDisplayByTicker = {};
+  }
+}
+
+function syncMetricDisplayControls() {
+  const settings = metricDisplaySettings();
+  $("#metric-group-mode").value = settings.groupMode;
+  $("#metric-sort-mode").value = settings.sortMode;
+  $("#metric-chart-mode").value = settings.chartMode;
+}
+
+function metricTierRank(metric) {
+  return { Core: 0, Important: 1, Detail: 2 }[metric.tier || "Detail"] ?? 3;
+}
+
+function sortedMetrics(metrics, sortMode = "importance") {
+  return [...metrics].sort((a, b) => {
+    if (sortMode === "name") return a.title.localeCompare(b.title);
+    if (sortMode === "latest") return Math.abs(latestMetricNumber(b) || 0) - Math.abs(latestMetricNumber(a) || 0);
+    if (sortMode === "trend") return Math.abs(b.trend?.percent || 0) - Math.abs(a.trend?.percent || 0);
+    return metricTierRank(a) - metricTierRank(b)
+      || Math.abs(b.trend?.percent || 0) - Math.abs(a.trend?.percent || 0)
+      || a.title.localeCompare(b.title);
+  });
+}
+
+function metricGroupLabel(metric, groupMode) {
+  if (groupMode === "tier") return metric.tier || "Detail";
+  if (groupMode === "none") return "All stock-specific metrics";
+  return metric.group || customMetricGroup(metric);
+}
+
+function metricChartType(metric, settings) {
+  if (settings.chartMode !== "auto") return settings.chartMode;
+  return /members|users|rate|ratio|margin|percentage/i.test(`${metric.title} ${metric.group || ""}`) ? "line" : "bar";
+}
+
 function renderStockMetricBoard(metrics) {
   const board = $("#stock-metric-board");
   if (!metrics.length) {
     board.innerHTML = `<div class="stock-metric-board-empty">${tr("No stock-specific SEC metrics are available for this ticker yet.")}</div>`;
     return;
   }
-  const groups = metrics.reduce((items, metric) => {
-    const group = metric.group || customMetricGroup(metric);
+  const settings = metricDisplaySettings();
+  const groups = sortedMetrics(metrics, settings.sortMode).reduce((items, metric) => {
+    const group = metricGroupLabel(metric, settings.groupMode);
     if (!items.has(group)) items.set(group, []);
     items.get(group).push(metric);
     return items;
   }, new Map());
   board.innerHTML = [...groups].map(([group, groupMetrics]) => {
-    const rows = groupMetrics
+    const rows = sortedMetrics(groupMetrics, settings.sortMode)
       .map((metric) => ({ metric, numeric: latestMetricNumber(metric) }))
-      .sort((a, b) => Math.abs(b.numeric || 0) - Math.abs(a.numeric || 0))
       .slice(0, 8);
     const max = Math.max(...rows.map((row) => Math.abs(row.numeric || 0)), 1);
     return `
@@ -1484,13 +1581,14 @@ function renderCustomMetrics(metrics) {
     return;
   }
   const visibleMetrics = metrics.filter((metric) => !isMetricHidden(metricKey("custom", metric.id)));
+  const settings = metricDisplaySettings();
   renderStockMetricBoard(visibleMetrics);
   if (!visibleMetrics.length) {
     $("#custom-metrics-grid").innerHTML = `<div class="custom-metrics-empty">${tr("All company-specific metrics are hidden. Use Manage metrics to restore them.")}</div>`;
     return;
   }
-  const groups = visibleMetrics.reduce((items, metric) => {
-    const group = metric.group || customMetricGroup(metric);
+  const groups = sortedMetrics(visibleMetrics, settings.sortMode).reduce((items, metric) => {
+    const group = metricGroupLabel(metric, settings.groupMode);
     if (!items.has(group)) items.set(group, []);
     items.get(group).push(metric);
     return items;
@@ -1501,7 +1599,7 @@ function renderCustomMetrics(metrics) {
         <strong>${tr(group)}</strong>
         <span>${groupMetrics.length}</span>
       </div>
-      ${groupMetrics.map((metric) => `
+      ${sortedMetrics(groupMetrics, settings.sortMode).map((metric) => `
     <article class="custom-metric">
       <div class="custom-metric-heading">
         <div>
@@ -1514,7 +1612,7 @@ function renderCustomMetrics(metrics) {
           <button data-hide-metric="${encodeURIComponent(metricKey("custom", metric.id))}" aria-label="${tr("Hide")} ${tr(metric.title)}">${tr("Hide")}</button>
         </div>
       </div>
-      ${miniChart(metric, /members|users|rate|ratio|margin|percentage/i.test(metric.title) ? "line" : "bar", metric.title)}
+      ${miniChart(metric, metricChartType(metric, settings), metric.title)}
       <div class="custom-metric-series">
         ${metric.labels.map((label, index) => `
           <div>
@@ -1851,6 +1949,7 @@ function selectCompany(ticker, updateUrl = true) {
   metricManagerOpen = false;
   localStorage.setItem(selectedTickerStorageKey, ticker);
   if (updateUrl) updateTickerUrl(ticker);
+  syncMetricDisplayControls();
   renderCompany();
   renderScatter();
   syncWatchlistButton();
@@ -1908,6 +2007,18 @@ function setupInteractions() {
   $("#manage-metrics").addEventListener("click", () => {
     metricManagerOpen = !metricManagerOpen;
     renderMetricManager(companies[selectedTicker]);
+  });
+
+  $("#metric-group-mode").addEventListener("change", (event) => {
+    setMetricDisplaySetting("groupMode", event.target.value);
+  });
+
+  $("#metric-sort-mode").addEventListener("change", (event) => {
+    setMetricDisplaySetting("sortMode", event.target.value);
+  });
+
+  $("#metric-chart-mode").addEventListener("change", (event) => {
+    setMetricDisplaySetting("chartMode", event.target.value);
   });
 
   ["#metrics-grid", "#financial-metrics-grid", "#custom-metrics-grid"].forEach((selector) => {
@@ -2067,7 +2178,9 @@ async function init() {
   if (!companies[selectedTicker]) selectedTicker = Object.keys(companies)[0];
   updateTickerUrl(selectedTicker, true);
   loadHiddenMetrics();
+  loadMetricDisplaySettings();
   loadWatchlist();
+  syncMetricDisplayControls();
   renderMarketStrip();
   renderCompany();
   renderPeers();

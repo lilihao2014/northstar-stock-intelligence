@@ -38,7 +38,7 @@ requireContract(/#add-watchlist[\s\S]*?openWatchlistSearch\(\)/.test(app), "Watc
 requireContract(app.includes("function miniChart(history, type, title)"), "Shared metric mini-chart renderer is missing");
 requireContract(app.includes('renderMetricHistory(label === "EPS growth" ? epsChangeChartHistory(company, selectedPeriod, history) : history, "metric-history", label, "line")'), "Summary histories must render line charts");
 requireContract(/renderMetricHistory\(metric\.history, "financial-metric-history"[\s\S]*?\? "line" : "bar"\)/.test(app), "Financial histories must select line or bar charts");
-requireContract(/miniChart\(metric,[\s\S]*?\? "line" : "bar", metric\.title\)/.test(app), "Company-specific histories must select line or bar charts");
+requireContract(app.includes("miniChart(metric, metricChartType(metric, settings), metric.title)"), "Company-specific histories must select line or bar charts through display settings");
 requireContract(app.includes("history.displayValues[index]"), "Exact historical display values must remain visible");
 requireContract(refresh.includes("values: entries.map((item) => item.value)"), "Generated histories must retain raw numeric values");
 requireContract(styles.includes(".metric-mini-chart"), "Metric mini-chart styles are missing");
@@ -89,6 +89,7 @@ requireContract(html.includes('id="manage-metrics"'), "Dashboard-wide metric man
 requireContract(html.includes('id="metric-profile"'), "Per-stock metric split profile is missing");
 requireContract(html.includes('id="stock-metric-board"'), "Stock-specific visual metric dashboard is missing");
 requireContract(html.includes('id="hidden-metrics-panel"'), "Hidden metric restore panel is missing");
+requireContract(html.includes('id="metric-group-mode"') && html.includes('id="metric-sort-mode"') && html.includes('id="metric-chart-mode"'), "Metric display customization controls are missing");
 requireContract(app.includes("function customMetricGroup(metric)"), "Metric grouping must be generic and client-side visible");
 requireContract(app.includes("function metricProfileFor(company)"), "Metric profile derivation is missing");
 requireContract(app.includes("renderMetricProfile(company)"), "Selected ticker must render its metric split profile");
@@ -110,9 +111,13 @@ requireContract(app.includes('metricKey("financial", metric.title)'), "Financial
 requireContract(app.includes('metricKey("custom", metric.id)'), "Company-specific metrics must use namespaced visibility keys");
 requireContract(app.includes('id.includes(":") ? id : metricKey("custom", id)'), "Legacy hidden metric preferences must be migrated");
 requireContract(app.includes("localStorage.setItem(hiddenMetricsStorageKey"), "Hidden metric preferences must persist in local storage");
+requireContract(app.includes("metricDisplayStorageKey") && app.includes("setMetricDisplaySetting"), "Metric display preferences must persist per ticker");
+requireContract(app.includes("metricGroupLabel(metric, settings.groupMode)") && app.includes("sortedMetrics(visibleMetrics, settings.sortMode)"), "Custom metrics must respect grouping and sorting preferences");
+requireContract(app.includes("metricChartType(metric, settings)"), "Custom metric charts must respect chart display preferences");
 requireContract(app.includes("data-restore-metric"), "Hidden metrics must provide restore actions");
 requireContract(app.includes('["#metrics-grid", "#financial-metrics-grid", "#custom-metrics-grid"]'), "Every metric section must handle hide actions");
 requireContract(styles.includes(".metric-visibility-card"), "Metric visibility manager styles are missing");
+requireContract(styles.includes(".metric-display-controls"), "Metric display customization styles are missing");
 requireContract(html.includes('id="news-feed"'), "Ticker news section is missing");
 requireContract(html.includes('id="x-feed"'), "Ticker X / Twitter section is missing");
 requireContract(app.includes("renderTickerContent(company.ticker)"), "Ticker selection must refresh news and social content");

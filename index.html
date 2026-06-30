@@ -149,6 +149,33 @@
               <p>Hidden only for this ticker</p>
             </div>
             <button class="text-button" id="manage-metrics">Manage metrics</button>
+            <div class="metric-display-controls" aria-label="Metric display settings">
+              <label for="metric-group-mode">
+                Group
+                <select id="metric-group-mode">
+                  <option value="category">Category</option>
+                  <option value="tier">Tier</option>
+                  <option value="none">None</option>
+                </select>
+              </label>
+              <label for="metric-sort-mode">
+                Sort
+                <select id="metric-sort-mode">
+                  <option value="importance">Importance</option>
+                  <option value="trend">Trend</option>
+                  <option value="latest">Latest value</option>
+                  <option value="name">Name</option>
+                </select>
+              </label>
+              <label for="metric-chart-mode">
+                Chart
+                <select id="metric-chart-mode">
+                  <option value="auto">Auto</option>
+                  <option value="line">Line</option>
+                  <option value="bar">Bar</option>
+                </select>
+              </label>
+            </div>
             <div class="metric-profile" id="metric-profile" aria-label="Per-stock metric split"></div>
             <div class="hidden-metrics-panel" id="hidden-metrics-panel" hidden>
               <div>
