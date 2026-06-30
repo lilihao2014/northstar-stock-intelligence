@@ -93,6 +93,8 @@ requireContract(render.includes("NODE_ENV") && render.includes("production"), "R
 requireContract(render.includes("npm install && npm run check"), "Render build must install runtime dependencies before checking");
 
 requireContract(html.includes('id="manage-metrics"'), "Dashboard-wide metric manager is missing");
+requireContract(/metric-visibility-card[\s\S]*id="period-control"/.test(html), "Annual/Quarterly control must live in the top-level metric controls");
+requireContract(!/revenue-card[\s\S]*id="period-control"/.test(html), "Annual/Quarterly control must not be nested inside Revenue & EPS");
 requireContract(html.includes('id="metric-profile"'), "Per-stock metric split profile is missing");
 requireContract(html.includes('id="stock-metric-board"'), "Stock-specific visual metric dashboard is missing");
 requireContract(html.includes('id="hidden-metrics-panel"'), "Hidden metric restore panel is missing");

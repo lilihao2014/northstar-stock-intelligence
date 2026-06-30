@@ -778,7 +778,7 @@ kbd {
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.42);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 10px;
 }
@@ -792,6 +792,19 @@ kbd {
 .metric-visibility-card .hidden-metrics-panel {
   grid-column: 1 / -1;
   margin-top: 2px;
+}
+
+.period-switcher {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-self: end;
+}
+
+.period-switcher .section-label {
+  color: var(--muted);
+  font-size: 8px;
+  white-space: nowrap;
 }
 
 .metric-action-row {

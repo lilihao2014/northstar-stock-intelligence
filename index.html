@@ -148,6 +148,13 @@
               <span class="section-label">Metric visibility</span>
               <p>Hidden only for this ticker</p>
             </div>
+            <div class="period-switcher">
+              <span class="section-label">Reporting period</span>
+              <div class="segmented-control" id="period-control">
+                <button data-period="annual" class="active">Annual</button>
+                <button data-period="quarterly">Quarterly</button>
+              </div>
+            </div>
             <div class="metric-action-row">
               <button class="text-button" id="manage-metrics">Manage metrics</button>
               <button class="text-button" id="toggle-metric-display" aria-expanded="true" aria-controls="metric-display-controls">Hide settings</button>
@@ -199,10 +206,6 @@
                   <h2>Revenue & EPS</h2>
                   <span class="chart-ticker" id="fundamentals-ticker">AAPL</span>
                 </div>
-              </div>
-              <div class="segmented-control" id="period-control">
-                <button data-period="annual" class="active">Annual</button>
-                <button data-period="quarterly">Quarterly</button>
               </div>
             </div>
             <div class="legend">
