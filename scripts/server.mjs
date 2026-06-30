@@ -86,12 +86,13 @@ function parseFreshnessDate(value) {
 }
 
 function marketDateKey(date = new Date()) {
-  return new Intl.DateTimeFormat("en-CA", {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
     timeZone: "America/New_York",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).format(date);
+  }).formatToParts(date).map((part) => [part.type, part.value]));
+  return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
 function quoteFreshness(company) {
@@ -634,7 +635,17 @@ async function startServer() {
   });
 }
 
-startServer().catch((error) => {
-  console.error(error.message);
-  process.exit(1);
-});
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  startServer().catch((error) => {
+    console.error(error.message);
+    process.exit(1);
+  });
+}
+
+export {
+  marketDateKey,
+  parseFreshnessDate,
+  prepareDashboardForRead,
+  quoteFreshness,
+  sanitizeCompanyForRead,
+};

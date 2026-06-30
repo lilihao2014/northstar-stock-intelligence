@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { estimateSeries } from "./estimate-utils.mjs";
 
-const [app, html, styles, refresh, server, db, ensureDeps, render, packageJson, dashboard] = await Promise.all([
+const [app, html, styles, refresh, server, db, ensureDeps, render, packageJson, dashboard, quoteTests] = await Promise.all([
   readFile(new URL("../app.js", import.meta.url), "utf8"),
   readFile(new URL("../index.html", import.meta.url), "utf8"),
   readFile(new URL("../styles.css", import.meta.url), "utf8"),
@@ -12,6 +12,7 @@ const [app, html, styles, refresh, server, db, ensureDeps, render, packageJson, 
   readFile(new URL("../render.yaml", import.meta.url), "utf8"),
   readFile(new URL("../package.json", import.meta.url), "utf8"),
   readFile(new URL("../data/dashboard.json", import.meta.url), "utf8"),
+  readFile(new URL("../tests/quote-freshness.test.mjs", import.meta.url), "utf8"),
 ]);
 
 const failures = [];
@@ -64,6 +65,7 @@ requireContract(server.includes("function prepareDashboardForRead("), "Productio
 requireContract(server.includes("function quoteFreshness("), "Server must validate quote dates before display");
 requireContract(server.includes("displayable: false"), "Undated or stale quotes must not be displayable as current prices");
 requireContract(server.includes("replace(/\\sET$/i") || server.includes("replace(/\\\\sET$/i"), "Quote freshness parser must handle provider timestamps ending in ET");
+requireContract(quoteTests.includes("Jun 30, 2026 5:55 PM ET") && quoteTests.includes("prepareDashboardForRead"), "Quote freshness tests must cover ET timestamps and dashboard sanitization");
 requireContract(server.includes("marketDateKey(") && server.includes('"previous-close"'), "Prior-day quotes must be labeled as previous close, not current");
 requireContract(server.includes("scheduleDashboardRefresh(\"stale dashboard or undated quotes\")"), "Stale production dashboards must trigger background refresh");
 requireContract(server.includes("refreshStaleDashboardOnStartup()"), "Production startup must check whether saved dashboard data needs refresh");
@@ -82,6 +84,8 @@ requireContract(db.includes("process.env.DATABASE_URL"), "Postgres support must 
 requireContract(db.includes("process.env.NODE_ENV === \"production\""), "Production runtime detection must be centralized");
 requireContract(db.includes("existing?.companies") && db.includes("!force"), "Database seeding must preserve existing dashboard snapshots unless forced");
 requireContract(packageJson.includes('"db:seed"'), "Package scripts must include a database seed command");
+requireContract(packageJson.includes('"test"') && packageJson.includes("node --test"), "Package scripts must include executable tests");
+requireContract(packageJson.includes("npm run test"), "Check script must run the test suite");
 requireContract(packageJson.includes("scripts/ensure-deps.mjs"), "Check script must bootstrap runtime dependencies for Render");
 requireContract(ensureDeps.includes('await import("pg")') && ensureDeps.includes("npm"), "Dependency bootstrap must install pg when missing");
 requireContract(render.includes("fromDatabase:"), "Render Blueprint must inject DATABASE_URL from the managed database");
