@@ -61,6 +61,7 @@ requireContract(server.includes("DATABASE_URL is required in production"), "Prod
 requireContract(server.includes("function prepareDashboardForRead("), "Production dashboard reads must apply freshness checks");
 requireContract(server.includes("function quoteFreshness("), "Server must validate quote dates before display");
 requireContract(server.includes("displayable: false"), "Undated or stale quotes must not be displayable as current prices");
+requireContract(server.includes("marketDateKey(") && server.includes('"previous-close"'), "Prior-day quotes must be labeled as previous close, not current");
 requireContract(server.includes("scheduleDashboardRefresh(\"stale dashboard or undated quotes\")"), "Stale production dashboards must trigger background refresh");
 requireContract(server.includes("refreshStaleDashboardOnStartup()"), "Production startup must check whether saved dashboard data needs refresh");
 requireContract(server.includes('url.pathname === "/api/refresh"'), "Server must expose a full dashboard refresh endpoint");
@@ -116,6 +117,7 @@ requireContract(server.includes("latestPublishedAt") && server.includes("headlin
 requireContract(app.includes("contentMetadataByTicker"), "Client must retain ticker content freshness metadata");
 requireContract(app.includes("News latest check") && app.includes("News fetched"), "Source panel must show news freshness");
 requireContract(app.includes("Quote freshness") && app.includes("quoteFreshness?.label"), "Source panel must show quote freshness");
+requireContract(app.includes("Previous close as of") && app.includes('quoteFreshness?.status === "previous-close"'), "Header must label prior-day quotes as previous close");
 requireContract(html.includes('id="copy-ticker-link"'), "Shareable ticker link action is missing");
 requireContract(html.includes('id="export-company-data"'), "Company data export action is missing");
 requireContract(html.includes('id="refresh-company-data"'), "Fundamentals refresh action is missing");

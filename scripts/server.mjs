@@ -81,6 +81,15 @@ function parseFreshnessDate(value) {
   return Number.isFinite(parsed.getTime()) ? parsed : null;
 }
 
+function marketDateKey(date = new Date()) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
 function quoteFreshness(company) {
   const quoteAsOf = company?.sources?.quoteAsOf || company?.quoteAsOf || null;
   const parsed = parseFreshnessDate(quoteAsOf);
@@ -92,12 +101,17 @@ function quoteFreshness(company) {
       displayable: false,
     };
   }
+  const quoteDateKey = marketDateKey(parsed);
+  const todayKey = marketDateKey();
   const ageDays = (Date.now() - parsed.getTime()) / 86400000;
   const stale = Number.isFinite(ageDays) && ageDays > quoteMaxAgeDays;
+  const current = quoteDateKey === todayKey;
   return {
-    status: stale ? "stale" : "fresh",
-    label: stale ? "Quote may be stale" : "Quote date verified",
+    status: stale ? "stale" : current ? "current" : "previous-close",
+    label: stale ? "Quote may be stale" : current ? "Today quote" : "Previous close",
     quoteAsOf,
+    quoteDate: quoteDateKey,
+    todayDate: todayKey,
     ageDays: Number.isFinite(ageDays) ? Number(ageDays.toFixed(1)) : null,
     displayable: !stale,
   };

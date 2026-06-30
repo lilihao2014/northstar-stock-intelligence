@@ -416,6 +416,9 @@ const translations = {
     "Quote date": "行情日期",
     "Quote freshness": "行情新鲜度",
     "Quote date verified": "行情日期已验证",
+    "Today quote": "今日行情",
+    "Previous close": "前收盘价",
+    "Previous close as of": "前收盘价截至",
     "Quote may be stale": "行情可能已过期",
     "Analyst estimates": "分析师预期",
     "Company news source": "公司新闻来源",
@@ -882,7 +885,8 @@ function renderCompany() {
     ? tr("Market cap unavailable")
     : `${tr("Market cap")} ${company.cap}`;
   if (Number.isFinite(company.price)) {
-    $("#company-cap").textContent += ` · ${quoteAsOf ? `${tr("Quote as of")} ${quoteAsOf}` : tr("Quote date unavailable")}`;
+    const quoteLabel = quoteFreshness?.status === "previous-close" ? "Previous close as of" : "Quote as of";
+    $("#company-cap").textContent += ` · ${quoteAsOf ? `${tr(quoteLabel)} ${quoteAsOf}` : tr("Quote date unavailable")}`;
   } else if (quoteFreshness?.label) {
     $("#company-cap").textContent += ` · ${tr(quoteFreshness.label)}`;
   }
