@@ -58,6 +58,10 @@ requireContract(app.includes("[404, 405].includes(apiResponse.status)"), "JSON f
 requireContract(server.includes('url.pathname === "/api/dashboard"'), "Server must expose /api/dashboard for production data loading");
 requireContract(server.includes("loadDashboardSnapshot()"), "Server must load dashboard snapshots from Postgres when configured");
 requireContract(server.includes("DATABASE_URL is required in production"), "Production must fail when DATABASE_URL is missing");
+requireContract(server.includes("function prepareDashboardForRead("), "Production dashboard reads must apply freshness checks");
+requireContract(server.includes("function quoteFreshness("), "Server must validate quote dates before display");
+requireContract(server.includes("displayable: false"), "Undated or stale quotes must not be displayable as current prices");
+requireContract(server.includes("scheduleDashboardRefresh(\"stale dashboard or undated quotes\")"), "Stale production dashboards must trigger background refresh");
 requireContract(server.includes("saveDashboardSnapshot(dashboard)"), "Ticker additions must persist refreshed dashboard snapshots");
 requireContract(server.includes("saveWatchlistItem"), "Ticker additions must persist watchlist items");
 requireContract(refresh.includes("loadDashboardSnapshot()"), "Refresh must reuse the Postgres dashboard cache when available");
@@ -108,6 +112,7 @@ requireContract(server.includes("function newsFreshness("), "Ticker news API mus
 requireContract(server.includes("latestPublishedAt") && server.includes("headlineCount"), "Ticker news freshness must include latest headline and count");
 requireContract(app.includes("contentMetadataByTicker"), "Client must retain ticker content freshness metadata");
 requireContract(app.includes("News latest check") && app.includes("News fetched"), "Source panel must show news freshness");
+requireContract(app.includes("Quote freshness") && app.includes("quoteFreshness?.label"), "Source panel must show quote freshness");
 requireContract(html.includes('id="copy-ticker-link"'), "Shareable ticker link action is missing");
 requireContract(html.includes('id="export-company-data"'), "Company data export action is missing");
 requireContract(html.includes('id="refresh-company-data"'), "Fundamentals refresh action is missing");

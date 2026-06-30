@@ -414,6 +414,9 @@ const translations = {
     "Filing date unavailable": "文件日期不可用",
     "Quote": "行情",
     "Quote date": "行情日期",
+    "Quote freshness": "行情新鲜度",
+    "Quote date verified": "行情日期已验证",
+    "Quote may be stale": "行情可能已过期",
     "Analyst estimates": "分析师预期",
     "Company news source": "公司新闻来源",
     "News latest check": "新闻最新检查",
@@ -865,6 +868,7 @@ async function chooseSearchResult(ticker) {
 function renderCompany() {
   const company = companies[selectedTicker];
   const quoteAsOf = company.sources?.quoteAsOf || company.quoteAsOf;
+  const quoteFreshness = company.sources?.quoteFreshness;
   $("#company-logo").textContent = company.ticker[0];
   $("#company-logo").style.background = company.color;
   $("#company-name").textContent = company.name;
@@ -872,13 +876,15 @@ function renderCompany() {
   $("#fundamentals-ticker").textContent = company.ticker;
   $("#company-meta").textContent = translateMeta(company.meta);
   $("#company-price").textContent = Number.isFinite(company.price) ? `$${company.price.toFixed(2)}` : tr("Price unavailable");
-  $("#company-change").textContent = fmtSign(company.change);
+  $("#company-change").textContent = Number.isFinite(company.price) ? fmtSign(company.change) : "N/A";
   $("#company-change").className = company.change >= 0 ? "positive" : "negative";
   $("#company-cap").textContent = company.cap === "Quote key required"
     ? tr("Market cap unavailable")
     : `${tr("Market cap")} ${company.cap}`;
   if (Number.isFinite(company.price)) {
     $("#company-cap").textContent += ` · ${quoteAsOf ? `${tr("Quote as of")} ${quoteAsOf}` : tr("Quote date unavailable")}`;
+  } else if (quoteFreshness?.label) {
+    $("#company-cap").textContent += ` · ${tr(quoteFreshness.label)}`;
   }
   $("#quality-score").textContent = company.score;
   $("#quality-label").textContent = tr(company.quality);
@@ -942,6 +948,7 @@ function renderResearchToolbar(company) {
   const contentMetadata = contentMetadataByTicker.get(company.ticker) || {};
   const newsFreshness = contentMetadata.newsFreshness || {};
   const quoteAsOf = company.sources?.quoteAsOf || company.quoteAsOf;
+  const quoteFreshness = company.sources?.quoteFreshness;
   const latestJob = refreshJobs.find((job) => job.ticker === company.ticker);
   const refreshStatus = latestJob
     ? `${tr(latestJob.status)} · ${new Date(latestJob.finishedAt || latestJob.startedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US")}`
@@ -957,6 +964,7 @@ function renderResearchToolbar(company) {
     <div><span>${tr("Fundamentals refresh")}</span><strong>${escapeHtml(fundamentalsAsOf.refreshedAt ? new Date(fundamentalsAsOf.refreshedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US") : generated)}</strong></div>
     <div><span>${tr("Quote")}</span><strong>${escapeHtml(company.sources?.quote || "N/A")}</strong></div>
     <div><span>${tr("Quote date")}</span><strong>${escapeHtml(quoteAsOf || tr("Quote date unavailable"))}</strong></div>
+    <div><span>${tr("Quote freshness")}</span><strong>${escapeHtml(tr(quoteFreshness?.label || (quoteAsOf ? "Quote date verified" : "Quote date unavailable")))}</strong></div>
     <div><span>${tr("Analyst estimates")}</span><strong>${escapeHtml(company.guidance?.source || tr("Analyst consensus unavailable"))}</strong></div>
     <div><span>${tr("Company news source")}</span><strong>${escapeHtml(newsFreshness.provider || "Nasdaq")}</strong></div>
     <div><span>${tr("News latest check")}</span><strong>${escapeHtml(tr(newsFreshness.label || "News unavailable"))}</strong></div>

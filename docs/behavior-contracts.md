@@ -83,6 +83,13 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 - Recent posts are shown only when the server has `X_BEARER_TOKEN`; an unavailable token must produce an honest configuration message, not mock posts.
 - News and social text is escaped before rendering, and provider credentials must never be returned to the browser.
 
+## Production freshness
+
+- Production reads dashboard data from Postgres, but it must not blindly trust an old snapshot forever.
+- If the dashboard snapshot is older than the configured freshness window, the server marks it stale and starts a background refresh when SEC access is configured.
+- If a company quote has no provider date or the quote date is older than the configured quote window, the API clears the display price and labels the quote freshness problem instead of rendering a stale numeric price as current.
+- The source/freshness panel must show quote freshness separately from the raw quote provider/date.
+
 ## Research utilities
 
 - Selecting a ticker updates the shareable `?ticker=` URL, and browser back/forward navigation restores the matching cached company.

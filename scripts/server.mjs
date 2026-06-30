@@ -22,6 +22,8 @@ const port = Number(process.env.PORT || 4173);
 const host = process.env.HOST || "0.0.0.0";
 const secIdentity = process.env.SEC_USER_AGENT;
 const xBearerToken = process.env.X_BEARER_TOKEN;
+const dashboardMaxAgeHours = Number(process.env.DASHBOARD_MAX_AGE_HOURS || 18);
+const quoteMaxAgeDays = Number(process.env.QUOTE_MAX_AGE_DAYS || 5);
 const tickerCachePath = join(root, "data", "sec-tickers.json");
 const watchlistPath = join(root, "config", "watchlist.json");
 const dashboardPath = join(root, "data", "dashboard.json");
@@ -37,6 +39,8 @@ const mimeTypes = {
 
 let tickerDirectory = null;
 let refreshQueue = Promise.resolve();
+let backgroundRefreshStarted = false;
+let lastBackgroundRefreshAt = 0;
 const fetchAttempts = new Map();
 const tickerContentCache = new Map();
 const allowedStaticFiles = new Set([
@@ -69,6 +73,76 @@ function allowCompanyFetch(request) {
   recent.push(now);
   fetchAttempts.set(ip, recent);
   return true;
+}
+
+function parseFreshnessDate(value) {
+  if (!value) return null;
+  const parsed = new Date(value);
+  return Number.isFinite(parsed.getTime()) ? parsed : null;
+}
+
+function quoteFreshness(company) {
+  const quoteAsOf = company?.sources?.quoteAsOf || company?.quoteAsOf || null;
+  const parsed = parseFreshnessDate(quoteAsOf);
+  if (!parsed) {
+    return {
+      status: "missing-date",
+      label: "Quote date unavailable",
+      quoteAsOf,
+      displayable: false,
+    };
+  }
+  const ageDays = (Date.now() - parsed.getTime()) / 86400000;
+  const stale = Number.isFinite(ageDays) && ageDays > quoteMaxAgeDays;
+  return {
+    status: stale ? "stale" : "fresh",
+    label: stale ? "Quote may be stale" : "Quote date verified",
+    quoteAsOf,
+    ageDays: Number.isFinite(ageDays) ? Number(ageDays.toFixed(1)) : null,
+    displayable: !stale,
+  };
+}
+
+function sanitizeCompanyForRead(company) {
+  if (!company?.ticker) return company;
+  const freshness = quoteFreshness(company);
+  const sources = { ...(company.sources || {}), quoteFreshness: freshness };
+  if (freshness.displayable) return { ...company, sources };
+  return {
+    ...company,
+    price: null,
+    change: 0,
+    cap: "Quote key required",
+    sources,
+  };
+}
+
+function dashboardAgeHours(payload) {
+  const generatedAt = parseFreshnessDate(payload?.generatedAt);
+  if (!generatedAt) return Infinity;
+  return (Date.now() - generatedAt.getTime()) / 3600000;
+}
+
+function prepareDashboardForRead(payload) {
+  const ageHours = dashboardAgeHours(payload);
+  const dashboardStale = Number.isFinite(ageHours) && ageHours > dashboardMaxAgeHours;
+  const companies = Object.fromEntries(
+    Object.entries(payload?.companies || {}).map(([ticker, company]) => [ticker, sanitizeCompanyForRead(company)]),
+  );
+  const staleQuotes = Object.values(companies)
+    .filter((company) => company.sources?.quoteFreshness && !company.sources.quoteFreshness.displayable)
+    .map((company) => company.ticker);
+  return {
+    ...payload,
+    companies,
+    freshness: {
+      ...(payload?.freshness || {}),
+      dashboardStatus: dashboardStale ? "stale" : "fresh",
+      dashboardAgeHours: Number.isFinite(ageHours) ? Number(ageHours.toFixed(1)) : null,
+      maxDashboardAgeHours: dashboardMaxAgeHours,
+      staleQuotes,
+    },
+  };
 }
 
 async function fetchNasdaqNews(ticker) {
@@ -210,7 +284,11 @@ async function readDashboardData() {
   try {
     const stored = await loadDashboardSnapshot();
     if (stored?.companies && Object.keys(stored.companies).length) {
-      return { ...stored, storage: "postgres" };
+      const prepared = prepareDashboardForRead(stored);
+      if (prepared.freshness?.dashboardStatus === "stale" || prepared.freshness?.staleQuotes?.length) {
+        scheduleDashboardRefresh("stale dashboard or undated quotes");
+      }
+      return { ...prepared, storage: "postgres" };
     }
   } catch (error) {
     if (isProductionRuntime()) throw error;
@@ -264,15 +342,16 @@ function searchTickers(directory, query) {
     .slice(0, 10);
 }
 
-async function runRefresh(ticker) {
+async function runRefresh(ticker = null) {
   if (!secIdentity) {
     throw new Error("SEC_USER_AGENT is required to download new company data");
   }
 
   await new Promise((resolvePromise, reject) => {
+    const env = ticker ? { ...process.env, REFRESH_TICKER: ticker } : process.env;
     const child = spawn(process.execPath, ["scripts/refresh-data.mjs"], {
       cwd: root,
-      env: { ...process.env, REFRESH_TICKER: ticker },
+      env,
       stdio: ["ignore", "pipe", "pipe"],
     });
     let output = "";
@@ -284,6 +363,28 @@ async function runRefresh(ticker) {
       else reject(new Error(output.trim() || `Refresh exited with code ${code}`));
     });
   });
+}
+
+function scheduleDashboardRefresh(reason) {
+  if (backgroundRefreshStarted || !isProductionRuntime() || !secIdentity) return;
+  const now = Date.now();
+  if (now - lastBackgroundRefreshAt < 30 * 60 * 1000) return;
+  lastBackgroundRefreshAt = now;
+  backgroundRefreshStarted = true;
+  const task = refreshQueue.then(async () => {
+    const refreshJobId = await createRefreshJob("ALL");
+    try {
+      console.log(`Starting background dashboard refresh: ${reason}`);
+      await runRefresh();
+      await finishRefreshJob(refreshJobId, "succeeded");
+    } catch (error) {
+      console.warn(`Background dashboard refresh failed: ${error.message}`);
+      await finishRefreshJob(refreshJobId, "failed", error.message);
+    } finally {
+      backgroundRefreshStarted = false;
+    }
+  });
+  refreshQueue = task.catch(() => {});
 }
 
 async function addCompany(ticker) {
