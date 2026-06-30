@@ -63,6 +63,7 @@ requireContract(server.includes("DATABASE_URL is required in production"), "Prod
 requireContract(server.includes("function prepareDashboardForRead("), "Production dashboard reads must apply freshness checks");
 requireContract(server.includes("function quoteFreshness("), "Server must validate quote dates before display");
 requireContract(server.includes("displayable: false"), "Undated or stale quotes must not be displayable as current prices");
+requireContract(server.includes("replace(/\\sET$/i") || server.includes("replace(/\\\\sET$/i"), "Quote freshness parser must handle provider timestamps ending in ET");
 requireContract(server.includes("marketDateKey(") && server.includes('"previous-close"'), "Prior-day quotes must be labeled as previous close, not current");
 requireContract(server.includes("scheduleDashboardRefresh(\"stale dashboard or undated quotes\")"), "Stale production dashboards must trigger background refresh");
 requireContract(server.includes("refreshStaleDashboardOnStartup()"), "Production startup must check whether saved dashboard data needs refresh");

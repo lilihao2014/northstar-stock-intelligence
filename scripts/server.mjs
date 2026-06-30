@@ -77,7 +77,11 @@ function allowCompanyFetch(request) {
 
 function parseFreshnessDate(value) {
   if (!value) return null;
-  const parsed = new Date(value);
+  const text = String(value).trim();
+  let parsed = new Date(text);
+  if (!Number.isFinite(parsed.getTime()) && /\sET$/i.test(text)) {
+    parsed = new Date(text.replace(/\sET$/i, ""));
+  }
   return Number.isFinite(parsed.getTime()) ? parsed : null;
 }
 
