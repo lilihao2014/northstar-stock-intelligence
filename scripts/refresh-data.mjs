@@ -632,23 +632,49 @@ function scoreDiscoveredMetric(concept, facts) {
   if (/Revenue|Sales|Premium|Claim|Margin|Rate|Percentage/i.test(name)) score += 35;
   if (/Fulfillment|Technology|Infrastructure|DataCenter|Cloud|Advertising|Capacity|Warranty|Royalty|License|Product|Service/i.test(name)) score += 20;
   if (/Expense|Income/i.test(name)) score += 5;
+  if (/Total|Active|Paid|Monthly|Daily|Annual|Cloud|DataCenter|Segment|Geographic|Region/i.test(name)) score += 10;
   if (/Adjustment|Ceded|Commission|Gross|Net|Current|Noncurrent/i.test(name)) score -= 15;
   return score;
+}
+
+function metricTier(score, explicit = false) {
+  if (explicit || score >= 100) return "Core";
+  if (score >= 70) return "Important";
+  return "Detail";
+}
+
+function metricTrend(values) {
+  const first = values.find((value) => Number.isFinite(value));
+  const latest = [...values].reverse().find((value) => Number.isFinite(value));
+  const change = percentChange(latest, first);
+  if (!Number.isFinite(change)) return null;
+  return {
+    percent: round(change),
+    label: formatPercent(change),
+  };
 }
 
 function buildMetric(metric, facts, labelForPeriod) {
   const byPeriod = new Map();
   for (const fact of facts) byPeriod.set(fact.period, fact);
-  const series = [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period)).slice(-8);
+  const series = [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period)).slice(-12);
+  const values = series.map((fact) => fact.value);
+  const group = metric.group || metricGroup(`${metric.title} ${metric.description || ""}`);
   return {
     id: metric.id,
     title: metric.title,
     description: metric.description,
+    concept: metric.concept || metric.id,
+    group,
+    tier: metric.tier || "Detail",
     labels: series.map((fact) => labelForPeriod(fact.period)),
-    values: series.map((fact) => fact.value),
+    values,
     displayValues: series.map((fact) => formatCustomMetric(fact.value, metric.format)),
     latest: formatCustomMetric(series.at(-1)?.value, metric.format),
     latestPeriod: series.at(-1)?.period || null,
+    latestLabel: series.at(-1) ? labelForPeriod(series.at(-1).period) : null,
+    observationCount: series.length,
+    trend: metricTrend(values),
     source: "SEC inline XBRL",
   };
 }
@@ -668,15 +694,20 @@ function metricGroup(title) {
 
 function metricProfile(summaryMetrics, financialMetrics, customMetrics) {
   const customGroups = customMetrics.reduce((groups, metric) => {
-    const group = metricGroup(`${metric.title} ${metric.description || ""}`);
+    const group = metric.group || metricGroup(`${metric.title} ${metric.description || ""}`);
     groups[group] = (groups[group] || 0) + 1;
     return groups;
+  }, {});
+  const customTiers = customMetrics.reduce((tiers, metric) => {
+    tiers[metric.tier || "Detail"] = (tiers[metric.tier || "Detail"] || 0) + 1;
+    return tiers;
   }, {});
   return {
     summaryCount: summaryMetrics.length,
     financialCount: financialMetrics.length,
     customCount: customMetrics.length,
     customGroups,
+    customTiers,
   };
 }
 
@@ -703,7 +734,7 @@ async function fetchCompanySpecificMetrics(config, companyFacts) {
       document: recent.primaryDocument[index],
     }))
     .filter((filing) => ["10-Q", "10-K"].includes(filing.form) && filing.document)
-    .slice(0, 12);
+    .slice(0, 20);
 
   const valuesByMetric = new Map(configured.map((metric) => [metric.id, []]));
   const discoveredByConcept = new Map();
@@ -733,7 +764,7 @@ async function fetchCompanySpecificMetrics(config, companyFacts) {
 
   const explicitConcepts = new Set(configured.map((metric) => metric.concept));
   const explicitMetrics = configured
-    .map((metric) => buildMetric(metric, valuesByMetric.get(metric.id), labelForPeriod))
+    .map((metric) => buildMetric({ ...metric, tier: metric.tier || "Core" }, valuesByMetric.get(metric.id), labelForPeriod))
     .filter((metric) => metric.values.length);
   const discoveredMetrics = [...discoveredByConcept.entries()]
     .filter(([concept]) => !explicitConcepts.has(concept))
@@ -742,13 +773,16 @@ async function fetchCompanySpecificMetrics(config, companyFacts) {
       const series = [...byPeriod.values()].sort((a, b) => a.period.localeCompare(b.period));
       const format = inferCustomFormat(series.at(-1)?.unit, series.map((fact) => fact.value));
       if (!format || series.length < 2) return null;
+      const score = scoreDiscoveredMetric(concept, series);
       return {
-        score: scoreDiscoveredMetric(concept, series),
+        score,
         metric: buildMetric({
-          id: concept.replace(/^.*:/, ""),
+          id: concept.replace(/[:]/g, "__"),
           title: humanizeConcept(concept),
           description: "Company-specific metric reported in SEC filings.",
+          concept,
           format,
+          tier: metricTier(score),
         }, series, labelForPeriod),
       };
     })

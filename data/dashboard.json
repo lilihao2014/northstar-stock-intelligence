@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-28T21:07:35.170Z",
+  "generatedAt": "2026-06-30T21:43:23.063Z",
   "sourceMode": "SEC filings + Alpha Vantage quotes",
   "companies": {
     "AAPL": {
@@ -5103,10 +5103,11 @@
     "OSCR": {
       "name": "Oscar Health, Inc.",
       "ticker": "OSCR",
-      "meta": "Healthcare · Health Plans · NYSE",
-      "price": 28.4,
-      "change": 0.4599,
-      "cap": "Quote key required",
+      "meta": "HEALTHCARE · HEALTHCARE PLANS · NYSE",
+      "price": 28.36,
+      "change": -0.63,
+      "quoteAsOf": "Jun 30, 2026 5:43 PM ET",
+      "cap": "$9.0B",
       "score": 63,
       "quality": "Mixed profile",
       "copy": "Growth, profitability, or balance-sheet signals require closer review.",
@@ -5203,7 +5204,7 @@
         ],
         [
           "Forward P/E",
-          "N/A",
+          "588.2x",
           "Provider",
           "Alpha Vantage overview"
         ]
@@ -5302,7 +5303,7 @@
           ],
           [
             "Forward P/E",
-            "N/A",
+            "588.2x",
             "Provider",
             "Alpha Vantage overview"
           ]
@@ -5388,9 +5389,9 @@
           ],
           [
             "Forward P/E",
-            "N/A",
+            "588.2x",
             "Provider",
-            "Add Alpha Vantage key"
+            "Alpha Vantage overview"
           ]
         ]
       },
@@ -5401,27 +5402,27 @@
           "period": "FY26 Q2",
           "revenue": "$4.7B",
           "revenueRange": "$4.1B – $5.1B",
-          "eps": "$0.33",
+          "eps": "$0.32",
           "epsRange": "-$0.18 – $0.69",
           "analystCount": 10,
           "revenueValue": 4742270210,
-          "epsValue": 0.333
+          "epsValue": 0.316
         },
         "fiscalYear": {
           "period": "FY26",
-          "revenue": "$18.6B",
+          "revenue": "$18.5B",
           "revenueRange": "$17.2B – $18.9B",
-          "eps": "$1.07",
+          "eps": "$1.06",
           "epsRange": "$0.63 – $1.38",
-          "analystCount": 9,
-          "revenueValue": 18576472100,
-          "epsValue": 1.0726
+          "analystCount": 10,
+          "revenueValue": 18546640340,
+          "epsValue": 1.0583
         }
       },
       "signals": [
         [
           "FCF yield",
-          "N/A"
+          "11.8%"
         ],
         [
           "ROE",
@@ -5801,6 +5802,9 @@
           "id": "members",
           "title": "Members",
           "description": "Total members reported at period end.",
+          "concept": "oscr:NumberOfMembers",
+          "group": "Users & scale",
+          "tier": "Core",
           "labels": [
             "FY24 Q2",
             "FY24 Q3",
@@ -5833,12 +5837,21 @@
           ],
           "latest": "3.2M",
           "latestPeriod": "2026-03-31",
+          "latestLabel": "FY26 Q1",
+          "observationCount": 8,
+          "trend": {
+            "percent": 100,
+            "label": "+100.0%"
+          },
           "source": "SEC inline XBRL"
         },
         {
-          "id": "SellingGeneralAndAdministrationExpenseMemberAcquisitionAndServicingCosts",
+          "id": "oscr__SellingGeneralAndAdministrationExpenseMemberAcquisitionAndServicingCosts",
           "title": "Selling General and Administration Expense Member Acquisition and Servicing Costs",
           "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:SellingGeneralAndAdministrationExpenseMemberAcquisitionAndServicingCosts",
+          "group": "Users & scale",
+          "tier": "Core",
           "labels": [
             "FY24 Q1",
             "FY24 Q2",
@@ -5868,13 +5881,138 @@
           ],
           "latest": "$349.6M",
           "latestPeriod": "2026-03-31",
+          "latestLabel": "FY26 Q1",
+          "observationCount": 7,
+          "trend": {
+            "percent": 104.3,
+            "label": "+104.3%"
+          },
           "source": "SEC inline XBRL"
         },
         {
-          "id": "PremiumsEarnedRiskAdjustment",
+          "id": "oscr__DirectAndAssumedPremiumsEarned",
+          "title": "Direct and Assumed Premiums Earned",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:DirectAndAssumedPremiumsEarned",
+          "group": "Financial operations",
+          "tier": "Core",
+          "labels": [
+            "FY20 Q2",
+            "FY20 Q3",
+            "FY21 Q1",
+            "FY21 Q2",
+            "FY21 Q3",
+            "FY22 Q1",
+            "FY22 Q2",
+            "FY22 Q3",
+            "FY23 Q1",
+            "FY23 Q2",
+            "FY23 Q3"
+          ],
+          "values": [
+            580445000,
+            584811000,
+            823225000,
+            841260000,
+            899237000,
+            1681211000,
+            1694927000,
+            1682289000,
+            1719409000,
+            1645169000,
+            1606407000
+          ],
+          "displayValues": [
+            "$580.4M",
+            "$584.8M",
+            "$823.2M",
+            "$841.3M",
+            "$899.2M",
+            "$1.7B",
+            "$1.7B",
+            "$1.7B",
+            "$1.7B",
+            "$1.6B",
+            "$1.6B"
+          ],
+          "latest": "$1.6B",
+          "latestPeriod": "2023-09-30",
+          "latestLabel": "FY23 Q3",
+          "observationCount": 11,
+          "trend": {
+            "percent": 176.8,
+            "label": "+176.8%"
+          },
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__CededPremiumsEarnedGross",
+          "title": "Ceded Premiums Earned Gross",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:CededPremiumsEarnedGross",
+          "group": "Financial operations",
+          "tier": "Core",
+          "labels": [
+            "FY20 Q2",
+            "FY20 Q3",
+            "FY21 Q1",
+            "FY21 Q2",
+            "FY21 Q3",
+            "FY22 Q1",
+            "FY22 Q2",
+            "FY22 Q3",
+            "FY23 Q1",
+            "FY23 Q2",
+            "FY23 Q3"
+          ],
+          "values": [
+            306427000,
+            338685000,
+            264787000,
+            239253000,
+            220472000,
+            367111000,
+            393857000,
+            382597000,
+            -10078000,
+            7210000,
+            1354000
+          ],
+          "displayValues": [
+            "$306.4M",
+            "$338.7M",
+            "$264.8M",
+            "$239.3M",
+            "$220.5M",
+            "$367.1M",
+            "$393.9M",
+            "$382.6M",
+            "-$10.1M",
+            "$7.2M",
+            "$1.4M"
+          ],
+          "latest": "$1.4M",
+          "latestPeriod": "2023-09-30",
+          "latestLabel": "FY23 Q3",
+          "observationCount": 11,
+          "trend": {
+            "percent": -99.6,
+            "label": "-99.6%"
+          },
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__PremiumsEarnedRiskAdjustment",
           "title": "Premiums Earned Risk Adjustment",
           "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:PremiumsEarnedRiskAdjustment",
+          "group": "Financial operations",
+          "tier": "Core",
           "labels": [
+            "FY22 Q2",
+            "FY22 Q3",
+            "FY23 Q1",
+            "FY23 Q2",
             "FY23 Q3",
             "FY24 Q1",
             "FY24 Q2",
@@ -5885,6 +6023,10 @@
             "FY26 Q1"
           ],
           "values": [
+            326450000,
+            364241000,
+            293147000,
+            160631000,
             211422000,
             269398000,
             432895000,
@@ -5895,6 +6037,10 @@
             1442811000
           ],
           "displayValues": [
+            "$326.4M",
+            "$364.2M",
+            "$293.1M",
+            "$160.6M",
             "$211.4M",
             "$269.4M",
             "$432.9M",
@@ -5906,13 +6052,197 @@
           ],
           "latest": "$1.4B",
           "latestPeriod": "2026-03-31",
+          "latestLabel": "FY26 Q1",
+          "observationCount": 12,
+          "trend": {
+            "percent": 342,
+            "label": "+342.0%"
+          },
           "source": "SEC inline XBRL"
         },
         {
-          "id": "CededPremiumsEarnedIncludingPriorPeriodAdjustments",
+          "id": "oscr__CededPremiumsExperienceRefund",
+          "title": "Ceded Premiums Experience Refund",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:CededPremiumsExperienceRefund",
+          "group": "Financial operations",
+          "tier": "Core",
+          "labels": [
+            "FY20 Q2",
+            "FY20 Q3",
+            "FY21 Q1",
+            "FY21 Q2",
+            "FY21 Q3",
+            "FY22 Q1",
+            "FY22 Q2",
+            "FY22 Q3",
+            "FY23 Q1",
+            "FY23 Q2",
+            "FY23 Q3"
+          ],
+          "values": [
+            26643000,
+            23325000,
+            23225000,
+            43485000,
+            -11245000,
+            7448000,
+            19975000,
+            18213000,
+            -7714000,
+            -2362000,
+            -1549000
+          ],
+          "displayValues": [
+            "$26.6M",
+            "$23.3M",
+            "$23.2M",
+            "$43.5M",
+            "-$11.2M",
+            "$7.4M",
+            "$20.0M",
+            "$18.2M",
+            "-$7.7M",
+            "-$2.4M",
+            "-$1.5M"
+          ],
+          "latest": "-$1.5M",
+          "latestPeriod": "2023-09-30",
+          "latestLabel": "FY23 Q3",
+          "observationCount": 11,
+          "trend": {
+            "percent": -105.8,
+            "label": "-105.8%"
+          },
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__PremiumsEarnedBeforePremiumsCeded",
+          "title": "Premiums Earned Before Premiums Ceded",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:PremiumsEarnedBeforePremiumsCeded",
+          "group": "Financial operations",
+          "tier": "Core",
+          "labels": [
+            "FY20 Q2",
+            "FY20 Q3",
+            "FY21 Q1",
+            "FY21 Q2",
+            "FY21 Q3",
+            "FY22 Q1",
+            "FY22 Q2",
+            "FY22 Q3",
+            "FY23 Q1",
+            "FY23 Q2",
+            "FY23 Q3",
+            "FY24 Q1"
+          ],
+          "values": [
+            393540000,
+            414505000,
+            610099000,
+            723927000,
+            673460000,
+            1315064000,
+            1368477000,
+            1318048000,
+            1426262000,
+            1484538000,
+            1394985000,
+            2098314000
+          ],
+          "displayValues": [
+            "$393.5M",
+            "$414.5M",
+            "$610.1M",
+            "$723.9M",
+            "$673.5M",
+            "$1.3B",
+            "$1.4B",
+            "$1.3B",
+            "$1.4B",
+            "$1.5B",
+            "$1.4B",
+            "$2.1B"
+          ],
+          "latest": "$2.1B",
+          "latestPeriod": "2024-03-31",
+          "latestLabel": "FY24 Q1",
+          "observationCount": 12,
+          "trend": {
+            "percent": 433.2,
+            "label": "+433.2%"
+          },
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__CededPremiumsEarnedNetOfAssumedPremiumsEarned",
+          "title": "Ceded Premiums Earned Net Of Assumed Premiums Earned",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:CededPremiumsEarnedNetOfAssumedPremiumsEarned",
+          "group": "Financial operations",
+          "tier": "Core",
+          "labels": [
+            "FY20 Q2",
+            "FY20 Q3",
+            "FY21 Q1",
+            "FY21 Q2",
+            "FY21 Q3",
+            "FY22 Q1",
+            "FY22 Q2",
+            "FY22 Q3",
+            "FY23 Q1",
+            "FY23 Q2",
+            "FY23 Q3"
+          ],
+          "values": [
+            279784000,
+            315360000,
+            239151000,
+            192583000,
+            227887000,
+            334873000,
+            339787000,
+            326975000,
+            -58299000,
+            -50823000,
+            -54933000
+          ],
+          "displayValues": [
+            "$279.8M",
+            "$315.4M",
+            "$239.2M",
+            "$192.6M",
+            "$227.9M",
+            "$334.9M",
+            "$339.8M",
+            "$327.0M",
+            "-$58.3M",
+            "-$50.8M",
+            "-$54.9M"
+          ],
+          "latest": "-$54.9M",
+          "latestPeriod": "2023-09-30",
+          "latestLabel": "FY23 Q3",
+          "observationCount": 11,
+          "trend": {
+            "percent": -119.6,
+            "label": "-119.6%"
+          },
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__CededPremiumsEarnedIncludingPriorPeriodAdjustments",
           "title": "Ceded Premiums Earned Including Prior Period Adjustments",
           "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:CededPremiumsEarnedIncludingPriorPeriodAdjustments",
+          "group": "Financial operations",
+          "tier": "Core",
           "labels": [
+            "FY22 Q2",
+            "FY22 Q3",
+            "FY23 Q1",
+            "FY23 Q2",
             "FY23 Q3",
             "FY24 Q1",
             "FY24 Q2",
@@ -5923,6 +6253,10 @@
             "FY26 Q1"
           ],
           "values": [
+            373882000,
+            364384000,
+            -2364000,
+            9572000,
             2903000,
             4632000,
             7564000,
@@ -5933,6 +6267,10 @@
             5618000
           ],
           "displayValues": [
+            "$373.9M",
+            "$364.4M",
+            "-$2.4M",
+            "$9.6M",
             "$2.9M",
             "$4.6M",
             "$7.6M",
@@ -5944,70 +6282,317 @@
           ],
           "latest": "$5.6M",
           "latestPeriod": "2026-03-31",
+          "latestLabel": "FY26 Q1",
+          "observationCount": 12,
+          "trend": {
+            "percent": -98.5,
+            "label": "-98.5%"
+          },
           "source": "SEC inline XBRL"
         },
         {
-          "id": "PremiumsEarnedBeforePremiumsCeded",
-          "title": "Premiums Earned Before Premiums Ceded",
+          "id": "oscr__ClaimsAdjustmentExpenseClaimsPaid",
+          "title": "Claims Adjustment Expense Claims Paid",
           "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:ClaimsAdjustmentExpenseClaimsPaid",
+          "group": "Financial operations",
+          "tier": "Important",
           "labels": [
+            "FY21 Q1",
+            "FY22 Q1",
+            "FY23 Q1",
+            "FY24 Q1",
+            "FY25 Q1",
+            "FY26 Q1"
+          ],
+          "values": [
+            15452000,
+            37618000,
+            25420000,
+            19868000,
+            27722000,
+            15048000
+          ],
+          "displayValues": [
+            "$15.5M",
+            "$37.6M",
+            "$25.4M",
+            "$19.9M",
+            "$27.7M",
+            "$15.0M"
+          ],
+          "latest": "$15.0M",
+          "latestPeriod": "2026-03-31",
+          "latestLabel": "FY26 Q1",
+          "observationCount": 6,
+          "trend": {
+            "percent": -2.6,
+            "label": "-2.6%"
+          },
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__ClaimsAdjustmentExpenseClaimsPaidPriorYear",
+          "title": "Claims Adjustment Expense Claims Paid Prior Year",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:ClaimsAdjustmentExpenseClaimsPaidPriorYear",
+          "group": "Financial operations",
+          "tier": "Important",
+          "labels": [
+            "FY21 Q1",
+            "FY22 Q1",
+            "FY23 Q1",
+            "FY24 Q1",
+            "FY25 Q1",
+            "FY26 Q1"
+          ],
+          "values": [
+            5509000,
+            9101000,
+            5728000,
+            5722000,
+            9969000,
+            7720000
+          ],
+          "displayValues": [
+            "$5.5M",
+            "$9.1M",
+            "$5.7M",
+            "$5.7M",
+            "$10.0M",
+            "$7.7M"
+          ],
+          "latest": "$7.7M",
+          "latestPeriod": "2026-03-31",
+          "latestLabel": "FY26 Q1",
+          "observationCount": 6,
+          "trend": {
+            "percent": 40.1,
+            "label": "+40.1%"
+          },
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__ClaimsAdjustmentExpenseClaimsPaidCurrentYear",
+          "title": "Claims Adjustment Expense Claims Paid Current Year",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:ClaimsAdjustmentExpenseClaimsPaidCurrentYear",
+          "group": "Financial operations",
+          "tier": "Important",
+          "labels": [
+            "FY21 Q1",
+            "FY22 Q1",
+            "FY23 Q1",
+            "FY24 Q1",
+            "FY25 Q1",
+            "FY26 Q1"
+          ],
+          "values": [
+            9943000,
+            28517000,
+            19692000,
+            14146000,
+            17753000,
+            7328000
+          ],
+          "displayValues": [
+            "$9.9M",
+            "$28.5M",
+            "$19.7M",
+            "$14.1M",
+            "$17.8M",
+            "$7.3M"
+          ],
+          "latest": "$7.3M",
+          "latestPeriod": "2026-03-31",
+          "latestLabel": "FY26 Q1",
+          "observationCount": 6,
+          "trend": {
+            "percent": -26.3,
+            "label": "-26.3%"
+          },
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__FederalAndStateAssessmentExpense",
+          "title": "Federal and State Assessment Expense",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:FederalAndStateAssessmentExpense",
+          "group": "Financial operations",
+          "tier": "Important",
+          "labels": [
+            "FY20 Q2",
+            "FY20 Q3",
+            "FY21 Q1",
+            "FY21 Q2",
+            "FY21 Q3",
+            "FY22 Q1",
             "FY22 Q2",
             "FY22 Q3",
             "FY23 Q1",
             "FY23 Q2",
-            "FY23 Q3",
-            "FY24 Q1"
-          ],
-          "values": [
-            1368477000,
-            1318048000,
-            1426262000,
-            1484538000,
-            1394985000,
-            2098314000
-          ],
-          "displayValues": [
-            "$1.4B",
-            "$1.3B",
-            "$1.4B",
-            "$1.5B",
-            "$1.4B",
-            "$2.1B"
-          ],
-          "latest": "$2.1B",
-          "latestPeriod": "2024-03-31",
-          "source": "SEC inline XBRL"
-        },
-        {
-          "id": "DirectAndAssumedPremiumsEarned",
-          "title": "Direct and Assumed Premiums Earned",
-          "description": "Company-specific metric reported in SEC filings.",
-          "labels": [
-            "FY22 Q2",
-            "FY22 Q3",
-            "FY23 Q2",
             "FY23 Q3"
           ],
           "values": [
-            1694927000,
-            1682289000,
-            1645169000,
-            1606407000
+            18958000,
+            20469000,
+            30515000,
+            36873000,
+            35453000,
+            69867000,
+            68749000,
+            71114000,
+            73891000,
+            72647000,
+            69876000
           ],
           "displayValues": [
-            "$1.7B",
-            "$1.7B",
-            "$1.6B",
-            "$1.6B"
+            "$19.0M",
+            "$20.5M",
+            "$30.5M",
+            "$36.9M",
+            "$35.5M",
+            "$69.9M",
+            "$68.7M",
+            "$71.1M",
+            "$73.9M",
+            "$72.6M",
+            "$69.9M"
           ],
-          "latest": "$1.6B",
+          "latest": "$69.9M",
           "latestPeriod": "2023-09-30",
+          "latestLabel": "FY23 Q3",
+          "observationCount": 11,
+          "trend": {
+            "percent": 268.6,
+            "label": "+268.6%"
+          },
           "source": "SEC inline XBRL"
         },
         {
-          "id": "SellingGeneralAndAdministrationExpenseAllOtherServicingCosts",
+          "id": "oscr__ClaimsAdjustmentExpenseIncurredClaims",
+          "title": "Claims Adjustment Expense Incurred Claims",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:ClaimsAdjustmentExpenseIncurredClaims",
+          "group": "Financial operations",
+          "tier": "Important",
+          "labels": [
+            "FY21 Q1",
+            "FY22 Q1",
+            "FY23 Q1",
+            "FY24 Q1",
+            "FY25 Q1",
+            "FY26 Q1"
+          ],
+          "values": [
+            16262000,
+            42018000,
+            25815000,
+            23556000,
+            28933000,
+            18317000
+          ],
+          "displayValues": [
+            "$16.3M",
+            "$42.0M",
+            "$25.8M",
+            "$23.6M",
+            "$28.9M",
+            "$18.3M"
+          ],
+          "latest": "$18.3M",
+          "latestPeriod": "2026-03-31",
+          "latestLabel": "FY26 Q1",
+          "observationCount": 6,
+          "trend": {
+            "percent": 12.6,
+            "label": "+12.6%"
+          },
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__ClaimsAdjustmentExpenseIncurredClaimsCurrentYear",
+          "title": "Claims Adjustment Expense Incurred Claims Current Year",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:ClaimsAdjustmentExpenseIncurredClaimsCurrentYear",
+          "group": "Financial operations",
+          "tier": "Important",
+          "labels": [
+            "FY21 Q1",
+            "FY22 Q1",
+            "FY23 Q1",
+            "FY24 Q1",
+            "FY25 Q1",
+            "FY26 Q1"
+          ],
+          "values": [
+            16262000,
+            42018000,
+            25815000,
+            23556000,
+            28933000,
+            18317000
+          ],
+          "displayValues": [
+            "$16.3M",
+            "$42.0M",
+            "$25.8M",
+            "$23.6M",
+            "$28.9M",
+            "$18.3M"
+          ],
+          "latest": "$18.3M",
+          "latestPeriod": "2026-03-31",
+          "latestLabel": "FY26 Q1",
+          "observationCount": 6,
+          "trend": {
+            "percent": 12.6,
+            "label": "+12.6%"
+          },
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__ClaimsAdjustmentExpenseIncurredClaimsPriorYear",
+          "title": "Claims Adjustment Expense Incurred Claims Prior Year",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:ClaimsAdjustmentExpenseIncurredClaimsPriorYear",
+          "group": "Financial operations",
+          "tier": "Important",
+          "labels": [
+            "FY21 Q1",
+            "FY22 Q1",
+            "FY23 Q1",
+            "FY24 Q1",
+            "FY25 Q1"
+          ],
+          "values": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "displayValues": [
+            "$0",
+            "$0",
+            "$0",
+            "$0",
+            "$0"
+          ],
+          "latest": "$0",
+          "latestPeriod": "2025-03-31",
+          "latestLabel": "FY25 Q1",
+          "observationCount": 5,
+          "trend": null,
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__SellingGeneralAndAdministrationExpenseAllOtherServicingCosts",
           "title": "Selling General and Administration Expense All Other Servicing Costs",
           "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:SellingGeneralAndAdministrationExpenseAllOtherServicingCosts",
+          "group": "Margins & ratios",
+          "tier": "Important",
           "labels": [
             "FY24 Q1",
             "FY24 Q2",
@@ -6037,13 +6622,26 @@
           ],
           "latest": "$160.1M",
           "latestPeriod": "2026-03-31",
+          "latestLabel": "FY26 Q1",
+          "observationCount": 7,
+          "trend": {
+            "percent": 22.5,
+            "label": "+22.5%"
+          },
           "source": "SEC inline XBRL"
         },
         {
-          "id": "CededCommissionIncome",
+          "id": "oscr__CededCommissionIncome",
           "title": "Ceded Commission Income",
           "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:CededCommissionIncome",
+          "group": "Financial operations",
+          "tier": "Important",
           "labels": [
+            "FY22 Q1",
+            "FY22 Q2",
+            "FY22 Q3",
+            "FY23 Q1",
             "FY23 Q2",
             "FY23 Q3",
             "FY24 Q1",
@@ -6054,6 +6652,10 @@
             "FY25 Q3"
           ],
           "values": [
+            38311000,
+            41016000,
+            40086000,
+            -1535000,
             589000,
             -30000,
             534000,
@@ -6064,6 +6666,10 @@
             0
           ],
           "displayValues": [
+            "$38.3M",
+            "$41.0M",
+            "$40.1M",
+            "-$1.5M",
             "$589000",
             "-$30000",
             "$534000",
@@ -6075,13 +6681,135 @@
           ],
           "latest": "$0",
           "latestPeriod": "2025-09-30",
+          "latestLabel": "FY25 Q3",
+          "observationCount": 12,
+          "trend": {
+            "percent": -100,
+            "label": "-100.0%"
+          },
           "source": "SEC inline XBRL"
         },
         {
-          "id": "SellingGeneralAndAdministrativeExpenseGross",
+          "id": "oscr__OtherInsuranceExpenseNet",
+          "title": "Other Insurance Expense Net",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:OtherInsuranceExpenseNet",
+          "group": "Financial operations",
+          "tier": "Important",
+          "labels": [
+            "FY20 Q2",
+            "FY20 Q3",
+            "FY21 Q1",
+            "FY21 Q2",
+            "FY21 Q3",
+            "FY22 Q1",
+            "FY22 Q2",
+            "FY22 Q3",
+            "FY23 Q1",
+            "FY23 Q2",
+            "FY23 Q3"
+          ],
+          "values": [
+            39644000,
+            38674000,
+            79837000,
+            94790000,
+            111302000,
+            165402000,
+            170200000,
+            174978000,
+            227431000,
+            197784000,
+            192863000
+          ],
+          "displayValues": [
+            "$39.6M",
+            "$38.7M",
+            "$79.8M",
+            "$94.8M",
+            "$111.3M",
+            "$165.4M",
+            "$170.2M",
+            "$175.0M",
+            "$227.4M",
+            "$197.8M",
+            "$192.9M"
+          ],
+          "latest": "$192.9M",
+          "latestPeriod": "2023-09-30",
+          "latestLabel": "FY23 Q3",
+          "observationCount": 11,
+          "trend": {
+            "percent": 386.5,
+            "label": "+386.5%"
+          },
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__OtherInsuranceExpenseGross",
+          "title": "Other Insurance Expense Gross",
+          "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:OtherInsuranceExpenseGross",
+          "group": "Financial operations",
+          "tier": "Important",
+          "labels": [
+            "FY20 Q2",
+            "FY20 Q3",
+            "FY21 Q1",
+            "FY21 Q2",
+            "FY21 Q3",
+            "FY22 Q1",
+            "FY22 Q2",
+            "FY22 Q3",
+            "FY23 Q1",
+            "FY23 Q2",
+            "FY23 Q3"
+          ],
+          "values": [
+            69893000,
+            70283000,
+            99143000,
+            115256000,
+            129516000,
+            203713000,
+            211216000,
+            215064000,
+            225896000,
+            198373000,
+            192833000
+          ],
+          "displayValues": [
+            "$69.9M",
+            "$70.3M",
+            "$99.1M",
+            "$115.3M",
+            "$129.5M",
+            "$203.7M",
+            "$211.2M",
+            "$215.1M",
+            "$225.9M",
+            "$198.4M",
+            "$192.8M"
+          ],
+          "latest": "$192.8M",
+          "latestPeriod": "2023-09-30",
+          "latestLabel": "FY23 Q3",
+          "observationCount": 11,
+          "trend": {
+            "percent": 175.9,
+            "label": "+175.9%"
+          },
+          "source": "SEC inline XBRL"
+        },
+        {
+          "id": "oscr__SellingGeneralAndAdministrativeExpenseGross",
           "title": "Selling General and Administrative Expense Gross",
           "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:SellingGeneralAndAdministrativeExpenseGross",
+          "group": "Financial operations",
+          "tier": "Important",
           "labels": [
+            "FY23 Q1",
             "FY23 Q2",
             "FY23 Q3",
             "FY24 Q1",
@@ -6092,6 +6820,7 @@
             "FY25 Q3"
           ],
           "values": [
+            396984000,
             337833000,
             325820000,
             394696000,
@@ -6102,6 +6831,7 @@
             521592000
           ],
           "displayValues": [
+            "$397.0M",
             "$337.8M",
             "$325.8M",
             "$394.7M",
@@ -6113,318 +6843,65 @@
           ],
           "latest": "$521.6M",
           "latestPeriod": "2025-09-30",
+          "latestLabel": "FY25 Q3",
+          "observationCount": 9,
+          "trend": {
+            "percent": 31.4,
+            "label": "+31.4%"
+          },
           "source": "SEC inline XBRL"
         },
         {
-          "id": "ClaimsAdjustmentExpenseClaimsPaid",
-          "title": "Claims Adjustment Expense Claims Paid",
+          "id": "oscr__HealthInsuranceIndustryFeeExpense",
+          "title": "Health Insurance Industry Fee Expense",
           "description": "Company-specific metric reported in SEC filings.",
+          "concept": "oscr:HealthInsuranceIndustryFeeExpense",
+          "group": "Financial operations",
+          "tier": "Detail",
           "labels": [
-            "FY23 Q1",
-            "FY24 Q1",
-            "FY25 Q1",
-            "FY26 Q1"
+            "FY20 Q2",
+            "FY20 Q3",
+            "FY21 Q2",
+            "FY21 Q3"
           ],
           "values": [
-            25420000,
-            19868000,
-            27722000,
-            15048000
-          ],
-          "displayValues": [
-            "$25.4M",
-            "$19.9M",
-            "$27.7M",
-            "$15.0M"
-          ],
-          "latest": "$15.0M",
-          "latestPeriod": "2026-03-31",
-          "source": "SEC inline XBRL"
-        },
-        {
-          "id": "ClaimsAdjustmentExpenseIncurredClaims",
-          "title": "Claims Adjustment Expense Incurred Claims",
-          "description": "Company-specific metric reported in SEC filings.",
-          "labels": [
-            "FY23 Q1",
-            "FY24 Q1",
-            "FY25 Q1",
-            "FY26 Q1"
-          ],
-          "values": [
-            25815000,
-            23556000,
-            28933000,
-            18317000
-          ],
-          "displayValues": [
-            "$25.8M",
-            "$23.6M",
-            "$28.9M",
-            "$18.3M"
-          ],
-          "latest": "$18.3M",
-          "latestPeriod": "2026-03-31",
-          "source": "SEC inline XBRL"
-        },
-        {
-          "id": "ClaimsAdjustmentExpenseClaimsPaidPriorYear",
-          "title": "Claims Adjustment Expense Claims Paid Prior Year",
-          "description": "Company-specific metric reported in SEC filings.",
-          "labels": [
-            "FY23 Q1",
-            "FY24 Q1",
-            "FY25 Q1",
-            "FY26 Q1"
-          ],
-          "values": [
-            5728000,
-            5722000,
-            9969000,
-            7720000
-          ],
-          "displayValues": [
-            "$5.7M",
-            "$5.7M",
-            "$10.0M",
-            "$7.7M"
-          ],
-          "latest": "$7.7M",
-          "latestPeriod": "2026-03-31",
-          "source": "SEC inline XBRL"
-        },
-        {
-          "id": "ClaimsAdjustmentExpenseClaimsPaidCurrentYear",
-          "title": "Claims Adjustment Expense Claims Paid Current Year",
-          "description": "Company-specific metric reported in SEC filings.",
-          "labels": [
-            "FY23 Q1",
-            "FY24 Q1",
-            "FY25 Q1",
-            "FY26 Q1"
-          ],
-          "values": [
-            19692000,
-            14146000,
-            17753000,
-            7328000
-          ],
-          "displayValues": [
-            "$19.7M",
-            "$14.1M",
-            "$17.8M",
-            "$7.3M"
-          ],
-          "latest": "$7.3M",
-          "latestPeriod": "2026-03-31",
-          "source": "SEC inline XBRL"
-        },
-        {
-          "id": "ClaimsAdjustmentExpenseIncurredClaimsCurrentYear",
-          "title": "Claims Adjustment Expense Incurred Claims Current Year",
-          "description": "Company-specific metric reported in SEC filings.",
-          "labels": [
-            "FY23 Q1",
-            "FY24 Q1",
-            "FY25 Q1",
-            "FY26 Q1"
-          ],
-          "values": [
-            25815000,
-            23556000,
-            28933000,
-            18317000
-          ],
-          "displayValues": [
-            "$25.8M",
-            "$23.6M",
-            "$28.9M",
-            "$18.3M"
-          ],
-          "latest": "$18.3M",
-          "latestPeriod": "2026-03-31",
-          "source": "SEC inline XBRL"
-        },
-        {
-          "id": "CededPremiumsEarnedGross",
-          "title": "Ceded Premiums Earned Gross",
-          "description": "Company-specific metric reported in SEC filings.",
-          "labels": [
-            "FY22 Q2",
-            "FY22 Q3",
-            "FY23 Q2",
-            "FY23 Q3"
-          ],
-          "values": [
-            393857000,
-            382597000,
-            7210000,
-            1354000
-          ],
-          "displayValues": [
-            "$393.9M",
-            "$382.6M",
-            "$7.2M",
-            "$1.4M"
-          ],
-          "latest": "$1.4M",
-          "latestPeriod": "2023-09-30",
-          "source": "SEC inline XBRL"
-        },
-        {
-          "id": "CededPremiumsExperienceRefund",
-          "title": "Ceded Premiums Experience Refund",
-          "description": "Company-specific metric reported in SEC filings.",
-          "labels": [
-            "FY22 Q2",
-            "FY22 Q3",
-            "FY23 Q2",
-            "FY23 Q3"
-          ],
-          "values": [
-            19975000,
-            18213000,
-            -2362000,
-            -1549000
-          ],
-          "displayValues": [
-            "$20.0M",
-            "$18.2M",
-            "-$2.4M",
-            "-$1.5M"
-          ],
-          "latest": "-$1.5M",
-          "latestPeriod": "2023-09-30",
-          "source": "SEC inline XBRL"
-        },
-        {
-          "id": "CededPremiumsEarnedNetOfAssumedPremiumsEarned",
-          "title": "Ceded Premiums Earned Net Of Assumed Premiums Earned",
-          "description": "Company-specific metric reported in SEC filings.",
-          "labels": [
-            "FY22 Q2",
-            "FY22 Q3",
-            "FY23 Q2",
-            "FY23 Q3"
-          ],
-          "values": [
-            339787000,
-            326975000,
-            -50823000,
-            -54933000
-          ],
-          "displayValues": [
-            "$339.8M",
-            "$327.0M",
-            "-$50.8M",
-            "-$54.9M"
-          ],
-          "latest": "-$54.9M",
-          "latestPeriod": "2023-09-30",
-          "source": "SEC inline XBRL"
-        },
-        {
-          "id": "ClaimsAdjustmentExpenseIncurredClaimsPriorYear",
-          "title": "Claims Adjustment Expense Incurred Claims Prior Year",
-          "description": "Company-specific metric reported in SEC filings.",
-          "labels": [
-            "FY23 Q1",
-            "FY24 Q1",
-            "FY25 Q1"
-          ],
-          "values": [
-            0,
+            4812000,
+            4813000,
             0,
             0
           ],
           "displayValues": [
-            "$0",
+            "$4.8M",
+            "$4.8M",
             "$0",
             "$0"
           ],
           "latest": "$0",
-          "latestPeriod": "2025-03-31",
-          "source": "SEC inline XBRL"
-        },
-        {
-          "id": "FederalAndStateAssessmentExpense",
-          "title": "Federal and State Assessment Expense",
-          "description": "Company-specific metric reported in SEC filings.",
-          "labels": [
-            "FY22 Q2",
-            "FY22 Q3",
-            "FY23 Q2",
-            "FY23 Q3"
-          ],
-          "values": [
-            68749000,
-            71114000,
-            72647000,
-            69876000
-          ],
-          "displayValues": [
-            "$68.7M",
-            "$71.1M",
-            "$72.6M",
-            "$69.9M"
-          ],
-          "latest": "$69.9M",
-          "latestPeriod": "2023-09-30",
-          "source": "SEC inline XBRL"
-        },
-        {
-          "id": "OtherInsuranceExpenseNet",
-          "title": "Other Insurance Expense Net",
-          "description": "Company-specific metric reported in SEC filings.",
-          "labels": [
-            "FY22 Q2",
-            "FY22 Q3",
-            "FY23 Q2",
-            "FY23 Q3"
-          ],
-          "values": [
-            170200000,
-            174978000,
-            197784000,
-            192863000
-          ],
-          "displayValues": [
-            "$170.2M",
-            "$175.0M",
-            "$197.8M",
-            "$192.9M"
-          ],
-          "latest": "$192.9M",
-          "latestPeriod": "2023-09-30",
-          "source": "SEC inline XBRL"
-        },
-        {
-          "id": "OtherInsuranceExpenseGross",
-          "title": "Other Insurance Expense Gross",
-          "description": "Company-specific metric reported in SEC filings.",
-          "labels": [
-            "FY22 Q2",
-            "FY22 Q3",
-            "FY23 Q2",
-            "FY23 Q3"
-          ],
-          "values": [
-            211216000,
-            215064000,
-            198373000,
-            192833000
-          ],
-          "displayValues": [
-            "$211.2M",
-            "$215.1M",
-            "$198.4M",
-            "$192.8M"
-          ],
-          "latest": "$192.8M",
-          "latestPeriod": "2023-09-30",
+          "latestPeriod": "2021-09-30",
+          "latestLabel": "FY21 Q3",
+          "observationCount": 4,
+          "trend": {
+            "percent": -100,
+            "label": "-100.0%"
+          },
           "source": "SEC inline XBRL"
         }
       ],
+      "metricProfile": {
+        "summaryCount": 4,
+        "financialCount": 8,
+        "customCount": 22,
+        "customGroups": {
+          "Users & scale": 2,
+          "Financial operations": 19,
+          "Margins & ratios": 1
+        },
+        "customTiers": {
+          "Core": 9,
+          "Important": 12,
+          "Detail": 1
+        }
+      },
       "operating": {
         "title": "Quarterly revenue",
         "value": "$4.6B",
@@ -6453,12 +6930,33 @@
         "revenueGrowth": 27.5,
         "epsGrowth": -1865.5,
         "netMargin": -3.8,
-        "pe": null,
+        "pe": 588.2,
         "score": 63
       },
       "sources": {
         "fundamentals": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001568651.json",
-        "quote": "Alpha Vantage"
+        "fundamentalsAsOf": {
+          "annualPeriod": "FY25",
+          "annualEnd": "2025-12-31",
+          "annualFiled": "2026-02-13",
+          "quarterPeriod": "FY26 Q1",
+          "quarterEnd": "2026-03-31",
+          "quarterFiled": "2026-05-07",
+          "refreshedAt": "2026-06-30T21:43:23.058Z",
+          "latestCheck": {
+            "status": "latest",
+            "label": "Latest confirmed",
+            "latestFiling": {
+              "form": "10-Q",
+              "filed": "2026-05-07",
+              "reportDate": "2026-03-31",
+              "accessionNumber": "0001568651-26-000040",
+              "primaryDocument": "oscr-20260331.htm"
+            }
+          }
+        },
+        "quote": "Nasdaq delayed quote",
+        "quoteAsOf": "Jun 30, 2026 5:43 PM ET"
       }
     }
   },
@@ -6523,7 +7021,7 @@
       "ticker": "OSCR",
       "growth": 27.5,
       "eps": -1865.5,
-      "pe": null,
+      "pe": 588.2,
       "margin": -3.8,
       "score": 63
     }

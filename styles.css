@@ -1399,6 +1399,14 @@ kbd {
   font: 600 20px "DM Mono", monospace;
 }
 
+.custom-metric-meta {
+  display: block;
+  margin-top: 5px;
+  color: var(--green);
+  font: 600 8px "DM Mono", monospace;
+  letter-spacing: 0.02em;
+}
+
 .custom-metric-series {
   align-items: stretch;
   margin-top: 14px;
@@ -1424,6 +1432,10 @@ kbd {
 
 .custom-metric p {
   margin: 10px 0 0;
+}
+
+.custom-metric-concept {
+  word-break: break-word;
 }
 
 .detail-grid {

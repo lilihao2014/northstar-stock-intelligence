@@ -95,11 +95,16 @@ requireContract(app.includes("renderMetricProfile(company)"), "Selected ticker m
 requireContract(app.includes("function renderStockMetricBoard(metrics)"), "Stock-specific visual dashboard renderer is missing");
 requireContract(app.includes("No stock-specific SEC metrics are available for this ticker yet."), "Missing stock-specific metrics must be shown honestly");
 requireContract(app.includes("custom-metric-group"), "Company-specific metrics must render split groups");
+requireContract(app.includes("custom-metric-meta") && app.includes("SEC concept"), "Company-specific metrics must show tier/trend/source detail");
 requireContract(styles.includes(".metric-profile-chip"), "Metric profile chip styles are missing");
 requireContract(styles.includes(".stock-metric-panel"), "Stock-specific visual dashboard styles are missing");
 requireContract(styles.includes(".custom-metric-group-heading"), "Grouped custom metric styles are missing");
+requireContract(styles.includes(".custom-metric-meta"), "Detailed company-specific metric metadata styles are missing");
 requireContract(refresh.includes("function metricProfile("), "Generated company data must include metric profile support");
 requireContract(refresh.includes("metricProfile: metricProfile("), "Refresh output must store each company's metric profile");
+requireContract(refresh.includes("function metricTier(") && refresh.includes("customTiers"), "Refresh output must classify company-specific metrics by importance tier");
+requireContract(refresh.includes("observationCount") && refresh.includes("trend: metricTrend"), "Generated custom metrics must retain detailed history metadata");
+requireContract(refresh.includes("concept.replace(/[:]/g"), "Discovered custom metric IDs must preserve namespace to avoid collisions");
 requireContract(app.includes('metricKey("summary", label)'), "Summary metrics must use namespaced visibility keys");
 requireContract(app.includes('metricKey("financial", metric.title)'), "Financial metrics must use namespaced visibility keys");
 requireContract(app.includes('metricKey("custom", metric.id)'), "Company-specific metrics must use namespaced visibility keys");

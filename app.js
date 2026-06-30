@@ -269,6 +269,11 @@ const translations = {
     "Margins & ratios": "利润率与比率",
     "Financial operations": "财务运营",
     "Other operating metrics": "其他运营指标",
+    Core: "核心",
+    Important: "重要",
+    Detail: "细节",
+    "SEC concept": "SEC 概念",
+    observations: "个观察值",
     "Stock-specific dashboard": "股票特定看板",
     "No stock-specific SEC metrics are available for this ticker yet.": "该股票目前暂无 SEC 披露的股票特定指标。",
     "Restore any metric when you need it again": "需要时可恢复任何指标",
@@ -1384,15 +1389,21 @@ function metricProfileFor(company) {
   const profile = company.metricProfile || {};
   const customMetrics = company.customMetrics || [];
   const customGroups = profile.customGroups || customMetrics.reduce((groups, metric) => {
-    const group = customMetricGroup(metric);
+    const group = metric.group || customMetricGroup(metric);
     groups[group] = (groups[group] || 0) + 1;
     return groups;
+  }, {});
+  const customTiers = profile.customTiers || customMetrics.reduce((tiers, metric) => {
+    const tier = metric.tier || "Detail";
+    tiers[tier] = (tiers[tier] || 0) + 1;
+    return tiers;
   }, {});
   return {
     summaryCount: profile.summaryCount ?? (company.metrics || []).length,
     financialCount: profile.financialCount ?? (company.financialMetrics || []).length,
     customCount: profile.customCount ?? customMetrics.length,
     customGroups,
+    customTiers,
   };
 }
 
@@ -1404,6 +1415,7 @@ function renderMetricProfile(company) {
     ["Common", profile.financialCount],
     ["Stock-specific", profile.customCount],
     ["Hidden", hiddenCount],
+    ...["Core", "Important", "Detail"].map((tier) => [tier, profile.customTiers?.[tier] || 0]).filter(([, count]) => count > 0),
     ...Object.entries(profile.customGroups).filter(([, count]) => count > 0),
   ];
   $("#metric-profile").innerHTML = chips.map(([label, count]) => `
@@ -1429,7 +1441,7 @@ function renderStockMetricBoard(metrics) {
     return;
   }
   const groups = metrics.reduce((items, metric) => {
-    const group = customMetricGroup(metric);
+    const group = metric.group || customMetricGroup(metric);
     if (!items.has(group)) items.set(group, []);
     items.get(group).push(metric);
     return items;
@@ -1438,7 +1450,7 @@ function renderStockMetricBoard(metrics) {
     const rows = groupMetrics
       .map((metric) => ({ metric, numeric: latestMetricNumber(metric) }))
       .sort((a, b) => Math.abs(b.numeric || 0) - Math.abs(a.numeric || 0))
-      .slice(0, 5);
+      .slice(0, 8);
     const max = Math.max(...rows.map((row) => Math.abs(row.numeric || 0)), 1);
     return `
       <article class="stock-metric-panel">
@@ -1478,7 +1490,7 @@ function renderCustomMetrics(metrics) {
     return;
   }
   const groups = visibleMetrics.reduce((items, metric) => {
-    const group = customMetricGroup(metric);
+    const group = metric.group || customMetricGroup(metric);
     if (!items.has(group)) items.set(group, []);
     items.get(group).push(metric);
     return items;
@@ -1495,6 +1507,7 @@ function renderCustomMetrics(metrics) {
         <div>
           <span>${tr(metric.title)}</span>
           <strong>${metric.latest}</strong>
+          <em class="custom-metric-meta">${tr(metric.tier || "Detail")} · ${escapeHtml(metric.latestLabel || metric.latestPeriod || "Latest")} · ${metric.observationCount || metric.values.length} ${tr("observations")}${metric.trend?.label ? ` · ${metric.trend.label}` : ""}</em>
         </div>
         <div class="custom-metric-controls">
           <small>${metric.source}</small>
@@ -1510,6 +1523,7 @@ function renderCustomMetrics(metrics) {
           </div>`).join("")}
       </div>
       <p>${tr(metric.description)}</p>
+      ${metric.concept ? `<p class="custom-metric-concept">${tr("SEC concept")}: ${escapeHtml(metric.concept)}</p>` : ""}
     </article>`).join("")}
     </div>`).join("");
 }

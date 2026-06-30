@@ -1,7 +1,7 @@
 {
   "_defaults": {
     "autoDiscover": true,
-    "maxMetrics": 24
+    "maxMetrics": 72
   },
   "OSCR": {
     "metrics": [
