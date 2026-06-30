@@ -387,6 +387,19 @@ function scheduleDashboardRefresh(reason) {
   refreshQueue = task.catch(() => {});
 }
 
+async function refreshStaleDashboardOnStartup() {
+  if (!isProductionRuntime() || !isDatabaseConfigured() || !secIdentity) return;
+  const stored = await loadDashboardSnapshot().catch(() => null);
+  if (!stored?.companies || !Object.keys(stored.companies).length) {
+    scheduleDashboardRefresh("missing production dashboard snapshot");
+    return;
+  }
+  const prepared = prepareDashboardForRead(stored);
+  if (prepared.freshness?.dashboardStatus === "stale" || prepared.freshness?.staleQuotes?.length) {
+    scheduleDashboardRefresh("startup stale dashboard or undated quotes");
+  }
+}
+
 async function addCompany(ticker) {
   const normalized = ticker.toUpperCase();
   const directory = await fetchTickerDirectory();
@@ -521,6 +534,28 @@ const server = createServer(async (request, response) => {
       return;
     }
 
+    if (request.method === "POST" && url.pathname === "/api/refresh") {
+      if (!allowCompanyFetch(request)) {
+        json(response, 429, { error: "Too many refresh requests. Try again in 10 minutes." });
+        return;
+      }
+      const refreshJobId = await createRefreshJob("ALL");
+      const task = refreshQueue.then(async () => {
+        try {
+          await runRefresh();
+          await finishRefreshJob(refreshJobId, "succeeded");
+          const dashboard = await loadDashboardSnapshot();
+          return { dashboard, job: { id: refreshJobId, ticker: "ALL", status: "succeeded", finishedAt: new Date().toISOString() } };
+        } catch (error) {
+          await finishRefreshJob(refreshJobId, "failed", error.message);
+          throw error;
+        }
+      });
+      refreshQueue = task.catch(() => {});
+      json(response, 200, await task);
+      return;
+    }
+
     const contentMatch = request.method === "GET" && url.pathname.match(/^\/api\/content\/([A-Z0-9.-]+)$/i);
     if (contentMatch) {
       json(response, 200, await tickerContent(contentMatch[1].toUpperCase(), url.searchParams.get("refresh") === "1"));
@@ -571,6 +606,7 @@ async function startServer() {
   if (isDatabaseConfigured()) {
     await seedDatabaseFromFiles({ dashboardPath, watchlistPath });
     console.log("Postgres persistence is enabled.");
+    await refreshStaleDashboardOnStartup();
   }
   server.listen(port, host, () => {
     console.log(`Northstar running at http://localhost:${port}`);

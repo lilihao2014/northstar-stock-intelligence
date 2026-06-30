@@ -62,6 +62,9 @@ requireContract(server.includes("function prepareDashboardForRead("), "Productio
 requireContract(server.includes("function quoteFreshness("), "Server must validate quote dates before display");
 requireContract(server.includes("displayable: false"), "Undated or stale quotes must not be displayable as current prices");
 requireContract(server.includes("scheduleDashboardRefresh(\"stale dashboard or undated quotes\")"), "Stale production dashboards must trigger background refresh");
+requireContract(server.includes("refreshStaleDashboardOnStartup()"), "Production startup must check whether saved dashboard data needs refresh");
+requireContract(server.includes('url.pathname === "/api/refresh"'), "Server must expose a full dashboard refresh endpoint");
+requireContract(server.includes("await runRefresh();") && server.includes('createRefreshJob("ALL")'), "Full refresh endpoint must regenerate and persist the dashboard snapshot");
 requireContract(server.includes("saveDashboardSnapshot(dashboard)"), "Ticker additions must persist refreshed dashboard snapshots");
 requireContract(server.includes("saveWatchlistItem"), "Ticker additions must persist watchlist items");
 requireContract(refresh.includes("loadDashboardSnapshot()"), "Refresh must reuse the Postgres dashboard cache when available");

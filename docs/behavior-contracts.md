@@ -87,6 +87,8 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 
 - Production reads dashboard data from Postgres, but it must not blindly trust an old snapshot forever.
 - If the dashboard snapshot is older than the configured freshness window, the server marks it stale and starts a background refresh when SEC access is configured.
+- On production startup, the server checks the saved dashboard snapshot and starts a background refresh when the saved data is missing, stale, or contains undated quotes.
+- A full-dashboard refresh endpoint regenerates all tracked tickers and saves the latest payload back to Postgres.
 - If a company quote has no provider date or the quote date is older than the configured quote window, the API clears the display price and labels the quote freshness problem instead of rendering a stale numeric price as current.
 - The source/freshness panel must show quote freshness separately from the raw quote provider/date.
 
