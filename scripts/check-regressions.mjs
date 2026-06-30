@@ -90,6 +90,7 @@ requireContract(html.includes('id="metric-profile"'), "Per-stock metric split pr
 requireContract(html.includes('id="stock-metric-board"'), "Stock-specific visual metric dashboard is missing");
 requireContract(html.includes('id="hidden-metrics-panel"'), "Hidden metric restore panel is missing");
 requireContract(html.includes('id="metric-group-mode"') && html.includes('id="metric-sort-mode"') && html.includes('id="metric-chart-mode"'), "Metric display customization controls are missing");
+requireContract(html.includes('id="toggle-metric-display"') && html.includes('aria-controls="metric-display-controls"'), "Metric display controls must be hideable");
 requireContract(app.includes("function customMetricGroup(metric)"), "Metric grouping must be generic and client-side visible");
 requireContract(app.includes("function metricProfileFor(company)"), "Metric profile derivation is missing");
 requireContract(app.includes("renderMetricProfile(company)"), "Selected ticker must render its metric split profile");
@@ -112,6 +113,7 @@ requireContract(app.includes('metricKey("custom", metric.id)'), "Company-specifi
 requireContract(app.includes('id.includes(":") ? id : metricKey("custom", id)'), "Legacy hidden metric preferences must be migrated");
 requireContract(app.includes("localStorage.setItem(hiddenMetricsStorageKey"), "Hidden metric preferences must persist in local storage");
 requireContract(app.includes("metricDisplayStorageKey") && app.includes("setMetricDisplaySetting"), "Metric display preferences must persist per ticker");
+requireContract(app.includes("metricDisplayControlsHiddenKey") && app.includes("toggleMetricDisplayPanel"), "Metric display control collapsed state must persist");
 requireContract(app.includes("metricGroupLabel(metric, settings.groupMode)") && app.includes("sortedMetrics(visibleMetrics, settings.sortMode)"), "Custom metrics must respect grouping and sorting preferences");
 requireContract(app.includes("metricChartType(metric, settings)"), "Custom metric charts must respect chart display preferences");
 requireContract(app.includes("data-restore-metric"), "Hidden metrics must provide restore actions");

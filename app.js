@@ -203,8 +203,10 @@ const svgNS = "http://www.w3.org/2000/svg";
 const watchlistStorageKey = "northstar-watchlist";
 const hiddenMetricsStorageKey = "northstar-hidden-metrics-v1";
 const metricDisplayStorageKey = "northstar-metric-display-v1";
+const metricDisplayControlsHiddenKey = "northstar-metric-display-controls-hidden";
 let hiddenMetricsByTicker = {};
 let metricDisplayByTicker = {};
+let metricDisplayControlsHidden = localStorage.getItem(metricDisplayControlsHiddenKey) === "true";
 let metricManagerOpen = false;
 const selectedTickerStorageKey = "northstar-selected-ticker";
 const translations = {
@@ -261,6 +263,8 @@ const translations = {
     "Already in watchlist": "已在自选股中",
     "Search to add a stock": "搜索并添加股票",
     "Metric visibility": "指标显示管理",
+    "Display settings": "显示设置",
+    "Hide settings": "隐藏设置",
     Group: "分组",
     Sort: "排序",
     Chart: "图表",
@@ -982,6 +986,7 @@ function renderResearchToolbar(company) {
   translateSelectOptions("#metric-group-mode");
   translateSelectOptions("#metric-sort-mode");
   translateSelectOptions("#metric-chart-mode");
+  syncMetricDisplayPanel();
   document.querySelector(".source-details summary").textContent = tr("Data sources & freshness");
   const generated = dataMetadata?.generatedAt
     ? new Date(dataMetadata.generatedAt).toLocaleString(currentLanguage === "zh" ? "zh-CN" : "en-US")
@@ -1503,6 +1508,21 @@ function syncMetricDisplayControls() {
   $("#metric-group-mode").value = settings.groupMode;
   $("#metric-sort-mode").value = settings.sortMode;
   $("#metric-chart-mode").value = settings.chartMode;
+  syncMetricDisplayPanel();
+}
+
+function syncMetricDisplayPanel() {
+  const panel = $("#metric-display-controls");
+  const button = $("#toggle-metric-display");
+  panel.hidden = metricDisplayControlsHidden;
+  button.textContent = tr(metricDisplayControlsHidden ? "Display settings" : "Hide settings");
+  button.setAttribute("aria-expanded", String(!metricDisplayControlsHidden));
+}
+
+function toggleMetricDisplayPanel() {
+  metricDisplayControlsHidden = !metricDisplayControlsHidden;
+  localStorage.setItem(metricDisplayControlsHiddenKey, String(metricDisplayControlsHidden));
+  syncMetricDisplayPanel();
 }
 
 function metricTierRank(metric) {
@@ -2007,6 +2027,10 @@ function setupInteractions() {
   $("#manage-metrics").addEventListener("click", () => {
     metricManagerOpen = !metricManagerOpen;
     renderMetricManager(companies[selectedTicker]);
+  });
+
+  $("#toggle-metric-display").addEventListener("click", () => {
+    toggleMetricDisplayPanel();
   });
 
   $("#metric-group-mode").addEventListener("change", (event) => {

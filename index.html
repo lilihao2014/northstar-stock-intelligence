@@ -148,8 +148,11 @@
               <span class="section-label">Metric visibility</span>
               <p>Hidden only for this ticker</p>
             </div>
-            <button class="text-button" id="manage-metrics">Manage metrics</button>
-            <div class="metric-display-controls" aria-label="Metric display settings">
+            <div class="metric-action-row">
+              <button class="text-button" id="manage-metrics">Manage metrics</button>
+              <button class="text-button" id="toggle-metric-display" aria-expanded="true" aria-controls="metric-display-controls">Hide settings</button>
+            </div>
+            <div class="metric-display-controls" id="metric-display-controls" aria-label="Metric display settings">
               <label for="metric-group-mode">
                 Group
                 <select id="metric-group-mode">

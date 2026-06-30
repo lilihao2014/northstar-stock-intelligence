@@ -40,6 +40,7 @@ Acceptance check: confirm summary cards contain line charts, free cash flow cont
 - Opening **Manage metrics** lists every hidden metric for the selected ticker, and each item has a `Restore` action.
 - Hiding a summary metric applies in both Annual and Quarterly modes when they share the same metric label.
 - End users can customize company-specific metric display per ticker with grouping, sorting, and chart-style controls; these preferences persist without deleting metric data.
+- The metric display controls can be hidden/collapsed, and that collapsed state persists without changing the selected display preferences.
 
 Acceptance check: hide one metric from each of the summary, financial, and company-specific sections; switch tickers and confirm the other ticker is unchanged; return to the original ticker, restore all three from **Manage metrics**, and confirm their historical charts and values return.
 

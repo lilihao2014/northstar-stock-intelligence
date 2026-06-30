@@ -794,12 +794,23 @@ kbd {
   margin-top: 2px;
 }
 
+.metric-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .metric-display-controls {
   grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 8px;
+}
+
+.metric-display-controls[hidden] {
+  display: none;
 }
 
 .metric-display-controls label {
