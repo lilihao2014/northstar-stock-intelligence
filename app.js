@@ -196,6 +196,9 @@ const tickerContentCache = new Map();
 const contentMetadataByTicker = new Map();
 let researchStatusTimer = null;
 let refreshJobs = [];
+let currentUser = null;
+let inviteCodeRequired = false;
+let preferenceSaveTimer = null;
 
 const $ = (selector) => document.querySelector(selector);
 const fmtSign = (value, suffix = "%") => `${value >= 0 ? "+" : ""}${value.toFixed(2)}${suffix}`;
@@ -220,6 +223,12 @@ const translations = {
     "Investment research workspace": "投资研究工作台",
     "Good morning,": "早上好，",
     "Search ticker or company": "搜索股票代码或公司",
+    "Personal research cloud": "个人研究云",
+    "Local browser mode": "本地浏览器模式",
+    "Signed in": "已登录",
+    "Signing in...": "登录中...",
+    "Cloud sync enabled": "云端同步已启用",
+    "Cloud sync paused": "云端同步暂停",
     "Alpha Vantage · ETF proxies": "Alpha Vantage · ETF 代理",
     "Fundamental score": "基本面评分",
     "[CALCULATED]": "[计算值]",
@@ -608,6 +617,7 @@ function applyLanguage() {
   renderSectors();
   renderScatter();
   renderMarketStrip();
+  renderAccount();
   renderFallbackWarning();
   renderDataStatus();
   renderSearchResults($("#stock-search").value);
@@ -702,8 +712,32 @@ function showWatchlistStatus(message) {
   }, 2200);
 }
 
-function saveWatchlist() {
+function watchlistPayload() {
+  return watchlistTickers.map((ticker) => {
+    const company = companies[ticker] || {};
+    const meta = company.meta || {};
+    return {
+      ticker,
+      cik: meta.cik || company.cik || null,
+      sector: meta.sector || "Unclassified",
+      industry: meta.industry || "SEC registrant",
+      exchange: meta.exchange || "US",
+    };
+  });
+}
+
+async function saveWatchlist() {
   localStorage.setItem(watchlistStorageKey, JSON.stringify(watchlistTickers));
+  if (!currentUser) return;
+  try {
+    await fetch("/api/me/watchlist", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ watchlist: watchlistPayload() }),
+    });
+  } catch {
+    showWatchlistStatus(tr("Cloud sync paused"));
+  }
 }
 
 function loadWatchlist() {
@@ -716,6 +750,24 @@ function loadWatchlist() {
   watchlistTickers = saved.filter((ticker) => companies[ticker]);
   if (!watchlistTickers.length) {
     watchlistTickers = ["AAPL", "MSFT", "NVDA", "AMZN"].filter((ticker) => companies[ticker]);
+  }
+}
+
+async function loadCloudWatchlist() {
+  if (!currentUser) return;
+  try {
+    const response = await fetch(`/api/me/watchlist?ts=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) return;
+    const payload = await response.json();
+    const cloudTickers = (payload.watchlist || []).map((item) => item.ticker).filter((ticker) => companies[ticker]);
+    if (cloudTickers.length) {
+      watchlistTickers = cloudTickers;
+      localStorage.setItem(watchlistStorageKey, JSON.stringify(watchlistTickers));
+    } else if (watchlistTickers.length) {
+      saveWatchlist();
+    }
+  } catch {
+    showWatchlistStatus(tr("Cloud sync paused"));
   }
 }
 
@@ -1497,6 +1549,7 @@ function metricDisplaySettings(ticker = selectedTicker) {
 
 function saveMetricDisplaySettings() {
   localStorage.setItem(metricDisplayStorageKey, JSON.stringify(metricDisplayByTicker));
+  schedulePreferenceSave();
 }
 
 function setMetricDisplaySetting(key, value) {
@@ -1535,6 +1588,102 @@ function toggleMetricDisplayPanel() {
   metricDisplayControlsHidden = !metricDisplayControlsHidden;
   localStorage.setItem(metricDisplayControlsHiddenKey, String(metricDisplayControlsHidden));
   syncMetricDisplayPanel();
+}
+
+async function loadSession() {
+  try {
+    const response = await fetch(`/api/session?ts=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) return;
+    const payload = await response.json();
+    currentUser = payload.user || null;
+    inviteCodeRequired = Boolean(payload.auth?.inviteRequired);
+    renderAccount();
+  } catch {
+    currentUser = null;
+  }
+}
+
+async function signIn(email, inviteCode) {
+  const response = await fetch("/api/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, inviteCode }),
+  });
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
+  currentUser = payload.user;
+  renderAccount();
+  await loadCloudPersonalization();
+  await loadCloudWatchlist();
+  renderWatchlist();
+  renderCompany();
+}
+
+async function signOut() {
+  await fetch("/api/session", { method: "DELETE" }).catch(() => {});
+  currentUser = null;
+  renderAccount();
+  showWatchlistStatus(tr("Local browser mode"));
+}
+
+function renderAccount() {
+  const button = $("#account-button");
+  const title = $("#account-title");
+  const status = $("#account-status");
+  const form = $("#signin-form");
+  const signout = $("#signout-button");
+  const code = $("#signin-code");
+  if (!button || !title || !status) return;
+  code.hidden = !inviteCodeRequired;
+  if (currentUser) {
+    const initials = currentUser.email.split("@")[0].slice(0, 2).toUpperCase();
+    button.textContent = initials || "ME";
+    title.textContent = tr("Personal research cloud");
+    status.textContent = `${tr("Signed in")} · ${currentUser.email}`;
+    form.hidden = true;
+    signout.hidden = false;
+  } else {
+    button.textContent = "LH";
+    title.textContent = tr("Personal research cloud");
+    status.textContent = tr("Local browser mode");
+    form.hidden = false;
+    signout.hidden = true;
+  }
+}
+
+async function loadCloudPersonalization() {
+  if (!currentUser) return;
+  try {
+    const response = await fetch(`/api/me/preferences?ts=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok) return;
+    const payload = await response.json();
+    if (payload.hiddenMetrics && Object.keys(payload.hiddenMetrics).length) {
+      hiddenMetricsByTicker = payload.hiddenMetrics;
+      localStorage.setItem(hiddenMetricsStorageKey, JSON.stringify(hiddenMetricsByTicker));
+    }
+    if (payload.metricDisplay && Object.keys(payload.metricDisplay).length) {
+      metricDisplayByTicker = payload.metricDisplay;
+      localStorage.setItem(metricDisplayStorageKey, JSON.stringify(metricDisplayByTicker));
+    }
+  } catch {
+    showWatchlistStatus(tr("Cloud sync paused"));
+  }
+}
+
+function schedulePreferenceSave() {
+  if (!currentUser) return;
+  clearTimeout(preferenceSaveTimer);
+  preferenceSaveTimer = setTimeout(async () => {
+    try {
+      await fetch("/api/me/preferences", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ hiddenMetrics: hiddenMetricsByTicker, metricDisplay: metricDisplayByTicker }),
+      });
+    } catch {
+      showWatchlistStatus(tr("Cloud sync paused"));
+    }
+  }, 300);
 }
 
 function metricTierRank(metric) {
@@ -1676,6 +1825,7 @@ function loadHiddenMetrics() {
 
 function saveHiddenMetrics() {
   localStorage.setItem(hiddenMetricsStorageKey, JSON.stringify(hiddenMetricsByTicker));
+  schedulePreferenceSave();
 }
 
 function metricKey(type, id) {
@@ -1988,6 +2138,39 @@ function selectCompany(ticker, updateUrl = true) {
 }
 
 function setupInteractions() {
+  $("#account-button").addEventListener("click", () => {
+    const panel = $("#account-panel");
+    const expanded = panel.hidden;
+    panel.hidden = !expanded;
+    $("#account-button").setAttribute("aria-expanded", String(expanded));
+  });
+
+  $("#signin-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const button = form.querySelector("button");
+    const previous = button.textContent;
+    button.disabled = true;
+    button.textContent = tr("Signing in...");
+    try {
+      await signIn($("#signin-email").value, $("#signin-code").value);
+      $("#account-panel").hidden = true;
+      $("#account-button").setAttribute("aria-expanded", "false");
+      showWatchlistStatus(tr("Cloud sync enabled"));
+    } catch (error) {
+      $("#account-status").textContent = error.message;
+    } finally {
+      button.disabled = false;
+      button.textContent = previous;
+    }
+  });
+
+  $("#signout-button").addEventListener("click", async () => {
+    await signOut();
+    $("#account-panel").hidden = true;
+    $("#account-button").setAttribute("aria-expanded", "false");
+  });
+
   $("#language-selector").addEventListener("click", (event) => {
     const button = event.target.closest("[data-language]");
     if (!button || button.dataset.language === currentLanguage) return;
@@ -2207,6 +2390,7 @@ function renderDataStatus() {
 async function init() {
   await loadGeneratedData();
   await loadRefreshStatus();
+  await loadSession();
   const linkedTicker = new URL(window.location.href).searchParams.get("ticker")?.toUpperCase();
   const savedTicker = localStorage.getItem(selectedTickerStorageKey);
   if (linkedTicker && companies[linkedTicker]) selectedTicker = linkedTicker;
@@ -2215,7 +2399,9 @@ async function init() {
   updateTickerUrl(selectedTicker, true);
   loadHiddenMetrics();
   loadMetricDisplaySettings();
+  await loadCloudPersonalization();
   loadWatchlist();
+  await loadCloudWatchlist();
   syncMetricDisplayControls();
   renderMarketStrip();
   renderCompany();

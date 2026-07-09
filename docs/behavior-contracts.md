@@ -156,6 +156,22 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 - Startup database seeding must preserve an existing dashboard snapshot so deploys do not overwrite server-added ticker data with older committed JSON.
 - The Render Blueprint declares `DATABASE_URL` from the managed database instead of exposing database credentials in client code.
 
+## Personal accounts
+
+- The top bar exposes a visible account control that distinguishes local browser mode from signed-in cloud mode.
+- Signing in creates a signed, HttpOnly session cookie; the browser must not receive provider secrets.
+- Signed-in watchlists are stored under `user_watchlist_items` in Postgres.
+- Signed-in metric visibility and display preferences are stored under `user_preferences` in Postgres.
+- Unsigned users may keep a local browser fallback, but production personalization should prefer signed-in cloud sync.
+- Render must expose `AUTH_SECRET`; `NORTHSTAR_INVITE_CODE` may be set to restrict access while the app is private.
+
+## Custom domain
+
+- `northstar-stock-intelligence.com` must be added to the Render web service as a custom domain.
+- DNS for the apex domain must point to Render using Render's provided A/ALIAS/ANAME target.
+- DNS for `www.northstar-stock-intelligence.com` must point to Render using the CNAME target Render provides.
+- The public custom domain is not considered production-ready until Render shows the domain as verified and TLS certificate issuance has completed.
+
 ## Automated check
 
 Run `npm run check`. In addition to JavaScript syntax validation, it verifies the source-level invariants above. Browser verification remains required for deliberate layout or interaction changes.

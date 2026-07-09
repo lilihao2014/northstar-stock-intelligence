@@ -519,6 +519,71 @@ kbd {
   font-weight: 700;
 }
 
+.account-control {
+  position: relative;
+}
+
+.account-panel {
+  position: absolute;
+  z-index: 25;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 285px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 24px 58px rgba(15, 23, 42, 0.18);
+  backdrop-filter: blur(18px);
+}
+
+.account-panel-copy strong,
+.account-panel-copy span {
+  display: block;
+}
+
+.account-panel-copy strong {
+  font-size: 12px;
+}
+
+.account-panel-copy span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+#signin-form {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+#signin-form input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: white;
+  color: var(--ink);
+  font-size: 11px;
+}
+
+#signin-form button {
+  border: 0;
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: #0f172a;
+  color: white;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+#signout-button {
+  margin-top: 10px;
+}
+
 .market-strip-wrap {
   margin: 29px 0 20px;
 }

@@ -65,6 +65,35 @@ export async function ensureDatabase() {
       updated_at timestamptz not null default now()
     );
 
+    create table if not exists users (
+      user_key text primary key,
+      email text not null unique,
+      display_name text,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now()
+    );
+
+    create table if not exists user_watchlist_items (
+      user_key text not null references users(user_key) on delete cascade,
+      ticker text not null,
+      cik text,
+      sector text,
+      industry text,
+      exchange text,
+      payload jsonb not null,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now(),
+      primary key (user_key, ticker)
+    );
+
+    create table if not exists user_preferences (
+      user_key text not null references users(user_key) on delete cascade,
+      preference_key text not null,
+      payload jsonb not null,
+      updated_at timestamptz not null default now(),
+      primary key (user_key, preference_key)
+    );
+
     create table if not exists metric_preferences (
       user_key text not null default 'default',
       ticker text not null,
@@ -93,6 +122,21 @@ export async function ensureDatabase() {
     );
   `);
   schemaReady = true;
+  return true;
+}
+
+export async function upsertUser({ userKey, email, displayName = null }) {
+  if (!isDatabaseConfigured() || !userKey || !email) return false;
+  await ensureDatabase();
+  await query(
+    `insert into users (user_key, email, display_name, updated_at)
+     values ($1, $2, $3, now())
+     on conflict (user_key) do update set
+       email = excluded.email,
+       display_name = coalesce(excluded.display_name, users.display_name),
+       updated_at = now()`,
+    [userKey, email, displayName],
+  );
   return true;
 }
 
@@ -156,6 +200,46 @@ export async function loadWatchlistItems() {
   return result.rows.map((row) => row.payload);
 }
 
+export async function loadUserWatchlistItems(userKey) {
+  if (!isDatabaseConfigured() || !userKey) return [];
+  await ensureDatabase();
+  const result = await query(
+    "select payload from user_watchlist_items where user_key = $1 order by created_at, ticker",
+    [userKey],
+  );
+  return result.rows.map((row) => row.payload);
+}
+
+export async function saveUserWatchlistItems(userKey, items) {
+  if (!isDatabaseConfigured() || !userKey) return false;
+  await ensureDatabase();
+  await query("delete from user_watchlist_items where user_key = $1", [userKey]);
+  for (const item of items || []) {
+    if (!item?.ticker) continue;
+    await query(
+      `insert into user_watchlist_items (user_key, ticker, cik, sector, industry, exchange, payload, updated_at)
+       values ($1, $2, $3, $4, $5, $6, $7::jsonb, now())
+       on conflict (user_key, ticker) do update set
+         cik = excluded.cik,
+         sector = excluded.sector,
+         industry = excluded.industry,
+         exchange = excluded.exchange,
+         payload = excluded.payload,
+         updated_at = now()`,
+      [
+        userKey,
+        item.ticker,
+        item.cik || null,
+        item.sector || null,
+        item.industry || null,
+        item.exchange || null,
+        JSON.stringify(item),
+      ],
+    );
+  }
+  return true;
+}
+
 export async function saveWatchlistItem(item) {
   if (!isDatabaseConfigured() || !item?.ticker) return false;
   await ensureDatabase();
@@ -185,6 +269,28 @@ export async function saveWatchlistItems(items) {
   if (!isDatabaseConfigured()) return false;
   await ensureDatabase();
   for (const item of items || []) await saveWatchlistItem(item);
+  return true;
+}
+
+export async function loadUserPreference(userKey, preferenceKey) {
+  if (!isDatabaseConfigured() || !userKey || !preferenceKey) return null;
+  await ensureDatabase();
+  const result = await query(
+    "select payload from user_preferences where user_key = $1 and preference_key = $2",
+    [userKey, preferenceKey],
+  );
+  return result.rows[0]?.payload ?? null;
+}
+
+export async function saveUserPreference(userKey, preferenceKey, payload) {
+  if (!isDatabaseConfigured() || !userKey || !preferenceKey) return false;
+  await ensureDatabase();
+  await query(
+    `insert into user_preferences (user_key, preference_key, payload, updated_at)
+     values ($1, $2, $3::jsonb, now())
+     on conflict (user_key, preference_key) do update set payload = excluded.payload, updated_at = now()`,
+    [userKey, preferenceKey, JSON.stringify(payload ?? {})],
+  );
   return true;
 }
 

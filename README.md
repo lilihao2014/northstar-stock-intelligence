@@ -117,6 +117,31 @@ The included `render.yaml` defines a public Node web service.
 
 The Blueprint also declares a Postgres database and injects `DATABASE_URL` into the service. Companies committed in `data/dashboard.json` are used only to seed a new database; companies fetched on demand are durable in Postgres.
 
+### Personal accounts
+
+Production supports lightweight signed email sessions so watchlists and metric preferences can live in Postgres instead of only in browser local storage.
+
+Set these Render environment variables:
+
+- `AUTH_SECRET`: long random string used to sign the HttpOnly session cookie.
+- `NORTHSTAR_INVITE_CODE`: optional private invite code while the site is not public.
+
+Signed-in user data is stored in `users`, `user_watchlist_items`, and `user_preferences`. Unsigned users can still use local browser mode, but production personalization should use sign-in.
+
+### Custom domain
+
+The Render service URL remains the canonical fallback:
+
+`https://northstar-stock-intelligence.onrender.com`
+
+For `https://northstar-stock-intelligence.com`:
+
+1. In Render, open the `northstar-stock-intelligence` web service.
+2. Add `northstar-stock-intelligence.com` and `www.northstar-stock-intelligence.com` under Custom Domains.
+3. In your DNS provider, point the apex domain to Render using the A/ALIAS/ANAME value Render shows.
+4. Point `www` to Render using the CNAME value Render shows.
+5. Wait for Render to show the domain as verified and TLS as issued.
+
 For an always-on public site, use a paid Render web-service instance. Free web services may sleep when idle.
 
 The market strip uses liquid ETF/ETN proxies rather than direct index feeds. Built-in fallback company figures are used only if generated data cannot load, and the entire fallback view is visibly labeled `[MOCK/FAKE]`. Always check the linked filing or investor-relations source before making an investment decision.

@@ -1,5 +1,6 @@
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
+import { createHmac, createHash, timingSafeEqual } from "node:crypto";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readFile, writeFile } from "node:fs/promises";
@@ -10,11 +11,16 @@ import {
   isProductionRuntime,
   listRefreshJobs,
   loadDashboardSnapshot,
+  loadUserPreference,
+  loadUserWatchlistItems,
   loadWatchlistItems,
   saveDashboardSnapshot,
+  saveUserPreference,
+  saveUserWatchlistItems,
   saveWatchlistItem,
   saveWatchlistItems,
   seedDatabaseFromFiles,
+  upsertUser,
 } from "./db.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -22,6 +28,8 @@ const port = Number(process.env.PORT || 4173);
 const host = process.env.HOST || "0.0.0.0";
 const secIdentity = process.env.SEC_USER_AGENT;
 const xBearerToken = process.env.X_BEARER_TOKEN;
+const authSecret = process.env.AUTH_SECRET || process.env.DATABASE_URL || "northstar-dev-session-secret";
+const inviteCode = process.env.NORTHSTAR_INVITE_CODE || "";
 const dashboardMaxAgeHours = Number(process.env.DASHBOARD_MAX_AGE_HOURS || 18);
 const quoteMaxAgeDays = Number(process.env.QUOTE_MAX_AGE_DAYS || 5);
 const tickerCachePath = join(root, "data", "sec-tickers.json");
@@ -56,6 +64,99 @@ function json(response, status, payload) {
     "Cache-Control": "no-store",
   });
   response.end(JSON.stringify(payload));
+}
+
+function readRequestBody(request) {
+  return new Promise((resolveBody, reject) => {
+    let body = "";
+    request.on("data", (chunk) => {
+      body += chunk;
+      if (body.length > 100_000) {
+        reject(new Error("Request body is too large"));
+        request.destroy();
+      }
+    });
+    request.on("end", () => resolveBody(body));
+    request.on("error", reject);
+  });
+}
+
+async function readJsonBody(request) {
+  const body = await readRequestBody(request);
+  if (!body.trim()) return {};
+  return JSON.parse(body);
+}
+
+function parseCookies(header = "") {
+  return Object.fromEntries(String(header)
+    .split(";")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .map((part) => {
+      const index = part.indexOf("=");
+      if (index === -1) return [part, ""];
+      return [part.slice(0, index), decodeURIComponent(part.slice(index + 1))];
+    }));
+}
+
+function signPayload(payload) {
+  return createHmac("sha256", authSecret).update(payload).digest("base64url");
+}
+
+function sessionCookieValue(session) {
+  const payload = Buffer.from(JSON.stringify(session)).toString("base64url");
+  return `${payload}.${signPayload(payload)}`;
+}
+
+function verifySessionCookie(value) {
+  if (!value || !value.includes(".")) return null;
+  const [payload, signature] = value.split(".");
+  const expected = signPayload(payload);
+  const left = Buffer.from(signature);
+  const right = Buffer.from(expected);
+  if (left.length !== right.length || !timingSafeEqual(left, right)) return null;
+  const session = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+  if (!session?.email || !session?.userKey || Date.now() > Number(session.expiresAt || 0)) return null;
+  return session;
+}
+
+function sessionFromRequest(request) {
+  try {
+    return verifySessionCookie(parseCookies(request.headers.cookie).northstar_session);
+  } catch {
+    return null;
+  }
+}
+
+function sessionHeaders(session = null) {
+  const secure = isProductionRuntime() ? "; Secure" : "";
+  if (!session) {
+    return {
+      "Set-Cookie": `northstar_session=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax${secure}`,
+    };
+  }
+  const maxAgeSeconds = Math.max(0, Math.floor((session.expiresAt - Date.now()) / 1000));
+  return {
+    "Set-Cookie": `northstar_session=${encodeURIComponent(sessionCookieValue(session))}; Max-Age=${maxAgeSeconds}; Path=/; HttpOnly; SameSite=Lax${secure}`,
+  };
+}
+
+function jsonWithHeaders(response, status, payload, headers = {}) {
+  response.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+    ...headers,
+  });
+  response.end(JSON.stringify(payload));
+}
+
+function userKeyForEmail(email) {
+  return createHash("sha256").update(email.trim().toLowerCase()).digest("hex");
+}
+
+function publicSession(session) {
+  if (!session) return null;
+  return { email: session.email, userKey: session.userKey, signedIn: true };
 }
 
 function clientIp(request) {
@@ -534,6 +635,98 @@ const server = createServer(async (request, response) => {
   try {
     if (request.method === "GET" && url.pathname === "/health") {
       json(response, 200, { status: "ok" });
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/session") {
+      json(response, 200, {
+        user: publicSession(sessionFromRequest(request)),
+        auth: {
+          configured: Boolean(authSecret),
+          inviteRequired: Boolean(inviteCode),
+          storage: isDatabaseConfigured() ? "postgres" : "local-development",
+        },
+      });
+      return;
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/session") {
+      const body = await readJsonBody(request);
+      const email = String(body.email || "").trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        json(response, 400, { error: "Enter a valid email address." });
+        return;
+      }
+      if (inviteCode && String(body.inviteCode || "") !== inviteCode) {
+        json(response, 401, { error: "Invite code is incorrect." });
+        return;
+      }
+      if (isProductionRuntime() && !isDatabaseConfigured()) {
+        json(response, 503, { error: "Postgres is required for production sign in." });
+        return;
+      }
+      const session = {
+        email,
+        userKey: userKeyForEmail(email),
+        issuedAt: Date.now(),
+        expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 30,
+      };
+      await upsertUser({ userKey: session.userKey, email });
+      jsonWithHeaders(response, 200, { user: publicSession(session) }, sessionHeaders(session));
+      return;
+    }
+
+    if (request.method === "DELETE" && url.pathname === "/api/session") {
+      jsonWithHeaders(response, 200, { user: null }, sessionHeaders(null));
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/me/watchlist") {
+      const session = sessionFromRequest(request);
+      if (!session) {
+        json(response, 401, { error: "Sign in required." });
+        return;
+      }
+      json(response, 200, { watchlist: await loadUserWatchlistItems(session.userKey) });
+      return;
+    }
+
+    if (request.method === "PUT" && url.pathname === "/api/me/watchlist") {
+      const session = sessionFromRequest(request);
+      if (!session) {
+        json(response, 401, { error: "Sign in required." });
+        return;
+      }
+      const body = await readJsonBody(request);
+      const items = Array.isArray(body.watchlist) ? body.watchlist : [];
+      await saveUserWatchlistItems(session.userKey, items);
+      json(response, 200, { watchlist: await loadUserWatchlistItems(session.userKey) });
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/me/preferences") {
+      const session = sessionFromRequest(request);
+      if (!session) {
+        json(response, 401, { error: "Sign in required." });
+        return;
+      }
+      json(response, 200, {
+        hiddenMetrics: await loadUserPreference(session.userKey, "hiddenMetrics") || {},
+        metricDisplay: await loadUserPreference(session.userKey, "metricDisplay") || {},
+      });
+      return;
+    }
+
+    if (request.method === "PUT" && url.pathname === "/api/me/preferences") {
+      const session = sessionFromRequest(request);
+      if (!session) {
+        json(response, 401, { error: "Sign in required." });
+        return;
+      }
+      const body = await readJsonBody(request);
+      await saveUserPreference(session.userKey, "hiddenMetrics", body.hiddenMetrics || {});
+      await saveUserPreference(session.userKey, "metricDisplay", body.metricDisplay || {});
+      json(response, 200, { ok: true });
       return;
     }
 
