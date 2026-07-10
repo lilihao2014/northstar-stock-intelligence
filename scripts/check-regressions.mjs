@@ -100,19 +100,23 @@ requireContract(packageJson.includes("scripts/ensure-deps.mjs"), "Check script m
 requireContract(ensureDeps.includes('await import("pg")') && ensureDeps.includes("npm"), "Dependency bootstrap must install pg when missing");
 requireContract(render.includes("fromDatabase:"), "Render Blueprint must inject DATABASE_URL from the managed database");
 requireContract(render.includes("NODE_ENV") && render.includes("production"), "Render must run with production storage rules enabled");
-requireContract(render.includes("AUTH_SECRET") && render.includes("NORTHSTAR_INVITE_CODE"), "Render must reserve production auth environment variables");
+requireContract(render.includes("AUTH_SECRET") && render.includes("GITHUB_CLIENT_ID") && render.includes("GITHUB_CLIENT_SECRET") && render.includes("NORTHSTAR_INVITE_CODE"), "Render must reserve production auth environment variables");
 requireContract(render.includes("npm install && npm run check"), "Render build must install runtime dependencies before checking");
 
 requireContract(server.includes('url.pathname === "/api/session"'), "Server must expose session endpoints");
+requireContract(server.includes('url.pathname === "/auth/github/start"') && server.includes('url.pathname === "/auth/github/callback"'), "Server must expose GitHub OAuth routes");
+requireContract(server.includes("https://github.com/login/oauth/authorize") && server.includes("https://github.com/login/oauth/access_token"), "GitHub OAuth authorization and token exchange are missing");
+requireContract(server.includes("northstar_oauth_state") && server.includes("randomBytes(24)") && server.includes("scope: \"read:user user:email\""), "GitHub OAuth must use state validation and verified email scope");
+requireContract(server.includes("Authorization: `Bearer ${tokenPayload.access_token}`") && server.includes("https://api.github.com/user/emails"), "Server must fetch GitHub identity without exposing access tokens to the browser");
 requireContract(server.includes("HttpOnly") && server.includes("SameSite=Lax"), "Session cookie must be HttpOnly with SameSite protection");
 requireContract(server.includes("createHmac") && server.includes("timingSafeEqual"), "Session cookie must be signed and verified safely");
 requireContract(server.includes('url.pathname === "/api/me/watchlist"'), "Server must expose per-user watchlist endpoints");
 requireContract(server.includes('url.pathname === "/api/me/preferences"'), "Server must expose per-user preference endpoints");
-requireContract(html.includes('id="account-control"') && html.includes('id="signin-form"'), "Account sign-in UI is missing");
-requireContract(app.includes("currentUser") && app.includes("loadCloudWatchlist") && app.includes("loadCloudPersonalization"), "Client must load signed-in personalization from the server");
+requireContract(html.includes('id="account-control"') && html.includes('id="github-signin"') && html.includes('href="/auth/github/start"'), "GitHub sign-in UI is missing");
+requireContract(app.includes("currentUser") && app.includes("githubOAuthConfigured") && app.includes("loadCloudWatchlist") && app.includes("loadCloudPersonalization"), "Client must load signed-in personalization from the server");
 requireContract(app.includes("/api/me/watchlist") && app.includes("/api/me/preferences"), "Client must sync user watchlist and preferences to server endpoints");
-requireContract(app.includes("Cloud sync enabled") && app.includes("Local browser mode"), "Client must distinguish signed-in cloud mode from local mode");
-requireContract(styles.includes(".account-panel") && styles.includes("backdrop-filter"), "Interactive account panel styling is missing");
+requireContract(app.includes("Cloud sync enabled") && app.includes("Local browser mode") && app.includes("Continue with GitHub"), "Client must distinguish signed-in cloud mode from local mode");
+requireContract(styles.includes(".account-panel") && styles.includes(".oauth-button") && styles.includes("backdrop-filter"), "Interactive account panel styling is missing");
 
 requireContract(html.includes('id="manage-metrics"'), "Dashboard-wide metric manager is missing");
 requireContract(/metric-visibility-card[\s\S]*id="period-control"/.test(html), "Annual/Quarterly control must live in the top-level metric controls");

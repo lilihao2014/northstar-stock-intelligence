@@ -1,6 +1,6 @@
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
-import { createHmac, createHash, timingSafeEqual } from "node:crypto";
+import { createHmac, createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readFile, writeFile } from "node:fs/promises";
@@ -30,6 +30,8 @@ const secIdentity = process.env.SEC_USER_AGENT;
 const xBearerToken = process.env.X_BEARER_TOKEN;
 const authSecret = process.env.AUTH_SECRET || process.env.DATABASE_URL || "northstar-dev-session-secret";
 const inviteCode = process.env.NORTHSTAR_INVITE_CODE || "";
+const githubClientId = process.env.GITHUB_CLIENT_ID || "";
+const githubClientSecret = process.env.GITHUB_CLIENT_SECRET || "";
 const dashboardMaxAgeHours = Number(process.env.DASHBOARD_MAX_AGE_HOURS || 18);
 const quoteMaxAgeDays = Number(process.env.QUOTE_MAX_AGE_DAYS || 5);
 const tickerCachePath = join(root, "data", "sec-tickers.json");
@@ -141,6 +143,18 @@ function sessionHeaders(session = null) {
   };
 }
 
+function oauthStateHeaders(state = null) {
+  const secure = isProductionRuntime() ? "; Secure" : "";
+  if (!state) {
+    return {
+      "Set-Cookie": `northstar_oauth_state=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax${secure}`,
+    };
+  }
+  return {
+    "Set-Cookie": `northstar_oauth_state=${encodeURIComponent(state)}; Max-Age=600; Path=/; HttpOnly; SameSite=Lax${secure}`,
+  };
+}
+
 function jsonWithHeaders(response, status, payload, headers = {}) {
   response.writeHead(status, {
     "Content-Type": "application/json; charset=utf-8",
@@ -156,7 +170,88 @@ function userKeyForEmail(email) {
 
 function publicSession(session) {
   if (!session) return null;
-  return { email: session.email, userKey: session.userKey, signedIn: true };
+  return {
+    email: session.email,
+    userKey: session.userKey,
+    signedIn: true,
+    provider: session.provider || "email",
+    name: session.name || null,
+    avatarUrl: session.avatarUrl || null,
+  };
+}
+
+function publicOrigin(request) {
+  const proto = request.headers["x-forwarded-proto"] || (isProductionRuntime() ? "https" : "http");
+  const hostHeader = request.headers["x-forwarded-host"] || request.headers.host || `${host}:${port}`;
+  return `${String(proto).split(",")[0]}://${String(hostHeader).split(",")[0]}`;
+}
+
+function githubOAuthConfigured() {
+  return Boolean(githubClientId && githubClientSecret);
+}
+
+function githubCallbackUrl(request) {
+  return `${publicOrigin(request)}/auth/github/callback`;
+}
+
+function safeRedirectTarget(value) {
+  const text = String(value || "/");
+  return text.startsWith("/") && !text.startsWith("//") ? text : "/";
+}
+
+function redirect(response, location, headers = {}) {
+  response.writeHead(302, { Location: location, ...headers });
+  response.end();
+}
+
+async function fetchGithubJson(url, options = {}) {
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      Accept: "application/vnd.github+json",
+      "User-Agent": "Northstar Stock Intelligence",
+      "X-GitHub-Api-Version": "2022-11-28",
+      ...(options.headers || {}),
+    },
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.message || `GitHub returned HTTP ${response.status}`);
+  return payload;
+}
+
+async function exchangeGithubCode(request, code) {
+  const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "User-Agent": "Northstar Stock Intelligence",
+    },
+    body: JSON.stringify({
+      client_id: githubClientId,
+      client_secret: githubClientSecret,
+      code,
+      redirect_uri: githubCallbackUrl(request),
+    }),
+  });
+  const tokenPayload = await tokenResponse.json();
+  if (!tokenResponse.ok || tokenPayload.error || !tokenPayload.access_token) {
+    throw new Error(tokenPayload.error_description || tokenPayload.error || "GitHub OAuth token exchange failed");
+  }
+  const headers = { Authorization: `Bearer ${tokenPayload.access_token}` };
+  const profile = await fetchGithubJson("https://api.github.com/user", { headers });
+  const emails = await fetchGithubJson("https://api.github.com/user/emails", { headers }).catch(() => []);
+  const primaryEmail = Array.isArray(emails)
+    ? emails.find((item) => item.primary && item.verified)?.email || emails.find((item) => item.verified)?.email
+    : null;
+  const email = profile.email || primaryEmail;
+  if (!email) throw new Error("GitHub did not return a verified email address");
+  return {
+    email: String(email).toLowerCase(),
+    name: profile.name || profile.login || null,
+    githubLogin: profile.login || null,
+    avatarUrl: profile.avatar_url || null,
+  };
 }
 
 function clientIp(request) {
@@ -638,11 +733,67 @@ const server = createServer(async (request, response) => {
       return;
     }
 
+    if (request.method === "GET" && url.pathname === "/auth/github/start") {
+      if (!githubOAuthConfigured()) {
+        json(response, 503, { error: "GitHub OAuth is not configured." });
+        return;
+      }
+      const state = randomBytes(24).toString("base64url");
+      const next = safeRedirectTarget(url.searchParams.get("next"));
+      const params = new URLSearchParams({
+        client_id: githubClientId,
+        redirect_uri: githubCallbackUrl(request),
+        scope: "read:user user:email",
+        state: `${state}:${Buffer.from(next).toString("base64url")}`,
+        allow_signup: "true",
+      });
+      redirect(response, `https://github.com/login/oauth/authorize?${params}`, oauthStateHeaders(state));
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/auth/github/callback") {
+      const cookies = parseCookies(request.headers.cookie);
+      const [state, encodedNext = ""] = String(url.searchParams.get("state") || "").split(":");
+      const next = safeRedirectTarget(Buffer.from(encodedNext, "base64url").toString("utf8"));
+      const clearState = oauthStateHeaders(null)["Set-Cookie"];
+      try {
+        if (!state || !cookies.northstar_oauth_state || state !== cookies.northstar_oauth_state) {
+          throw new Error("GitHub sign-in state did not match. Please try again.");
+        }
+        const code = url.searchParams.get("code");
+        if (!code) throw new Error(url.searchParams.get("error_description") || "GitHub did not return an authorization code");
+        if (isProductionRuntime() && !isDatabaseConfigured()) {
+          throw new Error("Postgres is required for production sign in.");
+        }
+        const identity = await exchangeGithubCode(request, code);
+        const session = {
+          email: identity.email,
+          userKey: userKeyForEmail(identity.email),
+          provider: "github",
+          name: identity.name,
+          githubLogin: identity.githubLogin,
+          avatarUrl: identity.avatarUrl,
+          issuedAt: Date.now(),
+          expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 30,
+        };
+        await upsertUser({ userKey: session.userKey, email: session.email, displayName: session.name || session.githubLogin });
+        redirect(response, `${next}${next.includes("?") ? "&" : "?"}signin=github`, {
+          "Set-Cookie": [clearState, sessionHeaders(session)["Set-Cookie"]],
+        });
+      } catch (error) {
+        redirect(response, `/?signin_error=${encodeURIComponent(error.message)}`, {
+          "Set-Cookie": clearState,
+        });
+      }
+      return;
+    }
+
     if (request.method === "GET" && url.pathname === "/api/session") {
       json(response, 200, {
         user: publicSession(sessionFromRequest(request)),
         auth: {
           configured: Boolean(authSecret),
+          githubConfigured: githubOAuthConfigured(),
           inviteRequired: Boolean(inviteCode),
           storage: isDatabaseConfigured() ? "postgres" : "local-development",
         },

@@ -119,14 +119,25 @@ The Blueprint also declares a Postgres database and injects `DATABASE_URL` into 
 
 ### Personal accounts
 
-Production supports lightweight signed email sessions so watchlists and metric preferences can live in Postgres instead of only in browser local storage.
+Production supports GitHub OAuth sign-in so watchlists and metric preferences can live in Postgres instead of only in browser local storage. The server exchanges the OAuth code and stores only a signed HttpOnly session cookie in the browser.
 
 Set these Render environment variables:
 
 - `AUTH_SECRET`: long random string used to sign the HttpOnly session cookie.
+- `GITHUB_CLIENT_ID`: GitHub OAuth app client ID.
+- `GITHUB_CLIENT_SECRET`: GitHub OAuth app client secret.
 - `NORTHSTAR_INVITE_CODE`: optional private invite code while the site is not public.
 
 Signed-in user data is stored in `users`, `user_watchlist_items`, and `user_preferences`. Unsigned users can still use local browser mode, but production personalization should use sign-in.
+
+Create the GitHub OAuth app at GitHub.com under **Settings -> Developer settings -> OAuth Apps**. Use:
+
+- Homepage URL: `https://northstar-stock-intelligence.onrender.com`
+- Authorization callback URL: `https://northstar-stock-intelligence.onrender.com/auth/github/callback`
+
+After the custom domain is verified, create or update the OAuth callback to:
+
+`https://northstar-stock-intelligence.com/auth/github/callback`
 
 ### Custom domain
 

@@ -556,7 +556,36 @@ kbd {
 #signin-form {
   display: grid;
   gap: 8px;
+  margin-top: 10px;
+}
+
+.oauth-button {
   margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #0f172a;
+  color: white;
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.oauth-button:hover {
+  background: #1e293b;
+}
+
+.oauth-button span {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.14);
+  font: 700 8px "DM Mono", monospace;
 }
 
 #signin-form input {

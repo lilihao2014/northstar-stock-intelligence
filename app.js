@@ -198,6 +198,7 @@ let researchStatusTimer = null;
 let refreshJobs = [];
 let currentUser = null;
 let inviteCodeRequired = false;
+let githubOAuthConfigured = false;
 let preferenceSaveTimer = null;
 
 const $ = (selector) => document.querySelector(selector);
@@ -227,6 +228,8 @@ const translations = {
     "Local browser mode": "本地浏览器模式",
     "Signed in": "已登录",
     "Signing in...": "登录中...",
+    "Continue with GitHub": "使用 GitHub 继续",
+    "Use email fallback": "使用邮箱备用登录",
     "Cloud sync enabled": "云端同步已启用",
     "Cloud sync paused": "云端同步暂停",
     "Alpha Vantage · ETF proxies": "Alpha Vantage · ETF 代理",
@@ -1597,6 +1600,7 @@ async function loadSession() {
     const payload = await response.json();
     currentUser = payload.user || null;
     inviteCodeRequired = Boolean(payload.auth?.inviteRequired);
+    githubOAuthConfigured = Boolean(payload.auth?.githubConfigured);
     renderAccount();
   } catch {
     currentUser = null;
@@ -1631,22 +1635,28 @@ function renderAccount() {
   const title = $("#account-title");
   const status = $("#account-status");
   const form = $("#signin-form");
+  const github = $("#github-signin");
   const signout = $("#signout-button");
   const code = $("#signin-code");
   if (!button || !title || !status) return;
   code.hidden = !inviteCodeRequired;
   if (currentUser) {
-    const initials = currentUser.email.split("@")[0].slice(0, 2).toUpperCase();
+    const label = currentUser.name || currentUser.email;
+    const initials = label.replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase();
     button.textContent = initials || "ME";
     title.textContent = tr("Personal research cloud");
     status.textContent = `${tr("Signed in")} · ${currentUser.email}`;
+    github.hidden = true;
     form.hidden = true;
     signout.hidden = false;
   } else {
     button.textContent = "LH";
     title.textContent = tr("Personal research cloud");
     status.textContent = tr("Local browser mode");
-    form.hidden = false;
+    github.hidden = !githubOAuthConfigured;
+    github.innerHTML = `<span>GH</span>${tr("Continue with GitHub")}`;
+    form.hidden = githubOAuthConfigured && !inviteCodeRequired;
+    form.querySelector("button").textContent = tr(githubOAuthConfigured ? "Use email fallback" : "Sign in");
     signout.hidden = true;
   }
 }
@@ -2391,6 +2401,19 @@ async function init() {
   await loadGeneratedData();
   await loadRefreshStatus();
   await loadSession();
+  const currentUrl = new URL(window.location.href);
+  if (currentUrl.searchParams.get("signin") === "github") {
+    showWatchlistStatus(tr("Cloud sync enabled"));
+    currentUrl.searchParams.delete("signin");
+    window.history.replaceState({}, "", currentUrl);
+  }
+  if (currentUrl.searchParams.get("signin_error")) {
+    $("#account-status").textContent = currentUrl.searchParams.get("signin_error");
+    $("#account-panel").hidden = false;
+    $("#account-button").setAttribute("aria-expanded", "true");
+    currentUrl.searchParams.delete("signin_error");
+    window.history.replaceState({}, "", currentUrl);
+  }
   const linkedTicker = new URL(window.location.href).searchParams.get("ticker")?.toUpperCase();
   const savedTicker = localStorage.getItem(selectedTickerStorageKey);
   if (linkedTicker && companies[linkedTicker]) selectedTicker = linkedTicker;
