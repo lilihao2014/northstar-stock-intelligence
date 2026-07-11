@@ -90,15 +90,16 @@
                   <strong id="account-title">Personal research cloud</strong>
                   <span id="account-status">Local browser mode</span>
                 </div>
-                <a class="oauth-button" id="github-signin" href="/auth/github/start">
-                  <span>GH</span>
-                  Continue with GitHub
+                <a class="oauth-button" id="google-signin" href="/auth/supabase/google/start">
+                  <span>G</span>
+                  Continue with Google
                 </a>
                 <form id="signin-form">
                   <input id="signin-email" type="email" placeholder="Email" autocomplete="email" />
                   <input id="signin-code" type="password" placeholder="Invite code" autocomplete="one-time-code" hidden />
-                  <button type="submit">Use email fallback</button>
+                  <button type="submit">Send magic link</button>
                 </form>
+                <a class="oauth-secondary" id="github-signin" href="/auth/github/start">Developer sign in with GitHub</a>
                 <button class="text-button" id="signout-button" hidden>Sign out</button>
               </div>
             </div>

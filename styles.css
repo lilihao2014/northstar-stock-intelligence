@@ -588,6 +588,20 @@ kbd {
   font: 700 8px "DM Mono", monospace;
 }
 
+.oauth-secondary {
+  display: block;
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.oauth-secondary:hover {
+  color: var(--ink);
+}
+
 #signin-form input {
   width: 100%;
   border: 1px solid var(--line);

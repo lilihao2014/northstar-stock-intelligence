@@ -159,12 +159,14 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 ## Personal accounts
 
 - The top bar exposes a visible account control that distinguishes local browser mode from signed-in cloud mode.
-- Production sign-in uses GitHub OAuth through server-owned `/auth/github/start` and `/auth/github/callback` routes.
+- Production end-user sign-in uses Supabase Auth with Google OAuth and email magic links.
+- Supabase access tokens are exchanged server-side through `/api/session/supabase` before Northstar creates its own signed session cookie.
+- GitHub OAuth may remain as a secondary developer sign-in, but it must not be the only production end-user path.
 - Signing in creates a signed, HttpOnly session cookie; the browser must not receive provider secrets or OAuth access tokens.
 - Signed-in watchlists are stored under `user_watchlist_items` in Postgres.
 - Signed-in metric visibility and display preferences are stored under `user_preferences` in Postgres.
 - Unsigned users may keep a local browser fallback, but production personalization should prefer signed-in cloud sync.
-- Render must expose `AUTH_SECRET`, `GITHUB_CLIENT_ID`, and `GITHUB_CLIENT_SECRET`; `NORTHSTAR_INVITE_CODE` may be set to restrict access while the app is private.
+- Render must expose `AUTH_SECRET`, `SUPABASE_URL`, and `SUPABASE_ANON_KEY`; `NORTHSTAR_INVITE_CODE` may be set to restrict access while the app is private.
 
 ## Custom domain
 

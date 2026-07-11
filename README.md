@@ -119,18 +119,31 @@ The Blueprint also declares a Postgres database and injects `DATABASE_URL` into 
 
 ### Personal accounts
 
-Production supports GitHub OAuth sign-in so watchlists and metric preferences can live in Postgres instead of only in browser local storage. The server exchanges the OAuth code and stores only a signed HttpOnly session cookie in the browser.
+Production supports end-user sign-in through Supabase Auth. Users can continue with Google or request an email magic link; after Supabase verifies the user, Northstar stores only a signed HttpOnly session cookie in the browser. Watchlists and metric preferences live in Postgres instead of only in browser local storage.
 
 Set these Render environment variables:
 
 - `AUTH_SECRET`: long random string used to sign the HttpOnly session cookie.
-- `GITHUB_CLIENT_ID`: GitHub OAuth app client ID.
-- `GITHUB_CLIENT_SECRET`: GitHub OAuth app client secret.
+- `SUPABASE_URL`: your Supabase project URL.
+- `SUPABASE_ANON_KEY`: your Supabase anon/public key.
+- `GITHUB_CLIENT_ID`: optional developer GitHub OAuth app client ID.
+- `GITHUB_CLIENT_SECRET`: optional developer GitHub OAuth app client secret.
 - `NORTHSTAR_INVITE_CODE`: optional private invite code while the site is not public.
 
 Signed-in user data is stored in `users`, `user_watchlist_items`, and `user_preferences`. Unsigned users can still use local browser mode, but production personalization should use sign-in.
 
-Create the GitHub OAuth app at GitHub.com under **Settings -> Developer settings -> OAuth Apps**. Use:
+In Supabase:
+
+1. Create a Supabase project.
+2. Enable Google under **Authentication -> Providers**.
+3. Add these Site/Redirect URLs under **Authentication -> URL Configuration**:
+   - `https://northstar-stock-intelligence.onrender.com`
+   - `https://northstar-stock-intelligence.onrender.com/`
+   - `https://northstar-stock-intelligence.com`
+   - `https://northstar-stock-intelligence.com/`
+4. Copy the project URL and anon key into Render.
+
+Optional developer GitHub OAuth remains available as a secondary sign-in. Create the GitHub OAuth app at GitHub.com under **Settings -> Developer settings -> OAuth Apps**. Use:
 
 - Homepage URL: `https://northstar-stock-intelligence.onrender.com`
 - Authorization callback URL: `https://northstar-stock-intelligence.onrender.com/auth/github/callback`

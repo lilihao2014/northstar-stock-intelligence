@@ -32,6 +32,8 @@ const authSecret = process.env.AUTH_SECRET || process.env.DATABASE_URL || "north
 const inviteCode = process.env.NORTHSTAR_INVITE_CODE || "";
 const githubClientId = process.env.GITHUB_CLIENT_ID || "";
 const githubClientSecret = process.env.GITHUB_CLIENT_SECRET || "";
+const supabaseUrl = (process.env.SUPABASE_URL || "").replace(/\/+$/, "");
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || "";
 const dashboardMaxAgeHours = Number(process.env.DASHBOARD_MAX_AGE_HOURS || 18);
 const quoteMaxAgeDays = Number(process.env.QUOTE_MAX_AGE_DAYS || 5);
 const tickerCachePath = join(root, "data", "sec-tickers.json");
@@ -190,6 +192,10 @@ function githubOAuthConfigured() {
   return Boolean(githubClientId && githubClientSecret);
 }
 
+function supabaseAuthConfigured() {
+  return Boolean(supabaseUrl && supabaseAnonKey);
+}
+
 function githubCallbackUrl(request) {
   return `${publicOrigin(request)}/auth/github/callback`;
 }
@@ -252,6 +258,49 @@ async function exchangeGithubCode(request, code) {
     githubLogin: profile.login || null,
     avatarUrl: profile.avatar_url || null,
   };
+}
+
+async function fetchSupabaseUser(accessToken) {
+  if (!supabaseAuthConfigured()) throw new Error("Supabase Auth is not configured.");
+  const response = await fetch(`${supabaseUrl}/auth/v1/user`, {
+    headers: {
+      apikey: supabaseAnonKey,
+      Authorization: `Bearer ${accessToken}`,
+    },
+    signal: AbortSignal.timeout(10000),
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.msg || payload.error_description || payload.error || "Supabase user verification failed");
+  const email = String(payload.email || payload.user_metadata?.email || "").toLowerCase();
+  if (!email) throw new Error("Supabase did not return a verified email address");
+  return {
+    email,
+    name: payload.user_metadata?.full_name || payload.user_metadata?.name || email.split("@")[0],
+    avatarUrl: payload.user_metadata?.avatar_url || null,
+    supabaseUserId: payload.id,
+    provider: payload.app_metadata?.provider || "supabase",
+  };
+}
+
+async function sendSupabaseMagicLink(email, redirectTo) {
+  if (!supabaseAuthConfigured()) throw new Error("Supabase Auth is not configured.");
+  const response = await fetch(`${supabaseUrl}/auth/v1/otp`, {
+    method: "POST",
+    headers: {
+      apikey: supabaseAnonKey,
+      Authorization: `Bearer ${supabaseAnonKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      create_user: true,
+      options: { email_redirect_to: redirectTo },
+    }),
+    signal: AbortSignal.timeout(10000),
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.msg || payload.error_description || payload.error || "Magic link request failed");
+  return true;
 }
 
 function clientIp(request) {
@@ -751,6 +800,20 @@ const server = createServer(async (request, response) => {
       return;
     }
 
+    if (request.method === "GET" && url.pathname === "/auth/supabase/google/start") {
+      if (!supabaseAuthConfigured()) {
+        json(response, 503, { error: "Supabase Auth is not configured." });
+        return;
+      }
+      const redirectTo = `${publicOrigin(request)}/`;
+      const params = new URLSearchParams({
+        provider: "google",
+        redirect_to: redirectTo,
+      });
+      redirect(response, `${supabaseUrl}/auth/v1/authorize?${params}`);
+      return;
+    }
+
     if (request.method === "GET" && url.pathname === "/auth/github/callback") {
       const cookies = parseCookies(request.headers.cookie);
       const [state, encodedNext = ""] = String(url.searchParams.get("state") || "").split(":");
@@ -794,6 +857,7 @@ const server = createServer(async (request, response) => {
         auth: {
           configured: Boolean(authSecret),
           githubConfigured: githubOAuthConfigured(),
+          supabaseConfigured: supabaseAuthConfigured(),
           inviteRequired: Boolean(inviteCode),
           storage: isDatabaseConfigured() ? "postgres" : "local-development",
         },
@@ -824,6 +888,49 @@ const server = createServer(async (request, response) => {
       };
       await upsertUser({ userKey: session.userKey, email });
       jsonWithHeaders(response, 200, { user: publicSession(session) }, sessionHeaders(session));
+      return;
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/session/supabase") {
+      const body = await readJsonBody(request);
+      const accessToken = String(body.accessToken || "");
+      if (!accessToken) {
+        json(response, 400, { error: "Supabase access token is required." });
+        return;
+      }
+      if (isProductionRuntime() && !isDatabaseConfigured()) {
+        json(response, 503, { error: "Postgres is required for production sign in." });
+        return;
+      }
+      const identity = await fetchSupabaseUser(accessToken);
+      const session = {
+        email: identity.email,
+        userKey: userKeyForEmail(identity.email),
+        provider: identity.provider === "google" ? "google" : "supabase",
+        name: identity.name,
+        avatarUrl: identity.avatarUrl,
+        supabaseUserId: identity.supabaseUserId,
+        issuedAt: Date.now(),
+        expiresAt: Date.now() + 1000 * 60 * 60 * 24 * 30,
+      };
+      await upsertUser({ userKey: session.userKey, email: session.email, displayName: session.name });
+      jsonWithHeaders(response, 200, { user: publicSession(session) }, sessionHeaders(session));
+      return;
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/auth/supabase/magic-link") {
+      const body = await readJsonBody(request);
+      const email = String(body.email || "").trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        json(response, 400, { error: "Enter a valid email address." });
+        return;
+      }
+      if (inviteCode && String(body.inviteCode || "") !== inviteCode) {
+        json(response, 401, { error: "Invite code is incorrect." });
+        return;
+      }
+      await sendSupabaseMagicLink(email, `${publicOrigin(request)}/`);
+      json(response, 200, { ok: true });
       return;
     }
 
