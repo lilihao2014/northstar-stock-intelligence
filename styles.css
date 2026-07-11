@@ -407,7 +407,7 @@ h1 em {
   top: calc(100% + 7px);
   right: 0;
   width: 320px;
-  max-height: 300px;
+  max-height: 390px;
   overflow-y: auto;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -432,6 +432,15 @@ h1 em {
   align-items: center;
   text-align: left;
   cursor: pointer;
+}
+
+.search-result:disabled {
+  cursor: wait;
+  opacity: 0.74;
+}
+
+.search-result.loading {
+  background: #ecfeff;
 }
 
 .search-result:last-child {
@@ -476,10 +485,24 @@ h1 em {
   white-space: nowrap;
 }
 
+.search-result-copy small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 8px;
+  line-height: 1.35;
+}
+
 .search-result-action {
+  min-width: 68px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 8px;
   color: var(--green);
-  font-size: 9px;
+  background: #f8fafc;
+  font-size: 8px;
   font-weight: 700;
+  text-align: center;
 }
 
 .search-empty {
@@ -487,6 +510,58 @@ h1 em {
   color: #7d8c87;
   font-size: 10px;
   line-height: 1.5;
+}
+
+.search-empty strong,
+.search-empty span {
+  display: block;
+}
+
+.search-empty strong {
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.search-empty span {
+  margin-top: 4px;
+}
+
+.search-progress {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, #ecfeff, #f8fafc);
+}
+
+.search-progress strong,
+.search-progress span {
+  display: block;
+}
+
+.search-progress strong {
+  color: var(--ink);
+  font: 700 9px "DM Mono", monospace;
+}
+
+.search-progress span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.search-error {
+  color: var(--coral);
+}
+
+.search-retry {
+  margin-top: 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 7px 9px;
+  background: white;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 9px;
+  font-weight: 800;
 }
 
 .search-box input {

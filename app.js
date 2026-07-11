@@ -190,6 +190,8 @@ let activeSearchIndex = -1;
 let searchRequest = 0;
 let searchTimer = null;
 let watchlistStatusTimer = null;
+let pendingTickerFetch = null;
+let searchLoading = false;
 let currentLanguage = localStorage.getItem("northstar-language") || "en";
 let tickerContentRequest = 0;
 const tickerContentCache = new Map();
@@ -319,6 +321,19 @@ const translations = {
     Added: "已添加",
     Add: "添加",
     Fetch: "获取",
+    "Open": "打开",
+    "Add cached": "添加缓存",
+    "Fetch & add": "获取并添加",
+    "Already saved": "已保存",
+    "Build SEC profile": "构建 SEC 档案",
+    "Usually takes 30-90 seconds for a new ticker.": "新股票通常需要 30-90 秒。",
+    "Searching SEC tickers...": "正在搜索 SEC 股票代码...",
+    "Type a ticker or company name.": "输入股票代码或公司名称。",
+    "Try another ticker or company name.": "请尝试其他股票代码或公司名称。",
+    "Downloading SEC filings and market data...": "正在下载 SEC 文件与市场数据...",
+    "Keep this tab open while Northstar builds the profile.": "请保持此标签页打开，Northstar 正在构建档案。",
+    "Add ticker failed": "添加股票失败",
+    "Try again": "重试",
     "Fetching...": "正在获取...",
     "SEC listed company": "SEC 上市公司",
     "Revenue growth": "营收增长",
@@ -828,6 +843,20 @@ function rankCachedCompanies(normalized) {
     }));
 }
 
+function searchActionLabel(company) {
+  if (pendingTickerFetch === company.ticker) return tr("Fetching...");
+  if (company.cached && watchlistTickers.includes(company.ticker)) return tr("Open");
+  if (company.cached) return tr("Add cached");
+  return tr("Fetch & add");
+}
+
+function searchResultNote(company) {
+  if (pendingTickerFetch === company.ticker) return tr("Downloading SEC filings and market data...");
+  if (company.cached && watchlistTickers.includes(company.ticker)) return tr("Already saved");
+  if (company.cached) return tr("Ready in dashboard");
+  return tr("Usually takes 30-90 seconds for a new ticker.");
+}
+
 function paintSearchResults(query) {
   const normalized = query.trim().toUpperCase();
   const results = $("#search-results");
@@ -840,21 +869,31 @@ function paintSearchResults(query) {
   if (!searchMatches.length) {
     results.innerHTML = `
       <div class="search-empty">
-        ${tr("No US-listed SEC ticker found.")}
+        <strong>${tr(searchLoading ? "Searching SEC tickers..." : "No US-listed SEC ticker found.")}</strong>
+        <span>${tr(searchLoading ? "Type a ticker or company name." : "Try another ticker or company name.")}</span>
       </div>`;
   } else {
     results.innerHTML = searchMatches
       .map((company, index) => `
-        <button class="search-result ${index === activeSearchIndex ? "active" : ""}" data-search-ticker="${company.ticker}" role="option">
+        <button class="search-result ${index === activeSearchIndex ? "active" : ""} ${pendingTickerFetch === company.ticker ? "loading" : ""}" data-search-ticker="${company.ticker}" role="option" ${pendingTickerFetch ? "disabled" : ""}>
           <span class="search-result-logo" style="background:${company.color || "#1f6657"}">${company.ticker[0]}</span>
           <span class="search-result-copy">
             <strong>${company.ticker} · ${company.name}</strong>
             <span>${translateMeta(company.meta || company.exchange || tr("SEC listed company"))}</span>
+            <small>${searchResultNote(company)}</small>
           </span>
-          <span class="search-result-action">${company.cached ? (watchlistTickers.includes(company.ticker) ? tr("Added") : tr("Add")) : tr("Fetch")}</span>
+          <span class="search-result-action">${searchActionLabel(company)}</span>
         </button>`,
       )
       .join("");
+  }
+
+  if (pendingTickerFetch) {
+    results.insertAdjacentHTML("afterbegin", `
+      <div class="search-progress">
+        <strong>${tr("Build SEC profile")} · ${pendingTickerFetch}</strong>
+        <span>${tr("Keep this tab open while Northstar builds the profile.")}</span>
+      </div>`);
   }
 
   results.classList.add("open");
@@ -875,6 +914,7 @@ async function renderSearchResults(query) {
   const requestId = ++searchRequest;
   const cached = rankCachedCompanies(normalized);
   searchMatches = cached.slice(0, 8);
+  searchLoading = true;
   paintSearchResults(normalized);
 
   try {
@@ -887,10 +927,12 @@ async function renderSearchResults(query) {
       if (!merged.has(result.ticker)) merged.set(result.ticker, { ...result, cached: false });
     }
     searchMatches = [...merged.values()].slice(0, 8);
+    searchLoading = false;
     paintSearchResults(normalized);
   } catch (error) {
+    searchLoading = false;
     if (!cached.length && requestId === searchRequest) {
-      $("#search-results").innerHTML = `<div class="search-empty">${currentLanguage === "zh" ? "实时股票搜索不可用" : "Live ticker search unavailable"}: ${error.message}</div>`;
+      $("#search-results").innerHTML = `<div class="search-empty search-error"><strong>${currentLanguage === "zh" ? "实时股票搜索不可用" : "Live ticker search unavailable"}</strong><span>${error.message}</span></div>`;
       $("#search-results").classList.add("open");
     }
   }
@@ -947,18 +989,21 @@ async function refreshCompanyData(ticker) {
 
 async function chooseSearchResult(ticker) {
   const match = searchMatches.find((item) => item.ticker === ticker);
-  if (!match) return;
+  if (!match || pendingTickerFetch) return;
   if (companies[ticker]) {
     selectCompany(ticker);
-    addToWatchlist(ticker);
+    const added = addToWatchlist(ticker);
+    showWatchlistStatus(added
+      ? currentLanguage === "zh" ? `${ticker} ${tr("added")}` : `${ticker} added`
+      : tr("Already in watchlist"));
     $("#stock-search").value = "";
     closeSearchResults();
     return;
   }
 
-  const action = document.querySelector(`[data-search-ticker="${ticker}"] .search-result-action`);
-  if (action) action.textContent = tr("Fetching...");
-  document.querySelectorAll(".search-result").forEach((button) => { button.disabled = true; });
+  pendingTickerFetch = ticker;
+  paintSearchResults($("#stock-search").value || ticker);
+  showWatchlistStatus(`${tr("Build SEC profile")} · ${ticker}`);
 
   try {
     const response = await fetch(`/api/companies/${encodeURIComponent(ticker)}`, { method: "POST" });
@@ -970,8 +1015,20 @@ async function chooseSearchResult(ticker) {
     addToWatchlist(ticker);
     $("#stock-search").value = "";
     closeSearchResults();
+    showWatchlistStatus(currentLanguage === "zh" ? `${ticker} ${tr("added")}` : `${ticker} added`);
   } catch (error) {
-    $("#search-results").innerHTML = `<div class="search-empty">${currentLanguage === "zh" ? `无法获取 ${ticker}` : `Could not fetch ${ticker}`}: ${error.message}</div>`;
+    pendingTickerFetch = null;
+    $("#search-results").innerHTML = `
+      <div class="search-empty search-error">
+        <strong>${tr("Add ticker failed")} · ${ticker}</strong>
+        <span>${error.message}</span>
+        <button class="search-retry" data-retry-ticker="${ticker}">${tr("Try again")}</button>
+      </div>`;
+    $("#search-results").classList.add("open");
+    document.querySelector("[data-retry-ticker]")?.addEventListener("click", () => chooseSearchResult(ticker));
+    showWatchlistStatus(`${tr("Add ticker failed")} · ${ticker}`);
+  } finally {
+    pendingTickerFetch = null;
   }
 }
 
