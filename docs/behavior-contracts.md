@@ -130,6 +130,9 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 - Decorative serif typography must not be used in the product shell; finance UI text uses Manrope and data values use DM Mono.
 - Primary cards use compact radius and border treatments so dense metric grids remain readable.
 - Controls use standard button/segmented-control styling with explicit active states and clear contrast.
+- Keyboard users must see a clear `:focus-visible` outline on links, buttons, inputs, selects, and summaries.
+- Search and account overlays close on Escape and outside click.
+- Mobile search remains visible as a usable input rather than collapsing to an icon-only target.
 - Design changes must bump the stylesheet cache key in `index.html` so Render deployments are visible immediately.
 
 ## Fundamentals freshness

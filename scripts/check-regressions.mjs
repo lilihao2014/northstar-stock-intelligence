@@ -65,6 +65,9 @@ requireContract(styles.includes("--cream: #f5f7fa") && styles.includes("--card: 
 requireContract(styles.includes("--shadow: 0 1px 2px rgba(15, 23, 42, 0.06)"), "Card shadow must remain subtle for the research-dashboard design");
 requireContract(styles.includes("border-radius: var(--radius)") && styles.includes("--radius: 8px"), "Cards must use compact industry-dashboard radius");
 requireContract(styles.includes(".company-price strong") && styles.includes('font: 600 22px "DM Mono"'), "Market price typography must remain compact and data-oriented");
+requireContract(styles.includes(":focus-visible") && styles.includes("outline: 2px solid var(--blue)"), "Interactive controls must expose a visible keyboard focus state");
+requireContract(app.includes("function closeAccountPanel()") && app.includes('event.key === "Escape"') && app.includes('!event.target.closest(".account-control")'), "Search and account overlays must close on Escape and outside click");
+requireContract(!styles.includes(".search-box input,\n  .search-box kbd {\n    display: none;"), "Mobile search must not collapse into an icon-only control");
 requireContract(refresh.includes("price / fiscalYearEstimate.epsAverage"), "Refresh must derive forward P/E from price and fiscal-year EPS consensus");
 requireContract(!refresh.includes("Number(overview.PERatio)"), "Trailing P/E must not be used as forward P/E");
 requireContract(app.includes('calculatedPe ? "[CALCULATED]"'), "Cached companies must label derived forward P/E as calculated");

@@ -43,6 +43,19 @@ button {
   color: inherit;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 .app-shell {
   min-height: 100vh;
   display: grid;
@@ -204,10 +217,11 @@ button {
   width: 25px;
   height: 25px;
   border: 1px solid rgba(255, 255, 255, 0.22);
-  border-radius: 50%;
-  color: var(--lime);
+  border-radius: 7px;
+  color: #dbeafe;
   background: rgba(255, 255, 255, 0.06);
-  font-size: 18px;
+  font-size: 14px;
+  font-weight: 800;
   line-height: 1;
   cursor: pointer;
 }
@@ -2185,27 +2199,24 @@ footer {
 
   .topbar {
     align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    align-items: stretch;
+    flex-wrap: wrap;
   }
 
   .search-box {
-    width: 42px;
-  }
-
-  .search-control:focus-within .search-box {
-    width: min(250px, 64vw);
-  }
-
-  .search-box input,
-  .search-box kbd {
-    display: none;
-  }
-
-  .search-control:focus-within .search-box input {
-    display: block;
+    width: min(100%, 360px);
   }
 
   .search-results {
-    width: min(320px, 88vw);
+    left: 0;
+    right: auto;
+    width: min(360px, 92vw);
   }
 
   .market-strip {

@@ -825,6 +825,11 @@ function closeSearchResults() {
   activeSearchIndex = -1;
 }
 
+function closeAccountPanel() {
+  $("#account-panel").hidden = true;
+  $("#account-button").setAttribute("aria-expanded", "false");
+}
+
 function rankCachedCompanies(normalized) {
   return Object.values(companies)
     .filter((company) =>
@@ -2293,8 +2298,7 @@ function setupInteractions() {
 
   $("#signout-button").addEventListener("click", async () => {
     await signOut();
-    $("#account-panel").hidden = true;
-    $("#account-button").setAttribute("aria-expanded", "false");
+    closeAccountPanel();
   });
 
   $("#language-selector").addEventListener("click", (event) => {
@@ -2403,6 +2407,11 @@ function setupInteractions() {
   });
 
   document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeSearchResults();
+      closeAccountPanel();
+      return;
+    }
     if (event.key === "/" && document.activeElement !== $("#stock-search")) {
       event.preventDefault();
       $("#stock-search").focus();
@@ -2411,6 +2420,7 @@ function setupInteractions() {
 
   document.addEventListener("click", (event) => {
     if (!event.target.closest(".search-control")) closeSearchResults();
+    if (!event.target.closest(".account-control")) closeAccountPanel();
   });
 
   window.addEventListener("popstate", () => {
