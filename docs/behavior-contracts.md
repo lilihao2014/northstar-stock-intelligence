@@ -84,6 +84,11 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 
 - `EN` renders English labels and `中文` renders Chinese labels.
 
+## Account state
+
+- Logged-out users see a neutral `Sign in` action, not a personal name or initials.
+- User initials are shown only after the backend confirms an authenticated session.
+
 ## Ticker news and social content
 
 - News is fetched for the selected ticker and every headline links to its original Nasdaq-hosted article.

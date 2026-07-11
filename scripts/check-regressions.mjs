@@ -63,7 +63,7 @@ requireContract(styles.includes(".metric-axis-explainer"), "Metric axis explanat
 requireContract(app.includes('axisFormat: "eps"'), "EPS histories must retain numeric per-share changes for charting");
 requireContract(app.includes('const step = period === "quarterly" ? 4 : 1'), "Quarterly EPS charts must compare against the prior-year quarter");
 requireContract(!html.includes("Playfair") && !styles.includes("Playfair"), "Product shell must not use decorative serif typography");
-requireContract(html.includes("styles.css?v=20260711-watchlist-1"), "Stylesheet cache key must be bumped for the latest interaction refresh");
+requireContract(html.includes("styles.css?v=20260711-account-1"), "Stylesheet cache key must be bumped for the latest interaction refresh");
 requireContract(styles.includes("--cream: #f5f7fa") && styles.includes("--card: #ffffff") && styles.includes("--line: #d8dee6"), "Industry design palette tokens are missing");
 requireContract(styles.includes("--shadow: 0 1px 2px rgba(15, 23, 42, 0.06)"), "Card shadow must remain subtle for the research-dashboard design");
 requireContract(styles.includes("border-radius: var(--radius)") && styles.includes("--radius: 8px"), "Cards must use compact industry-dashboard radius");
@@ -136,6 +136,9 @@ requireContract(app.includes("currentUser") && app.includes("supabaseAuthConfigu
 requireContract(app.includes("/api/me/watchlist") && app.includes("/api/me/preferences"), "Client must sync user watchlist and preferences to server endpoints");
 requireContract(app.includes("Cloud sync enabled") && app.includes("Local browser mode") && app.includes("Continue with Google"), "Client must distinguish signed-in cloud mode from local mode");
 requireContract(styles.includes(".account-panel") && styles.includes(".oauth-button") && styles.includes(".oauth-secondary") && styles.includes("backdrop-filter"), "Interactive account panel styling is missing");
+requireContract(html.includes('class="avatar signed-out"') && !html.includes('id="account-button" aria-expanded="false" aria-controls="account-panel">LH</button>'), "Logged-out account control must not show personal initials");
+requireContract(app.includes('button.classList.remove("signed-out")') && app.includes('button.classList.add("signed-out")') && app.includes('button.textContent = tr("Sign in")'), "Account button must show initials only after sign-in");
+requireContract(styles.includes(".avatar.signed-out"), "Signed-out account button styling is missing");
 requireContract(app.includes('const selectedPeriodStorageKey = "northstar-selected-period"') && app.includes("localStorage.setItem(selectedPeriodStorageKey, selectedPeriod)") && app.includes("syncPeriodControl()"), "Annual/Quarterly selection must persist locally and update the segmented control");
 requireContract(app.includes("validReportingPeriod(payload.selectedPeriod)") && server.includes("selectedPeriod: await loadUserPreference") && server.includes('saveUserPreference(session.userKey, "selectedPeriod"'), "Annual/Quarterly selection must sync through signed-in preferences");
 

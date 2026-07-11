@@ -231,6 +231,7 @@ const translations = {
     "Search ticker or company": "搜索股票代码或公司",
     "Personal research cloud": "个人研究云",
     "Local browser mode": "本地浏览器模式",
+    "Sign in": "登录",
     "Signed in": "已登录",
     "Signing in...": "登录中...",
     "Continue with Google": "使用 Google 继续",
@@ -1816,6 +1817,7 @@ function renderAccount() {
   if (currentUser) {
     const label = currentUser.name || currentUser.email;
     const initials = label.replace(/[^A-Za-z0-9]/g, "").slice(0, 2).toUpperCase();
+    button.classList.remove("signed-out");
     button.textContent = initials || "ME";
     title.textContent = tr("Personal research cloud");
     status.textContent = `${tr("Signed in")} · ${currentUser.email}`;
@@ -1824,7 +1826,8 @@ function renderAccount() {
     form.hidden = true;
     signout.hidden = false;
   } else {
-    button.textContent = "LH";
+    button.classList.add("signed-out");
+    button.textContent = tr("Sign in");
     title.textContent = tr("Personal research cloud");
     status.textContent = tr("Local browser mode");
     google.hidden = !supabaseAuthConfigured;
