@@ -10,6 +10,7 @@ These contracts describe user-visible behavior that must survive refactors. A ch
 - Existing membership is communicated in search results with `Added`; it does not replace the header add control.
 - Removing a ticker remains a separate `x` action on that watchlist row.
 - Cached ticker search results distinguish opening an already saved ticker from adding a cached ticker.
+- Every search suggestion row shows a star action state so users can save directly from the search dropdown without relying on the sidebar `+`.
 - Uncached ticker search results clearly say `Fetch & add` and explain that building the SEC profile can take 30-90 seconds.
 - While an uncached ticker is being added, the dropdown shows a progress panel and disables duplicate result clicks.
 - Add failures show the provider error and a retry action without losing the typed ticker.

@@ -37,10 +37,11 @@ requireContract(openSearch.includes("search.select()"), "Watchlist + must select
 requireContract(/#add-watchlist[\s\S]*?openWatchlistSearch\(\)/.test(app), "Watchlist + click must call openWatchlistSearch");
 requireContract(app.includes("pendingTickerFetch"), "Add ticker flow must track the active ticker fetch");
 requireContract(app.includes("Fetch & add") && app.includes("Usually takes 30-90 seconds for a new ticker."), "Uncached ticker results must explain the fetch-and-add workflow");
+requireContract(app.includes("function searchStar(company)") && app.includes("★") && app.includes("☆"), "Search suggestions must show star save states");
 requireContract(app.includes("search-progress") && app.includes("Keep this tab open while Northstar builds the profile."), "Add ticker flow must show progress while building a new SEC profile");
 requireContract(app.includes("data-retry-ticker") && app.includes("Add ticker failed"), "Add ticker failures must expose a retry action");
 requireContract(app.includes("Already saved") && app.includes("Add cached"), "Cached ticker results must distinguish saved and unsaved states");
-requireContract(styles.includes(".search-progress") && styles.includes(".search-retry") && styles.includes(".search-result.loading"), "Add ticker search UX styles are missing");
+requireContract(styles.includes(".search-progress") && styles.includes(".search-retry") && styles.includes(".search-result.loading") && styles.includes(".search-result-action.saved"), "Add ticker search UX styles are missing");
 
 requireContract(app.includes("function miniChart(history, type, title)"), "Shared metric mini-chart renderer is missing");
 requireContract(app.includes('renderMetricHistory(label === "EPS growth" ? epsChangeChartHistory(company, selectedPeriod, history) : history, "metric-history", label, "line")'), "Summary histories must render line charts");

@@ -325,6 +325,7 @@ const translations = {
     "Add cached": "添加缓存",
     "Fetch & add": "获取并添加",
     "Already saved": "已保存",
+    Saved: "已保存",
     "Build SEC profile": "构建 SEC 档案",
     "Usually takes 30-90 seconds for a new ticker.": "新股票通常需要 30-90 秒。",
     "Searching SEC tickers...": "正在搜索 SEC 股票代码...",
@@ -845,9 +846,14 @@ function rankCachedCompanies(normalized) {
 
 function searchActionLabel(company) {
   if (pendingTickerFetch === company.ticker) return tr("Fetching...");
-  if (company.cached && watchlistTickers.includes(company.ticker)) return tr("Open");
+  if (company.cached && watchlistTickers.includes(company.ticker)) return tr("Saved");
   if (company.cached) return tr("Add cached");
   return tr("Fetch & add");
+}
+
+function searchStar(company) {
+  if (pendingTickerFetch === company.ticker) return "…";
+  return watchlistTickers.includes(company.ticker) ? "★" : "☆";
 }
 
 function searchResultNote(company) {
@@ -882,7 +888,10 @@ function paintSearchResults(query) {
             <span>${translateMeta(company.meta || company.exchange || tr("SEC listed company"))}</span>
             <small>${searchResultNote(company)}</small>
           </span>
-          <span class="search-result-action">${searchActionLabel(company)}</span>
+          <span class="search-result-action ${watchlistTickers.includes(company.ticker) ? "saved" : ""}">
+            <b>${searchStar(company)}</b>
+            ${searchActionLabel(company)}
+          </span>
         </button>`,
       )
       .join("");
