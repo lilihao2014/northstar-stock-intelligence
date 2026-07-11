@@ -214,7 +214,7 @@ const metricDisplayControlsHiddenKey = "northstar-metric-display-controls-hidden
 const selectedPeriodStorageKey = "northstar-selected-period";
 let hiddenMetricsByTicker = {};
 let metricDisplayByTicker = {};
-let metricDisplayControlsHidden = localStorage.getItem(metricDisplayControlsHiddenKey) === "true";
+let metricDisplayControlsHidden = localStorage.getItem(metricDisplayControlsHiddenKey) !== "false";
 let metricManagerOpen = false;
 const selectedTickerStorageKey = "northstar-selected-ticker";
 const translations = {
@@ -225,8 +225,12 @@ const translations = {
     Markets: "市场",
     Watchlist: "自选股",
     "Built for clearer thinking, not financial advice.": "用于辅助清晰分析，不构成投资建议。",
+    "Verify source timestamps before making investment decisions.": "作出投资决策前，请核对数据来源时间。",
     "Investment research workspace": "投资研究工作台",
     "Good morning,": "早上好，",
+    "Good morning.": "早上好。",
+    "Save your research": "保存你的研究",
+    "Sign in to sync your watchlist and dashboard settings.": "登录后可同步自选股和看板设置。",
     "Search ticker or company": "搜索股票代码或公司",
     "Personal research cloud": "个人研究云",
     "Local browser mode": "本地浏览器模式",
@@ -332,6 +336,7 @@ const translations = {
     "Build SEC profile": "构建 SEC 档案",
     "Usually takes 30-90 seconds for a new ticker.": "新股票通常需要 30-90 秒。",
     "Searching SEC tickers...": "正在搜索 SEC 股票代码...",
+    "Looking for ticker and company matches.": "正在查找股票代码和公司匹配项。",
     "Type a ticker or company name.": "输入股票代码或公司名称。",
     "Try another ticker or company name.": "请尝试其他股票代码或公司名称。",
     "Downloading SEC filings and market data...": "正在下载 SEC 文件与市场数据...",
@@ -610,13 +615,13 @@ function applyLanguage() {
     [".scatter-card .section-label", "", "Market map"],
     [".scatter-card h2", "", "Growth vs. valuation"],
     ["footer span:first-child", "", "Northstar Research"],
+    ["footer span:last-child", "", "Verify source timestamps before making investment decisions."],
   ];
   staticText.forEach(([selector, prefix, key]) => {
     const element = $(selector);
     if (element) element.textContent = `${prefix}${tr(key)}`;
   });
-  const greeting = $("h1");
-  if (greeting) greeting.innerHTML = `${tr("Good morning,")} <em>Lihao.</em>`;
+  renderGreeting();
   document.querySelectorAll("#period-control button").forEach((button) => {
     button.textContent = tr(button.dataset.period === "annual" ? "Annual" : "Quarterly");
   });
@@ -661,6 +666,20 @@ function syncPeriodControl() {
     button.classList.toggle("active", active);
     button.setAttribute("aria-pressed", String(active));
   });
+}
+
+function renderGreeting() {
+  const greeting = $("h1");
+  if (!greeting) return;
+  if (!currentUser) {
+    greeting.textContent = tr("Good morning.");
+    return;
+  }
+  const identity = currentUser.name || currentUser.email?.split("@")[0] || "";
+  const firstName = identity.trim().split(/\s+/)[0];
+  greeting.innerHTML = firstName
+    ? `${tr("Good morning,")} <em>${escapeHtml(firstName)}.</em>`
+    : tr("Good morning.");
 }
 
 function translateSelectOptions(selector) {
@@ -935,7 +954,7 @@ function paintSearchResults(query) {
     results.innerHTML = `
       <div class="search-empty">
         <strong>${tr(searchLoading ? "Searching SEC tickers..." : "No US-listed SEC ticker found.")}</strong>
-        <span>${tr(searchLoading ? "Type a ticker or company name." : "Try another ticker or company name.")}</span>
+        <span>${tr(searchLoading ? "Looking for ticker and company matches." : "Try another ticker or company name.")}</span>
       </div>`;
   } else {
     results.innerHTML = searchMatches
@@ -1113,6 +1132,11 @@ function renderCompany() {
   $("#company-price").textContent = Number.isFinite(company.price) ? `$${company.price.toFixed(2)}` : tr("Price unavailable");
   $("#company-change").textContent = Number.isFinite(company.price) ? fmtSign(company.change) : "N/A";
   $("#company-change").className = company.change >= 0 ? "positive" : "negative";
+  const freshnessBadge = $("#quote-freshness-badge");
+  const freshnessStatus = quoteFreshness?.status || (quoteAsOf ? "verified" : "unavailable");
+  const freshnessLabel = quoteFreshness?.label || (quoteAsOf ? "Quote date verified" : "Quote date unavailable");
+  freshnessBadge.textContent = tr(freshnessLabel);
+  freshnessBadge.className = `quote-freshness-badge ${freshnessStatus}`;
   $("#company-cap").textContent = company.cap === "Quote key required"
     ? tr("Market cap unavailable")
     : `${tr("Market cap")} ${company.cap}`;
@@ -1822,14 +1846,46 @@ function renderAccount() {
   } else {
     button.classList.add("signed-out");
     button.textContent = tr("Sign in");
-    title.textContent = tr("Personal research cloud");
-    status.textContent = tr("Local browser mode");
+    title.textContent = tr("Save your research");
+    status.textContent = tr("Sign in to sync your watchlist and dashboard settings.");
     google.hidden = !supabaseAuthConfigured;
     google.innerHTML = `<span>G</span>${tr("Continue with Google")}`;
     form.hidden = false;
     form.querySelector("button").textContent = tr(supabaseAuthConfigured ? "Send magic link" : "Sign in");
     signout.hidden = true;
   }
+  renderGreeting();
+}
+
+function setActiveNavigation(view) {
+  document.querySelectorAll(".nav-item").forEach((item) => {
+    const active = item.dataset.view === view;
+    item.classList.toggle("active", active);
+    if (active) item.setAttribute("aria-current", "true");
+    else item.removeAttribute("aria-current");
+  });
+}
+
+function syncNavigationToScroll() {
+  const sections = [
+    ["overview", ".hero-card"],
+    ["companies", ".peer-card"],
+    ["sectors", ".sector-card"],
+    ["markets", ".scatter-card"],
+  ];
+  const atPageEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
+  if (atPageEnd) {
+    setActiveNavigation("markets");
+    return;
+  }
+  const marker = window.scrollY + Math.min(window.innerHeight * 0.35, 240);
+  let activeView = "overview";
+  sections.forEach(([view, selector]) => {
+    const section = document.querySelector(selector);
+    const sectionTop = section ? section.getBoundingClientRect().top + window.scrollY : Infinity;
+    if (sectionTop <= marker) activeView = view;
+  });
+  setActiveNavigation(activeView);
 }
 
 async function loadCloudPersonalization() {
@@ -2487,20 +2543,27 @@ function setupInteractions() {
 
   document.querySelectorAll(".nav-item").forEach((button) => {
     button.addEventListener("click", () => {
-      document.querySelectorAll(".nav-item").forEach((item) => item.classList.remove("active"));
-      button.classList.add("active");
+      setActiveNavigation(button.dataset.view);
       const targets = { overview: ".hero-card", companies: ".peer-card", sectors: ".sector-card", markets: ".scatter-card" };
       document.querySelector(targets[button.dataset.view])?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   });
+  window.addEventListener("scroll", syncNavigationToScroll, { passive: true });
+  syncNavigationToScroll();
 }
 
 function mergeCompany(realCompany) {
   const fallback = demoCompanies[realCompany.ticker] ?? {};
+  const quoteFreshness = realCompany.sources?.quoteFreshness;
+  const quoteIsDisplayable = quoteFreshness?.displayable === true
+    || ["current", "previous-close"].includes(quoteFreshness?.status);
+  const verifiedPrice = Number.isFinite(realCompany.price) && quoteIsDisplayable
+    ? realCompany.price
+    : null;
   const providerPe = realCompany.analytics?.pe;
   const fiscalYearEps = realCompany.guidance?.fiscalYear?.epsValue;
-  const calculatedPe = !Number.isFinite(providerPe) && Number.isFinite(realCompany.price) && fiscalYearEps > 0
-    ? realCompany.price / fiscalYearEps
+  const calculatedPe = !Number.isFinite(providerPe) && Number.isFinite(verifiedPrice) && fiscalYearEps > 0
+    ? verifiedPrice / fiscalYearEps
     : null;
   const forwardPe = Number.isFinite(providerPe) ? providerPe : calculatedPe;
   const patchForwardPe = (metrics = []) => metrics.map((metric) => metric[0] === "Forward P/E" && Number.isFinite(forwardPe)
@@ -2509,8 +2572,8 @@ function mergeCompany(realCompany) {
   return {
     ...fallback,
     ...realCompany,
-    price: Number.isFinite(realCompany.price) ? realCompany.price : null,
-    change: Number.isFinite(realCompany.price) ? realCompany.change : 0,
+    price: verifiedPrice,
+    change: Number.isFinite(verifiedPrice) ? realCompany.change : 0,
     quoteAsOf: realCompany.quoteAsOf || realCompany.sources?.quoteAsOf || fallback.quoteAsOf || null,
     cap: realCompany.cap,
     color: realCompany.color || fallback.color || "#1f6657",

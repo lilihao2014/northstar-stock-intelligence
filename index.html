@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260711-auth-1" />
+    <link rel="stylesheet" href="styles.css?v=20260711-ux-1" />
   </head>
   <body>
     <div class="app-shell">
@@ -24,8 +24,8 @@
           <span>Northstar</span>
         </a>
 
-        <nav class="main-nav" aria-label="Main navigation">
-          <button class="nav-item active" data-view="overview">
+        <nav class="main-nav" aria-label="Jump to dashboard section">
+          <button class="nav-item active" data-view="overview" aria-current="true">
             <span class="nav-icon">⌁</span> Overview
           </button>
           <button class="nav-item" data-view="companies">
@@ -61,7 +61,7 @@
         <header class="topbar">
           <div>
             <p class="eyebrow">Investment research workspace</p>
-            <h1>Good morning, <em>Lihao.</em></h1>
+            <h1>Good morning.</h1>
           </div>
           <div class="topbar-actions">
             <div class="language-selector" id="language-selector" role="group" aria-label="Language">
@@ -87,7 +87,7 @@
               <button class="avatar signed-out" id="account-button" aria-expanded="false" aria-controls="account-panel">Sign in</button>
               <div class="account-panel" id="account-panel" hidden>
                 <div class="account-panel-copy">
-                  <strong id="account-title">Personal research cloud</strong>
+                  <strong id="account-title">Save your research</strong>
                   <span id="account-status">Local browser mode</span>
                 </div>
                 <a class="oauth-button" id="google-signin" href="/auth/supabase/google/start">
@@ -128,6 +128,7 @@
                   <strong id="company-price">$203.92</strong>
                   <span class="positive" id="company-change">+1.24%</span>
                 </div>
+                <span class="quote-freshness-badge" id="quote-freshness-badge">Quote date unavailable</span>
                 <p id="company-cap">Market cap $3.08T</p>
               </div>
             </div>
@@ -385,10 +386,10 @@
 
         <footer>
           <span>Northstar Research</span>
-          <span>Figures are illustrative demo data until the local refresh runs</span>
+          <span>Verify source timestamps before making investment decisions.</span>
         </footer>
       </main>
     </div>
-    <script src="app.js?v=20260623-2"></script>
+    <script src="app.js?v=20260711-ux-1"></script>
   </body>
 </html>

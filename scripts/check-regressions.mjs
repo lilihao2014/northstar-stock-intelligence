@@ -63,7 +63,9 @@ requireContract(styles.includes(".metric-axis-explainer"), "Metric axis explanat
 requireContract(app.includes('axisFormat: "eps"'), "EPS histories must retain numeric per-share changes for charting");
 requireContract(app.includes('const step = period === "quarterly" ? 4 : 1'), "Quarterly EPS charts must compare against the prior-year quarter");
 requireContract(!html.includes("Playfair") && !styles.includes("Playfair"), "Product shell must not use decorative serif typography");
-requireContract(html.includes("styles.css?v=20260711-auth-1"), "Stylesheet cache key must be bumped for the latest interaction refresh");
+requireContract(html.includes("styles.css?v=20260711-ux-1"), "Stylesheet cache key must be bumped for the latest interaction refresh");
+requireContract(html.includes("app.js?v=20260711-ux-1"), "Application cache key must be bumped for the latest interaction refresh");
+requireContract(!html.includes("Figures are illustrative demo data"), "Production footer must not describe all figures as demo data");
 requireContract(styles.includes("--cream: #f5f7fa") && styles.includes("--card: #ffffff") && styles.includes("--line: #d8dee6"), "Industry design palette tokens are missing");
 requireContract(styles.includes("--shadow: 0 1px 2px rgba(15, 23, 42, 0.06)"), "Card shadow must remain subtle for the research-dashboard design");
 requireContract(styles.includes("border-radius: var(--radius)") && styles.includes("--radius: 8px"), "Cards must use compact industry-dashboard radius");
@@ -74,7 +76,7 @@ requireContract(!styles.includes(".search-box input,\n  .search-box kbd {\n    d
 requireContract(refresh.includes("price / fiscalYearEstimate.epsAverage"), "Refresh must derive forward P/E from price and fiscal-year EPS consensus");
 requireContract(!refresh.includes("Number(overview.PERatio)"), "Trailing P/E must not be used as forward P/E");
 requireContract(app.includes('calculatedPe ? "[CALCULATED]"'), "Cached companies must label derived forward P/E as calculated");
-requireContract(app.includes("realCompany.price / fiscalYearEps"), "Cached companies must derive forward P/E from real price and fiscal-year EPS consensus");
+requireContract(app.includes("verifiedPrice / fiscalYearEps"), "Cached companies must derive forward P/E from a freshness-verified price and fiscal-year EPS consensus");
 requireContract(app.includes('fetch(`/api/dashboard?ts=${Date.now()}`'), "Dashboard data must load from the backend API");
 requireContract(app.includes("[404, 405].includes(apiResponse.status)"), "JSON fallback must be limited to missing backend routes");
 requireContract(server.includes('url.pathname === "/api/dashboard"'), "Server must expose /api/dashboard for production data loading");
@@ -136,6 +138,13 @@ requireContract(styles.includes(".account-panel") && styles.includes(".oauth-but
 requireContract(html.includes('class="avatar signed-out"') && !html.includes('id="account-button" aria-expanded="false" aria-controls="account-panel">LH</button>'), "Logged-out account control must not show personal initials");
 requireContract(app.includes('button.classList.remove("signed-out")') && app.includes('button.classList.add("signed-out")') && app.includes('button.textContent = tr("Sign in")'), "Account button must show initials only after sign-in");
 requireContract(styles.includes(".avatar.signed-out"), "Signed-out account button styling is missing");
+requireContract(html.includes("Good morning.</h1>") && app.includes("function renderGreeting()") && !html.includes("Lihao"), "Signed-out greeting must not expose a hardcoded user name");
+requireContract(app.includes('title.textContent = tr("Save your research")') && app.includes("Sign in to sync your watchlist and dashboard settings."), "Signed-out account copy must explain the value of signing in");
+requireContract(app.includes("Looking for ticker and company matches."), "Search loading state must describe the active lookup");
+requireContract(app.includes("function syncNavigationToScroll()") && app.includes("const atPageEnd") && app.includes('aria-current'), "Section navigation must track the current scroll position accessibly");
+requireContract(html.includes('id="quote-freshness-badge"') && styles.includes(".quote-freshness-badge.previous-close"), "Quote freshness must be visible beside the headline price");
+requireContract(app.includes("const quoteIsDisplayable") && app.includes('includes(quoteFreshness?.status)') && app.includes("price: verifiedPrice"), "Client must hide prices unless quote freshness explicitly permits display");
+requireContract(/@media \(max-width: 760px\)[\s\S]*?\.watchlist-row \{[\s\S]*?width: auto;[\s\S]*?flex: 0 0 126px;/.test(styles), "Mobile watchlist rows must not force horizontal page overflow");
 requireContract(app.includes('const selectedPeriodStorageKey = "northstar-selected-period"') && app.includes("localStorage.setItem(selectedPeriodStorageKey, selectedPeriod)") && app.includes("syncPeriodControl()"), "Annual/Quarterly selection must persist locally and update the segmented control");
 requireContract(app.includes("validReportingPeriod(payload.selectedPeriod)") && server.includes("selectedPeriod: await loadUserPreference") && server.includes('saveUserPreference(session.userKey, "selectedPeriod"'), "Annual/Quarterly selection must sync through signed-in preferences");
 
