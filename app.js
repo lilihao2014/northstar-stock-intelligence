@@ -201,7 +201,6 @@ let researchStatusTimer = null;
 let refreshJobs = [];
 let currentUser = null;
 let inviteCodeRequired = false;
-let githubOAuthConfigured = false;
 let supabaseAuthConfigured = false;
 let preferenceSaveTimer = null;
 
@@ -235,8 +234,6 @@ const translations = {
     "Signed in": "已登录",
     "Signing in...": "登录中...",
     "Continue with Google": "使用 Google 继续",
-    "Continue with GitHub": "使用 GitHub 继续",
-    "Developer sign in with GitHub": "开发者使用 GitHub 登录",
     "Send magic link": "发送魔法链接",
     "Magic link sent. Check your email.": "魔法链接已发送，请检查邮箱。",
     "Cloud sync enabled": "云端同步已启用",
@@ -1732,7 +1729,6 @@ async function loadSession() {
     const payload = await response.json();
     currentUser = payload.user || null;
     inviteCodeRequired = Boolean(payload.auth?.inviteRequired);
-    githubOAuthConfigured = Boolean(payload.auth?.githubConfigured);
     supabaseAuthConfigured = Boolean(payload.auth?.supabaseConfigured);
     renderAccount();
   } catch {
@@ -1809,7 +1805,6 @@ function renderAccount() {
   const status = $("#account-status");
   const form = $("#signin-form");
   const google = $("#google-signin");
-  const github = $("#github-signin");
   const signout = $("#signout-button");
   const code = $("#signin-code");
   if (!button || !title || !status) return;
@@ -1822,7 +1817,6 @@ function renderAccount() {
     title.textContent = tr("Personal research cloud");
     status.textContent = `${tr("Signed in")} · ${currentUser.email}`;
     google.hidden = true;
-    github.hidden = true;
     form.hidden = true;
     signout.hidden = false;
   } else {
@@ -1832,9 +1826,6 @@ function renderAccount() {
     status.textContent = tr("Local browser mode");
     google.hidden = !supabaseAuthConfigured;
     google.innerHTML = `<span>G</span>${tr("Continue with Google")}`;
-    github.hidden = !githubOAuthConfigured;
-    github.innerHTML = `<span>GH</span>${tr("Continue with GitHub")}`;
-    github.textContent = tr("Developer sign in with GitHub");
     form.hidden = false;
     form.querySelector("button").textContent = tr(supabaseAuthConfigured ? "Send magic link" : "Sign in");
     signout.hidden = true;
@@ -2599,11 +2590,6 @@ async function init() {
     $("#account-button").setAttribute("aria-expanded", "true");
   });
   const currentUrl = new URL(window.location.href);
-  if (currentUrl.searchParams.get("signin") === "github") {
-    showWatchlistStatus(tr("Cloud sync enabled"));
-    currentUrl.searchParams.delete("signin");
-    window.history.replaceState({}, "", currentUrl);
-  }
   if (currentUrl.searchParams.get("signin_error")) {
     $("#account-status").textContent = currentUrl.searchParams.get("signin_error");
     $("#account-panel").hidden = false;

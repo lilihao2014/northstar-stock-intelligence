@@ -24,10 +24,6 @@ services:
         sync: false
       - key: SUPABASE_ANON_KEY
         sync: false
-      - key: GITHUB_CLIENT_ID
-        sync: false
-      - key: GITHUB_CLIENT_SECRET
-        sync: false
       - key: NORTHSTAR_INVITE_CODE
         sync: false
       - key: DATABASE_URL
