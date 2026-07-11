@@ -212,6 +212,7 @@ const watchlistStorageKey = "northstar-watchlist";
 const hiddenMetricsStorageKey = "northstar-hidden-metrics-v1";
 const metricDisplayStorageKey = "northstar-metric-display-v1";
 const metricDisplayControlsHiddenKey = "northstar-metric-display-controls-hidden";
+const selectedPeriodStorageKey = "northstar-selected-period";
 let hiddenMetricsByTicker = {};
 let metricDisplayByTicker = {};
 let metricDisplayControlsHidden = localStorage.getItem(metricDisplayControlsHiddenKey) === "true";
@@ -621,6 +622,7 @@ function applyLanguage() {
   document.querySelectorAll("#period-control button").forEach((button) => {
     button.textContent = tr(button.dataset.period === "annual" ? "Annual" : "Quarterly");
   });
+  syncPeriodControl();
   const legend = document.querySelectorAll(".legend span");
   if (legend[0]) legend[0].lastChild.textContent = tr("Revenue");
   document.querySelector(".users-card .section-label").childNodes[0].textContent = `${tr("Operating pulse")} `;
@@ -649,6 +651,18 @@ function applyLanguage() {
   renderDataStatus();
   renderSearchResults($("#stock-search").value);
   syncWatchlistButton();
+}
+
+function validReportingPeriod(period) {
+  return ["annual", "quarterly"].includes(period);
+}
+
+function syncPeriodControl() {
+  document.querySelectorAll("#period-control button").forEach((button) => {
+    const active = button.dataset.period === selectedPeriod;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
 }
 
 function translateSelectOptions(selector) {
@@ -1838,6 +1852,11 @@ async function loadCloudPersonalization() {
       metricDisplayByTicker = payload.metricDisplay;
       localStorage.setItem(metricDisplayStorageKey, JSON.stringify(metricDisplayByTicker));
     }
+    if (validReportingPeriod(payload.selectedPeriod)) {
+      selectedPeriod = payload.selectedPeriod;
+      localStorage.setItem(selectedPeriodStorageKey, selectedPeriod);
+      syncPeriodControl();
+    }
   } catch {
     showWatchlistStatus(tr("Cloud sync paused"));
   }
@@ -1851,7 +1870,7 @@ function schedulePreferenceSave() {
       await fetch("/api/me/preferences", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ hiddenMetrics: hiddenMetricsByTicker, metricDisplay: metricDisplayByTicker }),
+        body: JSON.stringify({ hiddenMetrics: hiddenMetricsByTicker, metricDisplay: metricDisplayByTicker, selectedPeriod }),
       });
     } catch {
       showWatchlistStatus(tr("Cloud sync paused"));
@@ -2352,9 +2371,11 @@ function setupInteractions() {
   });
   $("#period-control").addEventListener("click", (event) => {
     const button = event.target.closest("button");
-    if (!button) return;
+    if (!button || !validReportingPeriod(button.dataset.period) || button.dataset.period === selectedPeriod) return;
     selectedPeriod = button.dataset.period;
-    document.querySelectorAll("#period-control button").forEach((item) => item.classList.toggle("active", item === button));
+    localStorage.setItem(selectedPeriodStorageKey, selectedPeriod);
+    syncPeriodControl();
+    schedulePreferenceSave();
     renderFundamentals();
     renderSummaryMetrics(companies[selectedTicker]);
   });
@@ -2589,6 +2610,8 @@ async function init() {
   }
   const linkedTicker = new URL(window.location.href).searchParams.get("ticker")?.toUpperCase();
   const savedTicker = localStorage.getItem(selectedTickerStorageKey);
+  const savedPeriod = localStorage.getItem(selectedPeriodStorageKey);
+  if (validReportingPeriod(savedPeriod)) selectedPeriod = savedPeriod;
   if (linkedTicker && companies[linkedTicker]) selectedTicker = linkedTicker;
   else if (savedTicker && companies[savedTicker]) selectedTicker = savedTicker;
   if (!companies[selectedTicker]) selectedTicker = Object.keys(companies)[0];

@@ -118,6 +118,7 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 ## Metric chart axes
 
 - Annual/Quarterly reporting-period selection is a top-level metric control and must not be nested inside the Revenue & EPS card.
+- The last selected Annual/Quarterly reporting period persists locally and, for signed-in users, syncs through cloud preferences.
 - Every rendered metric history chart shows a labeled value range on the Y axis and fiscal-period labels on the X axis.
 - Every rendered metric history chart includes plain-language captions explaining `X axis = fiscal period` and `Y axis = metric value/range`.
 - The chart displays first-to-latest absolute change in the metric's own unit; percentage metrics use percentage-point change.

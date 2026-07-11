@@ -136,6 +136,8 @@ requireContract(app.includes("currentUser") && app.includes("supabaseAuthConfigu
 requireContract(app.includes("/api/me/watchlist") && app.includes("/api/me/preferences"), "Client must sync user watchlist and preferences to server endpoints");
 requireContract(app.includes("Cloud sync enabled") && app.includes("Local browser mode") && app.includes("Continue with Google"), "Client must distinguish signed-in cloud mode from local mode");
 requireContract(styles.includes(".account-panel") && styles.includes(".oauth-button") && styles.includes(".oauth-secondary") && styles.includes("backdrop-filter"), "Interactive account panel styling is missing");
+requireContract(app.includes('const selectedPeriodStorageKey = "northstar-selected-period"') && app.includes("localStorage.setItem(selectedPeriodStorageKey, selectedPeriod)") && app.includes("syncPeriodControl()"), "Annual/Quarterly selection must persist locally and update the segmented control");
+requireContract(app.includes("validReportingPeriod(payload.selectedPeriod)") && server.includes("selectedPeriod: await loadUserPreference") && server.includes('saveUserPreference(session.userKey, "selectedPeriod"'), "Annual/Quarterly selection must sync through signed-in preferences");
 
 requireContract(html.includes('id="manage-metrics"'), "Dashboard-wide metric manager is missing");
 requireContract(/metric-visibility-card[\s\S]*id="period-control"/.test(html), "Annual/Quarterly control must live in the top-level metric controls");

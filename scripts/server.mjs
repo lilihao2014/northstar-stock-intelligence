@@ -971,6 +971,7 @@ const server = createServer(async (request, response) => {
       json(response, 200, {
         hiddenMetrics: await loadUserPreference(session.userKey, "hiddenMetrics") || {},
         metricDisplay: await loadUserPreference(session.userKey, "metricDisplay") || {},
+        selectedPeriod: await loadUserPreference(session.userKey, "selectedPeriod") || null,
       });
       return;
     }
@@ -984,6 +985,9 @@ const server = createServer(async (request, response) => {
       const body = await readJsonBody(request);
       await saveUserPreference(session.userKey, "hiddenMetrics", body.hiddenMetrics || {});
       await saveUserPreference(session.userKey, "metricDisplay", body.metricDisplay || {});
+      if (["annual", "quarterly"].includes(body.selectedPeriod)) {
+        await saveUserPreference(session.userKey, "selectedPeriod", body.selectedPeriod);
+      }
       json(response, 200, { ok: true });
       return;
     }
