@@ -192,6 +192,7 @@ let searchTimer = null;
 let watchlistStatusTimer = null;
 let pendingTickerFetch = null;
 let searchLoading = false;
+let lastRemovedTicker = null;
 let currentLanguage = localStorage.getItem("northstar-language") || "en";
 let tickerContentRequest = 0;
 const tickerContentCache = new Map();
@@ -317,6 +318,9 @@ const translations = {
     "All metrics in this section are hidden. Use Manage metrics to restore them.": "本区域所有指标均已隐藏。请使用“管理指标”恢复。",
     added: "已添加",
     removed: "已移除",
+    Remove: "移除",
+    Undo: "撤销",
+    "Removed from watchlist": "已从自选股移除",
     "No US-listed SEC ticker found.": "未找到在美国上市的 SEC 股票代码。",
     Added: "已添加",
     Add: "添加",
@@ -696,7 +700,10 @@ function renderWatchlist() {
             <strong>${company.ticker}</strong>
             <span class="${company.change >= 0 ? "positive" : "negative"}">${fmtSign(company.change)}</span>
           </button>
-          <button class="watchlist-remove" data-remove-ticker="${company.ticker}" aria-label="${currentLanguage === "zh" ? `从自选股移除 ${company.ticker}` : `Remove ${company.ticker} from watchlist`}">×</button>
+          <button class="watchlist-remove" data-remove-ticker="${company.ticker}" aria-label="${currentLanguage === "zh" ? `从自选股移除 ${company.ticker}` : `Remove ${company.ticker} from watchlist`}">
+            <span>−</span>
+            <em>${tr("Remove")}</em>
+          </button>
         </div>`,
       ).join("")
     : `<div class="watchlist-empty">${tr("No companies yet. Select a company and press +.")}</div>`;
@@ -733,6 +740,24 @@ function showWatchlistStatus(message) {
   watchlistStatusTimer = setTimeout(() => {
     status.textContent = "";
   }, 2200);
+}
+
+function showWatchlistUndo(ticker) {
+  const status = $("#watchlist-status");
+  clearTimeout(watchlistStatusTimer);
+  const message = document.createElement("span");
+  message.textContent = `${ticker} ${tr("Removed from watchlist")}`;
+  const undo = document.createElement("button");
+  undo.className = "watchlist-undo";
+  undo.type = "button";
+  undo.dataset.undoTicker = ticker;
+  undo.textContent = tr("Undo");
+  undo.addEventListener("click", () => restoreRemovedTicker(ticker));
+  status.replaceChildren(message, undo);
+  watchlistStatusTimer = setTimeout(() => {
+    status.textContent = "";
+    if (lastRemovedTicker === ticker) lastRemovedTicker = null;
+  }, 6000);
 }
 
 function watchlistPayload() {
@@ -812,11 +837,28 @@ function addToWatchlist(ticker = selectedTicker) {
 }
 
 function removeFromWatchlist(ticker) {
+  if (!watchlistTickers.includes(ticker)) return;
+  lastRemovedTicker = ticker;
   watchlistTickers = watchlistTickers.filter((item) => item !== ticker);
   saveWatchlist();
+  if (selectedTicker === ticker) {
+    const nextTicker = watchlistTickers.find((item) => companies[item]) || Object.keys(companies)[0];
+    if (nextTicker) selectCompany(nextTicker);
+  }
   renderWatchlist();
   renderSearchResults($("#stock-search").value);
-  showWatchlistStatus(currentLanguage === "zh" ? `${ticker} ${tr("removed")}` : `${ticker} removed`);
+  showWatchlistUndo(ticker);
+}
+
+function restoreRemovedTicker(ticker) {
+  if (!lastRemovedTicker || lastRemovedTicker !== ticker || !companies[ticker]) return;
+  watchlistTickers = [...watchlistTickers, ticker];
+  lastRemovedTicker = null;
+  saveWatchlist();
+  selectCompany(ticker);
+  renderWatchlist();
+  renderSearchResults($("#stock-search").value);
+  showWatchlistStatus(currentLanguage === "zh" ? `${ticker} ${tr("added")}` : `${ticker} added`);
 }
 
 function closeSearchResults() {

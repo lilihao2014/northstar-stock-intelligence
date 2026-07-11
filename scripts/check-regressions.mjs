@@ -42,6 +42,9 @@ requireContract(app.includes("search-progress") && app.includes("Keep this tab o
 requireContract(app.includes("data-retry-ticker") && app.includes("Add ticker failed"), "Add ticker failures must expose a retry action");
 requireContract(app.includes("Already saved") && app.includes("Add cached"), "Cached ticker results must distinguish saved and unsaved states");
 requireContract(styles.includes(".search-progress") && styles.includes(".search-retry") && styles.includes(".search-result.loading") && styles.includes(".search-result-action.saved"), "Add ticker search UX styles are missing");
+requireContract(app.includes('tr("Remove")') && app.includes("function showWatchlistUndo(") && app.includes("function restoreRemovedTicker("), "Watchlist removal must be labeled and reversible");
+requireContract(app.includes("lastRemovedTicker") && app.includes("selectedTicker === ticker"), "Removing a selected ticker must track undo state and choose a new selection");
+requireContract(styles.includes(".watchlist-remove em") && styles.includes(".watchlist-undo"), "Watchlist remove/undo styles are missing");
 
 requireContract(app.includes("function miniChart(history, type, title)"), "Shared metric mini-chart renderer is missing");
 requireContract(app.includes('renderMetricHistory(label === "EPS growth" ? epsChangeChartHistory(company, selectedPeriod, history) : history, "metric-history", label, "line")'), "Summary histories must render line charts");
@@ -60,7 +63,7 @@ requireContract(styles.includes(".metric-axis-explainer"), "Metric axis explanat
 requireContract(app.includes('axisFormat: "eps"'), "EPS histories must retain numeric per-share changes for charting");
 requireContract(app.includes('const step = period === "quarterly" ? 4 : 1'), "Quarterly EPS charts must compare against the prior-year quarter");
 requireContract(!html.includes("Playfair") && !styles.includes("Playfair"), "Product shell must not use decorative serif typography");
-requireContract(html.includes("styles.css?v=20260630-design-1"), "Stylesheet cache key must be bumped for the industry design refresh");
+requireContract(html.includes("styles.css?v=20260711-watchlist-1"), "Stylesheet cache key must be bumped for the latest interaction refresh");
 requireContract(styles.includes("--cream: #f5f7fa") && styles.includes("--card: #ffffff") && styles.includes("--line: #d8dee6"), "Industry design palette tokens are missing");
 requireContract(styles.includes("--shadow: 0 1px 2px rgba(15, 23, 42, 0.06)"), "Card shadow must remain subtle for the research-dashboard design");
 requireContract(styles.includes("border-radius: var(--radius)") && styles.includes("--radius: 8px"), "Cards must use compact industry-dashboard radius");

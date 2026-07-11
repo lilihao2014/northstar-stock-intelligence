@@ -280,14 +280,71 @@ button:disabled {
 }
 
 .watchlist-remove {
-  border: 0;
-  padding: 7px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 5px 7px;
   background: transparent;
   color: #78908a;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.watchlist-remove:hover {
+.watchlist-remove span {
+  font: 700 12px/1 "DM Mono", monospace;
+}
+
+.watchlist-remove em {
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  font-style: normal;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition:
+    max-width 160ms ease,
+    opacity 160ms ease;
+}
+
+.watchlist-row:hover .watchlist-remove em,
+.watchlist-remove:focus-visible em {
+  max-width: 52px;
+  opacity: 1;
+}
+
+.watchlist-remove:hover,
+.watchlist-remove:focus-visible {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.watchlist-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.watchlist-undo {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #e9f3ef;
+  cursor: pointer;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.watchlist-undo:hover,
+.watchlist-undo:focus-visible {
+  border-color: var(--lime);
   color: white;
 }
 
