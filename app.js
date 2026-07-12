@@ -203,6 +203,8 @@ let currentUser = null;
 let inviteCodeRequired = false;
 let supabaseAuthConfigured = false;
 let preferenceSaveTimer = null;
+let quarterSummaryRequest = 0;
+const quarterSummaryCache = new Map();
 
 const $ = (selector) => document.querySelector(selector);
 const fmtSign = (value, suffix = "%") => `${value >= 0 ? "+" : ""}${value.toFixed(2)}${suffix}`;
@@ -240,6 +242,8 @@ const translations = {
     "Continue with Google": "使用 Google 继续",
     "Send magic link": "发送魔法链接",
     "Magic link sent. Check your email.": "魔法链接已发送，请检查邮箱。",
+    "Sign-in setup required": "需要配置登录",
+    "Google sign-in is not configured yet. Your dashboard remains available on this browser.": "Google 登录尚未配置。你仍可在此浏览器中使用看板。",
     "Cloud sync enabled": "云端同步已启用",
     "Cloud sync paused": "云端同步暂停",
     "Alpha Vantage · ETF proxies": "Alpha Vantage · ETF 代理",
@@ -402,6 +406,27 @@ const translations = {
     "Quarterly revenue": "季度营收",
     "Quarterly drill-down": "季度明细",
     "Latest reported details": "最新报告明细",
+    "AI filing review": "AI 文件解读",
+    "Latest quarter summary": "最新季度摘要",
+    "Summarize latest quarter": "总结最新季度",
+    "Summarizing SEC filing...": "正在总结 SEC 文件...",
+    "Checking shared summary cache...": "正在检查共享摘要缓存...",
+    "No cached summary yet.": "尚无缓存摘要。",
+    "Quarterly AI summaries are not configured yet.": "季度 AI 摘要尚未配置。",
+    "No quarterly SEC filing is available for this ticker.": "该股票暂无季度 SEC 文件。",
+    "Shared cached summary": "共享缓存摘要",
+    "New summary": "新生成摘要",
+    "Key items": "关键事项",
+    "What to watch": "后续关注",
+    "AI-generated from the linked SEC filing. Verify important details against the source.": "内容由 AI 根据链接的 SEC 文件生成。重要信息请与原始文件核对。",
+    "Open SEC filing ↗": "打开 SEC 文件 ↗",
+    "Summary unavailable": "摘要不可用",
+    growth: "增长",
+    profitability: "盈利能力",
+    cash: "现金流",
+    "balance-sheet": "资产负债表",
+    operations: "经营",
+    risk: "风险",
     "Revenue YoY": "营收同比",
     "Diluted EPS": "摊薄每股收益",
     "Net income": "净利润",
@@ -588,6 +613,8 @@ function applyLanguage() {
     [".revenue-card h2", "", "Revenue & EPS"],
     [".detail-card .section-label", "", "Quarterly drill-down"],
     [".detail-card h2", "", "Latest reported details"],
+    [".quarterly-summary-card .section-label", "", "AI filing review"],
+    [".quarterly-summary-card h2", "", "Latest quarter summary"],
     [".financial-metrics-card .section-label", "", "Common financial metrics"],
     [".financial-metrics-card h2", "", "Financial indicators"],
     [".financial-metrics-card .as-of", "", "SEC filings"],
@@ -1182,6 +1209,7 @@ function renderCompany() {
     : `<div class="detail-empty">${tr("Quarter details unavailable")}</div>`;
   renderFinancialMetrics(company.financialMetrics || []);
   renderGuidance(company.guidance || null, company);
+  renderQuarterSummary(company);
   renderCustomMetrics(company.customMetrics || []);
   renderMetricProfile(company);
   renderMetricManager(company);
@@ -1190,6 +1218,118 @@ function renderCompany() {
   renderFundamentals();
   renderOperatingChart();
   renderWatchlist();
+}
+
+function localizedSummaryText(value) {
+  if (!value || typeof value !== "object") return "";
+  return value[currentLanguage] || value.en || value.zh || "";
+}
+
+function quarterSummaryEmpty(message) {
+  return `<div class="quarter-summary-empty">${escapeHtml(tr(message))}</div>`;
+}
+
+function quarterSummaryClientKey(company) {
+  const filing = company?.sources?.fundamentalsAsOf?.latestCheck?.latestFiling;
+  return `${company?.ticker || "unknown"}:${filing?.accessionNumber || company?.sources?.fundamentalsAsOf?.quarterPeriod || "latest"}`;
+}
+
+function paintQuarterSummary(payload) {
+  const content = $("#quarter-summary-content");
+  const status = $("#quarter-summary-status");
+  const button = $("#generate-quarter-summary");
+  button.textContent = tr("Summarize latest quarter");
+  button.disabled = false;
+  if (payload.status === "unavailable") {
+    status.textContent = tr("Summary unavailable");
+    button.hidden = true;
+    content.innerHTML = quarterSummaryEmpty(payload.message || "No quarterly SEC filing is available for this ticker.");
+    return;
+  }
+  if (!payload.record) {
+    status.textContent = payload.filing?.fiscalPeriod || payload.filing?.reportDate || "";
+    button.hidden = !payload.llmConfigured;
+    content.innerHTML = quarterSummaryEmpty(payload.llmConfigured
+      ? "No cached summary yet."
+      : "Quarterly AI summaries are not configured yet.");
+    return;
+  }
+  const summary = payload.record.summary || {};
+  const filing = payload.filing || {};
+  status.textContent = `${tr(payload.status === "generated" ? "New summary" : "Shared cached summary")} · ${filing.fiscalPeriod || payload.record.reportPeriod || filing.reportDate || ""}`;
+  button.hidden = true;
+  const keyItems = (summary.keyItems || []).map((item) => `
+    <article class="quarter-summary-item" data-category="${escapeHtml(item.category || "operations")}">
+      <span>${escapeHtml(tr(item.category || "operations"))}</span>
+      <h3>${escapeHtml(localizedSummaryText(item.title))}</h3>
+      <p>${escapeHtml(localizedSummaryText(item.detail))}</p>
+      <small>${escapeHtml(item.evidence || "")}</small>
+    </article>`).join("");
+  const watchItems = (summary.watchItems || []).map((item) => `
+    <li><strong>${escapeHtml(localizedSummaryText(item.title))}</strong><span>${escapeHtml(localizedSummaryText(item.detail))}</span></li>`).join("");
+  content.innerHTML = `
+    <div class="quarter-summary-lead">
+      <h3>${escapeHtml(localizedSummaryText(summary.headline))}</h3>
+      <p>${escapeHtml(localizedSummaryText(summary.overview))}</p>
+    </div>
+    <h3 class="quarter-summary-section-title">${tr("Key items")}</h3>
+    <div class="quarter-summary-grid">${keyItems}</div>
+    ${watchItems ? `<div class="quarter-summary-watch"><h3>${tr("What to watch")}</h3><ul>${watchItems}</ul></div>` : ""}
+    ${summary.limitations ? `<p class="quarter-summary-limitations">${escapeHtml(localizedSummaryText(summary.limitations))}</p>` : ""}
+    <div class="quarter-summary-footer">
+      <span>${tr("AI-generated from the linked SEC filing. Verify important details against the source.")}</span>
+      ${filing.sourceUrl ? `<a href="${escapeHtml(filing.sourceUrl)}" target="_blank" rel="noopener noreferrer">${tr("Open SEC filing ↗")}</a>` : ""}
+    </div>`;
+}
+
+async function renderQuarterSummary(company, refresh = false) {
+  const card = $("#quarter-summary-card");
+  card.hidden = selectedPeriod !== "quarterly";
+  if (card.hidden || !company?.ticker) return;
+  const requestId = ++quarterSummaryRequest;
+  const cacheKey = quarterSummaryClientKey(company);
+  const cached = !refresh && quarterSummaryCache.get(cacheKey);
+  if (cached) {
+    paintQuarterSummary(cached);
+    return;
+  }
+  $("#generate-quarter-summary").hidden = true;
+  $("#quarter-summary-status").textContent = tr("Checking shared summary cache...");
+  $("#quarter-summary-content").innerHTML = quarterSummaryEmpty("Checking shared summary cache...");
+  try {
+    const response = await fetch(`/api/quarter-summary/${encodeURIComponent(company.ticker)}?ts=${Date.now()}`, { cache: "no-store" });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
+    if (requestId !== quarterSummaryRequest || company.ticker !== selectedTicker) return;
+    quarterSummaryCache.set(cacheKey, payload);
+    paintQuarterSummary(payload);
+  } catch (error) {
+    if (requestId !== quarterSummaryRequest) return;
+    $("#quarter-summary-status").textContent = tr("Summary unavailable");
+    $("#quarter-summary-content").innerHTML = quarterSummaryEmpty(error.message);
+  }
+}
+
+async function generateQuarterSummary() {
+  const ticker = selectedTicker;
+  const cacheKey = quarterSummaryClientKey(companies[ticker]);
+  const button = $("#generate-quarter-summary");
+  button.disabled = true;
+  button.textContent = tr("Summarizing SEC filing...");
+  $("#quarter-summary-content").innerHTML = quarterSummaryEmpty("Summarizing SEC filing...");
+  try {
+    const response = await fetch(`/api/quarter-summary/${encodeURIComponent(ticker)}`, { method: "POST" });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
+    if (ticker !== selectedTicker) return;
+    quarterSummaryCache.set(cacheKey, payload);
+    paintQuarterSummary(payload);
+  } catch (error) {
+    button.disabled = false;
+    button.textContent = tr("Summarize latest quarter");
+    $("#quarter-summary-status").textContent = tr("Summary unavailable");
+    $("#quarter-summary-content").innerHTML = quarterSummaryEmpty(error.message);
+  }
 }
 
 function renderResearchToolbar(company) {
@@ -1761,30 +1901,15 @@ async function loadSession() {
 }
 
 async function signIn(email, inviteCode) {
-  if (supabaseAuthConfigured) {
-    const response = await fetch("/api/auth/supabase/magic-link", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, inviteCode }),
-    });
-    const payload = await response.json();
-    if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
-    $("#account-status").textContent = tr("Magic link sent. Check your email.");
-    return;
-  }
-  const response = await fetch("/api/session", {
+  if (!supabaseAuthConfigured) throw new Error(tr("Sign-in setup required"));
+  const response = await fetch("/api/auth/supabase/magic-link", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, inviteCode }),
   });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`);
-  currentUser = payload.user;
-  renderAccount();
-  await loadCloudPersonalization();
-  await loadCloudWatchlist();
-  renderWatchlist();
-  renderCompany();
+  $("#account-status").textContent = tr("Magic link sent. Check your email.");
 }
 
 async function completeSupabaseAuthFromHash() {
@@ -1847,11 +1972,13 @@ function renderAccount() {
     button.classList.add("signed-out");
     button.textContent = tr("Sign in");
     title.textContent = tr("Save your research");
-    status.textContent = tr("Sign in to sync your watchlist and dashboard settings.");
+    status.textContent = tr(supabaseAuthConfigured
+      ? "Sign in to sync your watchlist and dashboard settings."
+      : "Google sign-in is not configured yet. Your dashboard remains available on this browser.");
     google.hidden = !supabaseAuthConfigured;
     google.innerHTML = `<span>G</span>${tr("Continue with Google")}`;
-    form.hidden = false;
-    form.querySelector("button").textContent = tr(supabaseAuthConfigured ? "Send magic link" : "Sign in");
+    form.hidden = !supabaseAuthConfigured;
+    form.querySelector("button").textContent = tr("Send magic link");
     signout.hidden = true;
   }
   renderGreeting();
@@ -2428,6 +2555,7 @@ function setupInteractions() {
     schedulePreferenceSave();
     renderFundamentals();
     renderSummaryMetrics(companies[selectedTicker]);
+    renderQuarterSummary(companies[selectedTicker]);
   });
 
   $("#sort-peers").addEventListener("click", () => {
@@ -2449,6 +2577,7 @@ function setupInteractions() {
   $("#refresh-company-data").addEventListener("click", () => {
     refreshCompanyData(selectedTicker);
   });
+  $("#generate-quarter-summary").addEventListener("click", generateQuarterSummary);
 
   $("#refresh-ticker-content").addEventListener("click", () => {
     $("#refresh-ticker-content").textContent = tr("Refreshing...");

@@ -120,6 +120,21 @@ export async function ensureDatabase() {
       created_at timestamptz not null default now(),
       updated_at timestamptz not null default now()
     );
+
+    create table if not exists filing_summaries (
+      ticker text not null,
+      accession_number text not null,
+      prompt_version text not null,
+      report_period text,
+      filed_at date,
+      source_url text not null,
+      source_hash text,
+      model text not null,
+      payload jsonb not null,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now(),
+      primary key (ticker, accession_number, prompt_version)
+    );
   `);
   schemaReady = true;
   return true;
@@ -331,6 +346,63 @@ export async function listRefreshJobs(limit = 10) {
     startedAt: row.started_at,
     finishedAt: row.finished_at,
   }));
+}
+
+export async function loadFilingSummary(ticker, accessionNumber, promptVersion) {
+  if (!isDatabaseConfigured() || !ticker || !accessionNumber || !promptVersion) return null;
+  await ensureDatabase();
+  const result = await query(
+    `select ticker, accession_number, prompt_version, report_period, filed_at, source_url,
+            source_hash, model, payload, created_at, updated_at
+     from filing_summaries
+     where ticker = $1 and accession_number = $2 and prompt_version = $3`,
+    [ticker, accessionNumber, promptVersion],
+  );
+  const row = result.rows[0];
+  if (!row) return null;
+  return {
+    ticker: row.ticker,
+    accessionNumber: row.accession_number,
+    promptVersion: row.prompt_version,
+    reportPeriod: row.report_period,
+    filedAt: row.filed_at,
+    sourceUrl: row.source_url,
+    sourceHash: row.source_hash,
+    model: row.model,
+    summary: row.payload,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export async function saveFilingSummary(summary) {
+  if (!isDatabaseConfigured() || !summary?.ticker || !summary?.accessionNumber) return false;
+  await ensureDatabase();
+  await query(
+    `insert into filing_summaries
+       (ticker, accession_number, prompt_version, report_period, filed_at, source_url, source_hash, model, payload, updated_at)
+     values ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, now())
+     on conflict (ticker, accession_number, prompt_version) do update set
+       report_period = excluded.report_period,
+       filed_at = excluded.filed_at,
+       source_url = excluded.source_url,
+       source_hash = excluded.source_hash,
+       model = excluded.model,
+       payload = excluded.payload,
+       updated_at = now()`,
+    [
+      summary.ticker,
+      summary.accessionNumber,
+      summary.promptVersion,
+      summary.reportPeriod || null,
+      summary.filedAt || null,
+      summary.sourceUrl,
+      summary.sourceHash || null,
+      summary.model,
+      JSON.stringify(summary.summary),
+    ],
+  );
+  return true;
 }
 
 export async function seedDatabaseFromFiles({ dashboardPath, watchlistPath, force = false }) {

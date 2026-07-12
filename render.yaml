@@ -18,6 +18,10 @@ services:
         sync: false
       - key: X_BEARER_TOKEN
         sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_SUMMARY_MODEL
+        value: gpt-5-mini
       - key: AUTH_SECRET
         sync: false
       - key: SUPABASE_URL

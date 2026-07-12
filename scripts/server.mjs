@@ -11,10 +11,12 @@ import {
   isProductionRuntime,
   listRefreshJobs,
   loadDashboardSnapshot,
+  loadFilingSummary,
   loadUserPreference,
   loadUserWatchlistItems,
   loadWatchlistItems,
   saveDashboardSnapshot,
+  saveFilingSummary,
   saveUserPreference,
   saveUserWatchlistItems,
   saveWatchlistItem,
@@ -22,6 +24,11 @@ import {
   seedDatabaseFromFiles,
   upsertUser,
 } from "./db.mjs";
+import {
+  generateQuarterlySummary,
+  reportSummaryPromptVersion,
+  resolveQuarterlyFiling,
+} from "./report-summary.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const port = Number(process.env.PORT || 4173);
@@ -32,6 +39,8 @@ const authSecret = process.env.AUTH_SECRET || process.env.DATABASE_URL || "north
 const inviteCode = process.env.NORTHSTAR_INVITE_CODE || "";
 const supabaseUrl = (process.env.SUPABASE_URL || "").replace(/\/+$/, "");
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || "";
+const openaiApiKey = process.env.OPENAI_API_KEY || "";
+const openaiSummaryModel = process.env.OPENAI_SUMMARY_MODEL || "gpt-5-mini";
 const dashboardMaxAgeHours = Number(process.env.DASHBOARD_MAX_AGE_HOURS || 18);
 const quoteMaxAgeDays = Number(process.env.QUOTE_MAX_AGE_DAYS || 5);
 const tickerCachePath = join(root, "data", "sec-tickers.json");
@@ -52,6 +61,9 @@ let refreshQueue = Promise.resolve();
 let backgroundRefreshStarted = false;
 let lastBackgroundRefreshAt = 0;
 const fetchAttempts = new Map();
+const summaryAttempts = new Map();
+const summaryMemoryCache = new Map();
+const summaryTasks = new Map();
 const tickerContentCache = new Map();
 const allowedStaticFiles = new Set([
   "index.html",
@@ -240,6 +252,17 @@ function allowCompanyFetch(request) {
   if (recent.length >= 5) return false;
   recent.push(now);
   fetchAttempts.set(ip, recent);
+  return true;
+}
+
+function allowSummaryGeneration(request) {
+  const ip = clientIp(request);
+  const now = Date.now();
+  const windowMs = 60 * 60 * 1000;
+  const recent = (summaryAttempts.get(ip) || []).filter((timestamp) => now - timestamp < windowMs);
+  if (recent.length >= 5) return false;
+  recent.push(now);
+  summaryAttempts.set(ip, recent);
   return true;
 }
 
@@ -487,6 +510,87 @@ async function readDashboardData() {
   return readFile(dashboardPath, "utf8").then(JSON.parse);
 }
 
+function summaryCacheKey(filing) {
+  return `${filing.ticker}:${filing.accessionNumber}:${reportSummaryPromptVersion}`;
+}
+
+async function loadSharedFilingSummary(filing) {
+  const key = summaryCacheKey(filing);
+  if (isDatabaseConfigured()) {
+    return loadFilingSummary(filing.ticker, filing.accessionNumber, reportSummaryPromptVersion);
+  }
+  return summaryMemoryCache.get(key) || null;
+}
+
+async function saveSharedFilingSummary(record) {
+  if (isDatabaseConfigured()) return saveFilingSummary(record);
+  summaryMemoryCache.set(summaryCacheKey(record), record);
+  return true;
+}
+
+async function quarterlySummaryContext(ticker) {
+  const normalized = ticker.toUpperCase();
+  const dashboard = await readDashboardData();
+  const company = dashboard.companies?.[normalized];
+  if (!company) throw new Error(`Ticker ${normalized} is not currently tracked`);
+  const filing = await resolveQuarterlyFiling(company, { secIdentity });
+  if (!filing) return { company, filing: null, cached: null };
+  return { company, filing, cached: await loadSharedFilingSummary(filing) };
+}
+
+async function quarterlySummaryStatus(ticker) {
+  const { filing, cached } = await quarterlySummaryContext(ticker);
+  if (!filing) {
+    return {
+      status: "unavailable",
+      llmConfigured: Boolean(openaiApiKey),
+      message: "No quarterly SEC filing is available for this ticker.",
+    };
+  }
+  return {
+    status: cached ? "cached" : "missing",
+    llmConfigured: Boolean(openaiApiKey),
+    filing,
+    record: cached,
+  };
+}
+
+async function createQuarterlySummary(ticker) {
+  const { company, filing, cached } = await quarterlySummaryContext(ticker);
+  if (!filing) throw new Error("No quarterly SEC filing is available for this ticker.");
+  if (cached) return { status: "cached", llmConfigured: Boolean(openaiApiKey), filing, record: cached };
+  if (!openaiApiKey) throw new Error("OPENAI_API_KEY is not configured");
+  const key = summaryCacheKey(filing);
+  if (!summaryTasks.has(key)) {
+    const task = (async () => {
+      const existing = await loadSharedFilingSummary(filing);
+      if (existing) return existing;
+      const generated = await generateQuarterlySummary(company, filing, {
+        openaiKey: openaiApiKey,
+        model: openaiSummaryModel,
+        secIdentity,
+      });
+      const record = {
+        ticker: filing.ticker,
+        accessionNumber: filing.accessionNumber,
+        promptVersion: reportSummaryPromptVersion,
+        reportPeriod: filing.fiscalPeriod || filing.reportDate,
+        filedAt: filing.filed,
+        sourceUrl: filing.sourceUrl,
+        sourceHash: generated.sourceHash,
+        model: generated.model,
+        summary: generated.payload,
+        createdAt: new Date().toISOString(),
+      };
+      await saveSharedFilingSummary(record);
+      return record;
+    })().finally(() => summaryTasks.delete(key));
+    summaryTasks.set(key, task);
+  }
+  const record = await summaryTasks.get(key);
+  return { status: "generated", llmConfigured: true, filing, record };
+}
+
 async function readWatchlistData() {
   if (isProductionRuntime()) return loadWatchlistItems();
   const fileWatchlist = await readFile(watchlistPath, "utf8").then(JSON.parse);
@@ -707,7 +811,8 @@ const server = createServer(async (request, response) => {
 
     if (request.method === "GET" && url.pathname === "/auth/supabase/google/start") {
       if (!supabaseAuthConfigured()) {
-        json(response, 503, { error: "Supabase Auth is not configured." });
+        const message = encodeURIComponent("Google sign-in is not configured yet. Add the Supabase environment variables in Render.");
+        redirect(response, `/?signin_error=${message}`);
         return;
       }
       const redirectTo = `${publicOrigin(request)}/`;
@@ -733,6 +838,10 @@ const server = createServer(async (request, response) => {
     }
 
     if (request.method === "POST" && url.pathname === "/api/session") {
+      if (isProductionRuntime()) {
+        json(response, 503, { error: "Verified sign-in is not configured. Add Supabase Auth in Render." });
+        return;
+      }
       const body = await readJsonBody(request);
       const email = String(body.email || "").trim().toLowerCase();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -867,6 +976,30 @@ const server = createServer(async (request, response) => {
 
     if (request.method === "GET" && url.pathname === "/api/dashboard") {
       json(response, 200, await readDashboardData());
+      return;
+    }
+
+    const summaryMatch = url.pathname.match(/^\/api\/quarter-summary\/([A-Z0-9.-]+)$/i);
+    if (request.method === "GET" && summaryMatch) {
+      json(response, 200, await quarterlySummaryStatus(summaryMatch[1]));
+      return;
+    }
+
+    if (request.method === "POST" && summaryMatch) {
+      const current = await quarterlySummaryStatus(summaryMatch[1]);
+      if (current.status === "cached") {
+        json(response, 200, current);
+        return;
+      }
+      if (!current.llmConfigured) {
+        json(response, 503, { ...current, error: "Quarterly AI summaries are not configured yet." });
+        return;
+      }
+      if (!allowSummaryGeneration(request)) {
+        json(response, 429, { error: "Too many summary requests. Try again later." });
+        return;
+      }
+      json(response, 200, await createQuarterlySummary(summaryMatch[1]));
       return;
     }
 

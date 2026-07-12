@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260711-ux-1" />
+    <link rel="stylesheet" href="styles.css?v=20260712-summary-1" />
   </head>
   <body>
     <div class="app-shell">
@@ -90,11 +90,11 @@
                   <strong id="account-title">Save your research</strong>
                   <span id="account-status">Local browser mode</span>
                 </div>
-                <a class="oauth-button" id="google-signin" href="/auth/supabase/google/start">
+                <a class="oauth-button" id="google-signin" href="/auth/supabase/google/start" hidden>
                   <span>G</span>
                   Continue with Google
                 </a>
-                <form id="signin-form">
+                <form id="signin-form" hidden>
                   <input id="signin-email" type="email" placeholder="Email" autocomplete="email" />
                   <input id="signin-code" type="password" placeholder="Invite code" autocomplete="one-time-code" hidden />
                   <button type="submit">Send magic link</button>
@@ -269,6 +269,20 @@
             <div class="detail-grid" id="detail-grid"></div>
           </section>
 
+          <section class="card quarterly-summary-card" id="quarter-summary-card" hidden>
+            <div class="card-heading">
+              <div>
+                <span class="section-label">AI filing review</span>
+                <h2>Latest quarter summary</h2>
+              </div>
+              <div class="quarter-summary-actions">
+                <span class="as-of" id="quarter-summary-status"></span>
+                <button class="text-button" id="generate-quarter-summary" hidden>Summarize latest quarter</button>
+              </div>
+            </div>
+            <div id="quarter-summary-content" aria-live="polite"></div>
+          </section>
+
           <section class="card financial-metrics-card" id="financial-metrics-card">
             <div class="card-heading">
               <div>
@@ -390,6 +404,6 @@
         </footer>
       </main>
     </div>
-    <script src="app.js?v=20260711-ux-1"></script>
+    <script src="app.js?v=20260712-summary-1"></script>
   </body>
 </html>

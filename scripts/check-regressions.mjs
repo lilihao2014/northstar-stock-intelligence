@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { estimateSeries } from "./estimate-utils.mjs";
 
-const [app, html, styles, refresh, server, db, ensureDeps, render, packageJson, dashboard, quoteTests] = await Promise.all([
+const [app, html, styles, refresh, server, db, ensureDeps, render, packageJson, dashboard, quoteTests, reportSummary] = await Promise.all([
   readFile(new URL("../app.js", import.meta.url), "utf8"),
   readFile(new URL("../index.html", import.meta.url), "utf8"),
   readFile(new URL("../styles.css", import.meta.url), "utf8"),
@@ -13,6 +13,7 @@ const [app, html, styles, refresh, server, db, ensureDeps, render, packageJson, 
   readFile(new URL("../package.json", import.meta.url), "utf8"),
   readFile(new URL("../data/dashboard.json", import.meta.url), "utf8"),
   readFile(new URL("../tests/quote-freshness.test.mjs", import.meta.url), "utf8"),
+  readFile(new URL("./report-summary.mjs", import.meta.url), "utf8"),
 ]);
 
 const failures = [];
@@ -63,8 +64,8 @@ requireContract(styles.includes(".metric-axis-explainer"), "Metric axis explanat
 requireContract(app.includes('axisFormat: "eps"'), "EPS histories must retain numeric per-share changes for charting");
 requireContract(app.includes('const step = period === "quarterly" ? 4 : 1'), "Quarterly EPS charts must compare against the prior-year quarter");
 requireContract(!html.includes("Playfair") && !styles.includes("Playfair"), "Product shell must not use decorative serif typography");
-requireContract(html.includes("styles.css?v=20260711-ux-1"), "Stylesheet cache key must be bumped for the latest interaction refresh");
-requireContract(html.includes("app.js?v=20260711-ux-1"), "Application cache key must be bumped for the latest interaction refresh");
+requireContract(html.includes("styles.css?v=20260712-summary-1"), "Stylesheet cache key must be bumped for the latest interaction refresh");
+requireContract(html.includes("app.js?v=20260712-summary-1"), "Application cache key must be bumped for the latest interaction refresh");
 requireContract(!html.includes("Figures are illustrative demo data"), "Production footer must not describe all figures as demo data");
 requireContract(styles.includes("--cream: #f5f7fa") && styles.includes("--card: #ffffff") && styles.includes("--line: #d8dee6"), "Industry design palette tokens are missing");
 requireContract(styles.includes("--shadow: 0 1px 2px rgba(15, 23, 42, 0.06)"), "Card shadow must remain subtle for the research-dashboard design");
@@ -104,6 +105,8 @@ requireContract(db.includes("create table if not exists users"), "Postgres schem
 requireContract(db.includes("create table if not exists user_watchlist_items"), "Postgres schema must include per-user watchlists");
 requireContract(db.includes("create table if not exists user_preferences"), "Postgres schema must include per-user preferences");
 requireContract(db.includes("create table if not exists refresh_jobs"), "Postgres schema must include refresh job tracking");
+requireContract(db.includes("create table if not exists filing_summaries"), "Postgres schema must include shared filing summaries");
+requireContract(db.includes("loadFilingSummary") && db.includes("saveFilingSummary"), "Shared filing summary persistence helpers are missing");
 requireContract(db.includes("process.env.DATABASE_URL"), "Postgres support must be gated by DATABASE_URL");
 requireContract(db.includes("process.env.NODE_ENV === \"production\""), "Production runtime detection must be centralized");
 requireContract(db.includes("upsertUser") && db.includes("saveUserWatchlistItems") && db.includes("saveUserPreference"), "User-scoped persistence helpers are missing");
@@ -116,6 +119,7 @@ requireContract(ensureDeps.includes('await import("pg")') && ensureDeps.includes
 requireContract(render.includes("fromDatabase:"), "Render Blueprint must inject DATABASE_URL from the managed database");
 requireContract(render.includes("NODE_ENV") && render.includes("production"), "Render must run with production storage rules enabled");
 requireContract(render.includes("AUTH_SECRET") && render.includes("SUPABASE_URL") && render.includes("SUPABASE_ANON_KEY") && render.includes("NORTHSTAR_INVITE_CODE"), "Render must reserve production end-user auth environment variables");
+requireContract(render.includes("OPENAI_API_KEY") && render.includes("OPENAI_SUMMARY_MODEL"), "Render must reserve quarterly summary model environment variables");
 requireContract(render.includes("npm install && npm run check"), "Render build must install runtime dependencies before checking");
 
 requireContract(server.includes('url.pathname === "/api/session"'), "Server must expose session endpoints");
@@ -138,6 +142,9 @@ requireContract(styles.includes(".account-panel") && styles.includes(".oauth-but
 requireContract(html.includes('class="avatar signed-out"') && !html.includes('id="account-button" aria-expanded="false" aria-controls="account-panel">LH</button>'), "Logged-out account control must not show personal initials");
 requireContract(app.includes('button.classList.remove("signed-out")') && app.includes('button.classList.add("signed-out")') && app.includes('button.textContent = tr("Sign in")'), "Account button must show initials only after sign-in");
 requireContract(styles.includes(".avatar.signed-out"), "Signed-out account button styling is missing");
+requireContract(html.includes('id="google-signin"') && /id="google-signin"[^>]*hidden/.test(html), "Google sign-in must be hidden until backend configuration is confirmed");
+requireContract(html.includes('id="signin-form" hidden') && app.includes("form.hidden = !supabaseAuthConfigured"), "Email magic-link form must be hidden when Supabase is not configured");
+requireContract(server.includes("if (isProductionRuntime())") && server.includes("Verified sign-in is not configured"), "Production must not accept unverified direct-email sessions");
 requireContract(html.includes("Good morning.</h1>") && app.includes("function renderGreeting()") && !html.includes("Lihao"), "Signed-out greeting must not expose a hardcoded user name");
 requireContract(app.includes('title.textContent = tr("Save your research")') && app.includes("Sign in to sync your watchlist and dashboard settings."), "Signed-out account copy must explain the value of signing in");
 requireContract(app.includes("Looking for ticker and company matches."), "Search loading state must describe the active lookup");
@@ -147,6 +154,16 @@ requireContract(app.includes("const quoteIsDisplayable") && app.includes('includ
 requireContract(/@media \(max-width: 760px\)[\s\S]*?\.watchlist-row \{[\s\S]*?width: auto;[\s\S]*?flex: 0 0 126px;/.test(styles), "Mobile watchlist rows must not force horizontal page overflow");
 requireContract(app.includes('const selectedPeriodStorageKey = "northstar-selected-period"') && app.includes("localStorage.setItem(selectedPeriodStorageKey, selectedPeriod)") && app.includes("syncPeriodControl()"), "Annual/Quarterly selection must persist locally and update the segmented control");
 requireContract(app.includes("validReportingPeriod(payload.selectedPeriod)") && server.includes("selectedPeriod: await loadUserPreference") && server.includes('saveUserPreference(session.userKey, "selectedPeriod"'), "Annual/Quarterly selection must sync through signed-in preferences");
+
+requireContract(html.includes('id="quarter-summary-card"') && html.includes('id="generate-quarter-summary"'), "Quarterly AI summary card is missing");
+requireContract(app.includes('card.hidden = selectedPeriod !== "quarterly"'), "AI filing summary must appear only in Quarterly mode");
+requireContract(app.includes("renderQuarterSummary(companies[selectedTicker])") && app.includes("generateQuarterSummary"), "Quarterly summary selection and generation flows are missing");
+requireContract(app.includes("function quarterSummaryClientKey(company)") && app.includes("filing?.accessionNumber"), "Client summary cache must recheck when the filing accession changes");
+requireContract(server.includes("api\\/quarter-summary") && server.includes("quarterlySummaryStatus") && server.includes("createQuarterlySummary"), "Quarterly filing summary API routes are missing");
+requireContract(server.includes("summaryTasks") && server.includes("loadSharedFilingSummary") && server.includes("status: \"cached\""), "Concurrent summary generation must reuse the shared filing cache");
+requireContract(reportSummary.includes("reportSummaryPromptVersion") && reportSummary.includes("accessionNumber") && reportSummary.includes("json_schema"), "Filing summary generation must use accession-keyed structured output");
+requireContract(reportSummary.includes("Use only the supplied SEC filing") && reportSummary.includes("Never invent values"), "Filing summary prompt must constrain unsupported claims");
+requireContract(styles.includes(".quarter-summary-grid") && styles.includes(".quarter-summary-footer"), "Quarterly summary presentation styles are missing");
 
 requireContract(html.includes('id="manage-metrics"'), "Dashboard-wide metric manager is missing");
 requireContract(/metric-visibility-card[\s\S]*id="period-control"/.test(html), "Annual/Quarterly control must live in the top-level metric controls");

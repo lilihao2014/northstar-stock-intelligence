@@ -1,6 +1,6 @@
 # Northstar Stock Intelligence
 
-A responsive, dependency-free stock analysis dashboard covering:
+A responsive stock analysis dashboard covering:
 
 - Revenue and EPS growth
 - Profitability, valuation, and quality metrics
@@ -11,7 +11,7 @@ A responsive, dependency-free stock analysis dashboard covering:
 
 ## Refresh real data
 
-Northstar uses a local refresh script instead of a backend server:
+Northstar uses a server-side refresh pipeline that can also run from the command line during local development:
 
 - SEC Company Facts supplies reported revenue, EPS, margins, cash flow, debt, and equity.
 - Alpha Vantage supplies company quotes, market capitalization, profile data, P/E, analyst estimates, broad-market ETF proxies, and sector ETF quotes.
@@ -57,6 +57,8 @@ Common financial indicators are calculated consistently for every ticker from st
 
 Historical observations are retained and displayed alongside the latest value for SEC-derived summary, financial, and company-specific metrics. The Annual/Quarterly selector changes both the revenue/EPS chart and the corresponding historical growth and margin series. Provider-only point-in-time metrics such as forward P/E remain current-only when no historical feed is available.
 
+In Quarterly mode, Northstar can summarize the latest SEC 10-Q with an LLM. The server fetches the filing directly from SEC EDGAR, requests a bilingual structured summary, and stores one shared result in Postgres for the ticker, accession number, and prompt version. All users reuse that row until the company files a new quarterly report, so opening the same report does not create another model call. Set `OPENAI_API_KEY` on the server and optionally override `OPENAI_SUMMARY_MODEL` (default `gpt-5-mini`). The browser never receives the API key.
+
 All quarterly periods use fiscal labels such as `FY26 Q2`, calculated from each company's SEC-reported fiscal-year-end anchor. Calendar month-year labels are not used for quarterly results or forecasts.
 
 Metric histories include compact visualizations as well as exact period values: trend and ratio metrics use line charts, while cash flow, expenditure, and other monetary series use positive/negative bar charts. The Watchlist header keeps a permanent `+` control that focuses ticker search for adding another company.
@@ -94,7 +96,7 @@ Northstar can run from committed JSON files for local development and first-time
 - `npm run refresh` writes the Postgres dashboard snapshot in production and only writes `data/dashboard.json` outside production.
 - Adding a ticker through `/api/companies/:ticker` stores the watchlist item, refreshed company snapshot, refresh job status, and full dashboard snapshot in Postgres.
 - Production ticker refresh reads the watchlist from Postgres instead of `config/watchlist.json`.
-- Browser-only metric visibility preferences remain local for now; the `metric_preferences` table is reserved for moving those preferences server-side with user accounts.
+- Signed-in watchlists, metric visibility, display preferences, and reporting-period selection are stored per user in Postgres; unsigned users retain a browser-local fallback.
 
 To initialize a local or Render database from the committed cache:
 
@@ -126,8 +128,8 @@ Set these Render environment variables:
 - `AUTH_SECRET`: long random string used to sign the HttpOnly session cookie.
 - `SUPABASE_URL`: your Supabase project URL.
 - `SUPABASE_ANON_KEY`: your Supabase anon/public key.
-- `GITHUB_CLIENT_ID`: optional developer GitHub OAuth app client ID.
-- `GITHUB_CLIENT_SECRET`: optional developer GitHub OAuth app client secret.
+- `OPENAI_API_KEY`: server-only key used to generate a missing quarterly filing summary.
+- `OPENAI_SUMMARY_MODEL`: optional summary model override; defaults to `gpt-5-mini`.
 - `NORTHSTAR_INVITE_CODE`: optional private invite code while the site is not public.
 
 Signed-in user data is stored in `users`, `user_watchlist_items`, and `user_preferences`. Unsigned users can still use local browser mode, but production personalization should use sign-in.
@@ -135,22 +137,16 @@ Signed-in user data is stored in `users`, `user_watchlist_items`, and `user_pref
 In Supabase:
 
 1. Create a Supabase project.
-2. Enable Google under **Authentication -> Providers**.
-3. Add these Site/Redirect URLs under **Authentication -> URL Configuration**:
+2. In Google Auth Platform, create a **Web application** OAuth client. Add your Supabase callback URL shown on the Supabase Google provider page, normally `https://<project-ref>.supabase.co/auth/v1/callback`, as an authorized redirect URI.
+3. Enable Google under **Authentication -> Providers** and enter the Google client ID and secret.
+4. Add these Site/Redirect URLs under **Authentication -> URL Configuration**:
    - `https://northstar-stock-intelligence.onrender.com`
    - `https://northstar-stock-intelligence.onrender.com/`
    - `https://northstar-stock-intelligence.com`
    - `https://northstar-stock-intelligence.com/`
-4. Copy the project URL and anon key into Render.
+5. Copy the project URL and anon/publishable key into Render as `SUPABASE_URL` and `SUPABASE_ANON_KEY`, then redeploy the web service.
 
-Optional developer GitHub OAuth remains available as a secondary sign-in. Create the GitHub OAuth app at GitHub.com under **Settings -> Developer settings -> OAuth Apps**. Use:
-
-- Homepage URL: `https://northstar-stock-intelligence.onrender.com`
-- Authorization callback URL: `https://northstar-stock-intelligence.onrender.com/auth/github/callback`
-
-After the custom domain is verified, create or update the OAuth callback to:
-
-`https://northstar-stock-intelligence.com/auth/github/callback`
+Until both Supabase variables are present, Northstar keeps Google and magic-link controls hidden and explains that sign-in setup is required. The dashboard remains available in local-browser mode; production never treats an unverified email address as an authenticated account.
 
 ### Custom domain
 

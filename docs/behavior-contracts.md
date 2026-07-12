@@ -88,6 +88,22 @@ Acceptance check: hide one metric from each of the summary, financial, and compa
 
 - Logged-out users see a neutral `Sign in` action, not a personal name or initials.
 - User initials are shown only after the backend confirms an authenticated session.
+- Google and email magic-link controls remain hidden until `/api/session` confirms that Supabase is configured.
+- Missing Supabase configuration produces a setup message in the account panel instead of navigating to a raw JSON error.
+- Production must never create an authenticated session from an unverified email-only POST.
+
+## Quarterly filing summaries
+
+- The AI filing review appears only when the top-level reporting period is Quarterly.
+- The summary source is the latest SEC 10-Q (or 10-Q/A), resolved by accession number and linked from the rendered result.
+- Generated output contains bilingual English/Simplified Chinese headline, overview, key items, watch items, evidence, and limitations.
+- The prompt instructs the model to use only the supplied filing and structured facts and never invent values, guidance, claims, or risks.
+- Postgres stores one shared summary per ticker, accession number, and prompt version. The cache is global across users, not duplicated in user tables.
+- GET requests read the shared cache. POST generation checks the cache again and deduplicates concurrent requests before calling the model.
+- The same accession reuses the existing summary. A new quarterly filing accession is the normal invalidation event.
+- Production summary generation requires server-only `OPENAI_API_KEY`; the key is never returned to the browser.
+- When the model key or quarterly filing is unavailable, the UI states that honestly and does not fabricate a summary.
+- Every rendered summary is labeled AI-generated and tells users to verify important details against the linked SEC filing.
 
 ## Ticker news and social content
 
